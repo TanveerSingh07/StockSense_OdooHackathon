@@ -180,14 +180,14 @@ export function ProductFormSlideOver({
       />
 
       <div className="fixed inset-y-0 right-0 flex max-w-full pl-10">
-        <div className="w-screen max-w-md bg-[#161B22] text-[#F0F6FC] shadow-2xl border-l border-white/[0.08] flex flex-col justify-between">
+        <div className="w-screen max-w-md bg-[#131b2e] text-[#dae2fd] shadow-2xl border-l border-[#2d3449]/70 flex flex-col justify-between">
           {/* Header */}
-          <div className="px-6 py-5 border-b border-white/[0.08] flex items-center justify-between bg-[#161B22]">
+          <div className="px-6 py-5 border-b border-[#2d3449]/70 flex items-center justify-between bg-[#131b2e]">
             <div>
-              <h2 className="text-base font-semibold text-white tracking-tight">
+              <h2 className="text-base font-semibold text-[#dae2fd] tracking-tight">
                 {productToEdit ? "Edit Product" : "Add New Product"}
               </h2>
-              <p className="text-xs text-slate-400 mt-0.5">
+              <p className="text-xs text-[#94a3b8] mt-0.5">
                 {productToEdit
                   ? "Update product metadata and reorder threshold"
                   : "Register a new SKU in your catalog"}
@@ -195,7 +195,7 @@ export function ProductFormSlideOver({
             </div>
             <button
               onClick={onClose}
-              className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/[0.06] transition-colors focus:outline-none"
+              className="p-1.5 rounded-lg text-[#94a3b8] hover:text-[#dae2fd] hover:bg-[#222a3d] transition-colors focus:outline-none"
             >
               <X className="h-4 w-4" />
             </button>
@@ -211,7 +211,7 @@ export function ProductFormSlideOver({
 
             {/* Product Name */}
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1.5">
+              <label className="block text-xs font-medium text-[#b4c6d4] mb-1.5">
                 Product Name <span className="text-red-400">*</span>
               </label>
               <input
@@ -220,8 +220,8 @@ export function ProductFormSlideOver({
                 placeholder="e.g. Wireless Barcode Scanner"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className={`w-full px-3 py-2 text-sm bg-[#0D1117] border rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-colors ${
-                  fieldErrors.name ? "border-red-500" : "border-white/[0.08]"
+                className={`w-full px-3 py-2 text-sm bg-[#0b1326] border rounded-lg text-[#dae2fd] placeholder-[#6b7280] focus:outline-none focus:ring-2 focus:ring-[#ffc174]/20 focus:border-[#ffc174] transition-colors ${
+                  fieldErrors.name ? "border-red-500" : "border-[#2d3449]/70"
                 }`}
               />
               {fieldErrors.name && (
@@ -231,7 +231,7 @@ export function ProductFormSlideOver({
 
             {/* SKU */}
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1.5">
+              <label className="block text-xs font-medium text-[#b4c6d4] mb-1.5">
                 SKU / Barcode <span className="text-red-400">*</span>
               </label>
               <input
@@ -239,8 +239,8 @@ export function ProductFormSlideOver({
                 placeholder="e.g. ELEC-SCN-001"
                 value={sku}
                 onChange={(e) => setSku(e.target.value)}
-                className={`w-full px-3 py-2 text-sm font-mono bg-[#0D1117] border rounded-lg text-white placeholder-slate-500 uppercase focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-colors ${
-                  fieldErrors.sku ? "border-red-500" : "border-white/[0.08]"
+                className={`w-full px-3 py-2 text-sm font-mono bg-[#0b1326] border rounded-lg text-[#dae2fd] placeholder-[#6b7280] uppercase focus:outline-none focus:ring-2 focus:ring-[#ffc174]/20 focus:border-[#ffc174] transition-colors ${
+                  fieldErrors.sku ? "border-red-500" : "border-[#2d3449]/70"
                 }`}
               />
               {fieldErrors.sku && (
@@ -251,13 +251,13 @@ export function ProductFormSlideOver({
             {/* Category */}
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <label className="block text-xs font-medium text-slate-300">
+                <label className="block text-xs font-medium text-[#b4c6d4]">
                   Category <span className="text-red-400">*</span>
                 </label>
                 <button
                   type="button"
                   onClick={() => setIsAddingNewCategory(!isAddingNewCategory)}
-                  className="text-xs text-emerald-400 hover:text-emerald-300 flex items-center gap-1 font-medium"
+                  className="text-xs text-[#ffc174] hover:text-[#ffd49d] flex items-center gap-1 font-medium"
                 >
                   <FolderPlus className="h-3.5 w-3.5" />
                   {isAddingNewCategory ? "Choose existing" : "+ New Category"}
@@ -270,21 +270,21 @@ export function ProductFormSlideOver({
                   placeholder="Enter new category name..."
                   value={newCategoryName}
                   onChange={(e) => setNewCategoryName(e.target.value)}
-                  className={`w-full px-3 py-2 text-sm bg-[#0D1117] border rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-colors ${
-                    fieldErrors.category ? "border-red-500" : "border-white/[0.08]"
+                  className={`w-full px-3 py-2 text-sm bg-[#0b1326] border rounded-lg text-[#dae2fd] placeholder-[#6b7280] focus:outline-none focus:ring-2 focus:ring-[#ffc174]/20 focus:border-[#ffc174] transition-colors ${
+                    fieldErrors.category ? "border-red-500" : "border-[#2d3449]/70"
                   }`}
                 />
               ) : (
                 <select
                   value={categoryId}
                   onChange={(e) => setCategoryId(e.target.value)}
-                  className={`w-full px-3 py-2 text-sm bg-[#0D1117] border rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-colors ${
-                    fieldErrors.category ? "border-red-500" : "border-white/[0.08]"
+                  className={`w-full px-3 py-2 text-sm bg-[#0b1326] border rounded-lg text-[#dae2fd] focus:outline-none focus:ring-2 focus:ring-[#ffc174]/20 focus:border-[#ffc174] transition-colors ${
+                    fieldErrors.category ? "border-red-500" : "border-[#2d3449]/70"
                   }`}
                 >
                   <option value="" disabled>Select category...</option>
                   {categories.map((c) => (
-                    <option key={c.id} value={c.id} className="bg-[#161B22] text-white">
+                    <option key={c.id} value={c.id} className="bg-[#131b2e] text-[#dae2fd]">
                       {c.name}
                     </option>
                   ))}
@@ -298,7 +298,7 @@ export function ProductFormSlideOver({
             {/* Unit & Reorder Point Row */}
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-medium text-slate-300 mb-1.5">
+                <label className="block text-xs font-medium text-[#b4c6d4] mb-1.5">
                   Unit of Measure
                 </label>
                 <input
@@ -306,12 +306,12 @@ export function ProductFormSlideOver({
                   placeholder="e.g. Units, Boxes"
                   value={unit}
                   onChange={(e) => setUnit(e.target.value)}
-                  className="w-full px-3 py-2 text-sm bg-[#0D1117] border border-white/[0.08] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-colors"
+                  className="w-full px-3 py-2 text-sm bg-[#0b1326] border border-[#2d3449]/70 rounded-lg text-[#dae2fd] focus:outline-none focus:ring-2 focus:ring-[#ffc174]/20 focus:border-[#ffc174] transition-colors"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-slate-300 mb-1.5">
+                <label className="block text-xs font-medium text-[#b4c6d4] mb-1.5">
                   Reorder Threshold
                 </label>
                 <input
@@ -320,7 +320,7 @@ export function ProductFormSlideOver({
                   placeholder="10"
                   value={reorderPoint}
                   onChange={(e) => setReorderPoint(e.target.value)}
-                  className="w-full px-3 py-2 text-sm font-mono bg-[#0D1117] border border-white/[0.08] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-colors"
+                  className="w-full px-3 py-2 text-sm font-mono bg-[#0b1326] border border-[#2d3449]/70 rounded-lg text-[#dae2fd] focus:outline-none focus:ring-2 focus:ring-[#ffc174]/20 focus:border-[#ffc174] transition-colors"
                 />
               </div>
             </div>
@@ -328,7 +328,7 @@ export function ProductFormSlideOver({
             {/* Initial Stock (Only for new products) */}
             {!productToEdit && (
               <div>
-                <label className="block text-xs font-medium text-slate-300 mb-1.5">
+                <label className="block text-xs font-medium text-[#b4c6d4] mb-1.5">
                   Initial Starting Stock
                 </label>
                 <input
@@ -337,9 +337,9 @@ export function ProductFormSlideOver({
                   placeholder="0"
                   value={initialStock}
                   onChange={(e) => setInitialStock(e.target.value)}
-                  className="w-full px-3 py-2 text-sm font-mono bg-[#0D1117] border border-white/[0.08] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-colors"
+                  className="w-full px-3 py-2 text-sm font-mono bg-[#0b1326] border border-[#2d3449]/70 rounded-lg text-[#dae2fd] focus:outline-none focus:ring-2 focus:ring-[#ffc174]/20 focus:border-[#ffc174] transition-colors"
                 />
-                <p className="mt-1 text-[11px] text-slate-400">
+                <p className="mt-1 text-[11px] text-[#94a3b8]">
                   Sets the starting quantity in the Main Warehouse.
                 </p>
               </div>
@@ -347,11 +347,11 @@ export function ProductFormSlideOver({
           </form>
 
           {/* Footer Actions */}
-          <div className="p-4 px-6 border-t border-white/[0.08] bg-[#161B22] flex items-center justify-end gap-3">
+          <div className="p-4 px-6 border-t border-[#2d3449]/70 bg-[#131b2e] flex items-center justify-end gap-3">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-xs font-medium text-slate-300 hover:text-white bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] rounded-lg transition-colors cursor-pointer"
+              className="px-4 py-2 text-xs font-medium text-[#b4c6d4] hover:text-[#dae2fd] bg-[#131b2e] hover:bg-[#222a3d] border border-[#2d3449]/70 rounded-lg transition-colors cursor-pointer"
             >
               Cancel
             </button>
@@ -359,7 +359,7 @@ export function ProductFormSlideOver({
               type="submit"
               form="product-form"
               disabled={loading}
-              className="px-4 py-2 text-xs font-medium bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg shadow-sm shadow-emerald-600/30 transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+              className="px-4 py-2 text-xs font-medium bg-[#ffc174] hover:bg-[#f59e0b] text-[#090D16] rounded-lg shadow-sm shadow-[#ffc174]/20 transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
             >
               {loading ? (
                 <span>Saving...</span>

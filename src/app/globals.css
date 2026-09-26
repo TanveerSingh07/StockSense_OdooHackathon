@@ -16,20 +16,23 @@
 }
 
 :root {
-  --bg: #0D1117;
-  --sidebar-bg: #090C10;
-  --surface: #161B22;
-  --surface-raised: #1F242C;
-  --border: rgba(255, 255, 255, 0.08);
-  --border-focus: rgba(16, 185, 129, 0.5);
-  --text: #F0F6FC;
-  --text-muted: #8B949E;
-  --primary: #10B981;
-  --primary-hover: #059669;
-  --accent: #10B981;
-  --danger: #EF4444;
-  --warning: #F59E0B;
-  --success: #10B981;
+  /* Stitch "Tactical Slate" palette */
+  --bg:             #0b1326;
+  --sidebar-bg:     #060e20;
+  --surface:        #131b2e;
+  --surface-raised: #171f33;
+  --surface-high:   #222a3d;
+  --border:         rgba(45, 52, 73, 0.7);
+  --border-focus:   rgba(255, 193, 116, 0.5);
+  --text:           #dae2fd;
+  --text-muted:     #94a3b8;
+  --primary:        #ffc174;
+  --primary-hover:  #f59e0b;
+  --secondary:      #93ccff;
+  --accent:         #ffc174;
+  --danger:         #ffb4ab;
+  --warning:        #ffc174;
+  --success:        #10b981;
 }
 
 @layer base {
@@ -37,11 +40,11 @@
     border-color: var(--border);
   }
   body {
-    background-color: #0D1117;
-    color: #F0F6FC;
+    background-color: #0b1326;
+    color: #dae2fd;
     font-family: var(--font-sans);
     min-height: 100vh;
-    background-image: radial-gradient(circle at 50% 0%, rgba(16, 185, 129, 0.04) 0%, transparent 60%);
+    background-image: radial-gradient(circle at 50% 0%, rgba(255, 193, 116, 0.05) 0%, transparent 60%);
     background-attachment: fixed;
   }
 }
@@ -55,9 +58,9 @@
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(45, 52, 73, 0.8);
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(45, 52, 73, 1);
 }

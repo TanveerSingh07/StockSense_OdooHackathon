@@ -13,6 +13,35 @@ export const authOptions: NextAuthOptions = {
     signIn: "/login",
   },
 
+  cookies: {
+    sessionToken: {
+      name: "next-auth.session-token",
+      options: {
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        secure: process.env.NODE_ENV === "production" || !!process.env.NEXTAUTH_URL?.startsWith("https"),
+      },
+    },
+    callbackUrl: {
+      name: "next-auth.callback-url",
+      options: {
+        sameSite: "lax",
+        path: "/",
+        secure: process.env.NODE_ENV === "production" || !!process.env.NEXTAUTH_URL?.startsWith("https"),
+      },
+    },
+    csrfToken: {
+      name: "next-auth.csrf-token",
+      options: {
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        secure: process.env.NODE_ENV === "production" || !!process.env.NEXTAUTH_URL?.startsWith("https"),
+      },
+    },
+  },
+
   providers: [
     CredentialsProvider({
       name: "Credentials",

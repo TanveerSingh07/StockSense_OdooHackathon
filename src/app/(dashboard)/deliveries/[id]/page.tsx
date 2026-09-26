@@ -87,7 +87,7 @@ export default function DeliveryDetailPage() {
   };
 
   if (loading) {
-    return <div className="p-12 text-center text-slate-400 text-xs animate-pulse">Loading delivery details...</div>;
+    return <div className="p-12 text-center text-[#94a3b8] text-xs animate-pulse">Loading delivery details...</div>;
   }
 
   if (error && !delivery) {
@@ -110,12 +110,12 @@ export default function DeliveryDetailPage() {
   const hasDeficit = !isDone && delivery.hasInsufficientStock;
 
   return (
-    <div className="p-4 sm:p-8 max-w-4xl mx-auto space-y-6 text-[#F0F6FC]">
+    <div className="p-4 sm:p-8 max-w-4xl mx-auto space-y-6 text-[#dae2fd]">
       {/* Top Bar / Navigation */}
       <div className="flex justify-between items-center print:hidden">
         <Link
           href="/deliveries"
-          className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-400 hover:text-white transition-colors"
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#94a3b8] hover:text-[#dae2fd] transition-colors"
         >
           <ArrowLeft className="h-3.5 w-3.5" />
           <span>Back to Delivery Orders</span>
@@ -127,8 +127,8 @@ export default function DeliveryDetailPage() {
               disabled={validating || hasDeficit}
               className={`h-9 px-4 text-xs font-semibold transition-all ${
                 hasDeficit
-                  ? 'bg-slate-800 text-slate-500 border border-white/[0.08] cursor-not-allowed'
-                  : 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-sm shadow-emerald-600/30 cursor-pointer'
+                  ? 'bg-[#131b2e] text-[#94a3b8] border border-[#2d3449]/70 cursor-not-allowed'
+                  : 'bg-[#ffc174] hover:bg-[#f59e0b] text-[#090D16] shadow-sm shadow-[#ffc174]/20 cursor-pointer'
               }`}
               title={hasDeficit ? 'Cannot validate: Insufficient inventory stock' : 'Validate and deduct inventory stock'}
             >
@@ -140,16 +140,16 @@ export default function DeliveryDetailPage() {
             <Button
               onClick={handlePrint}
               variant="outline"
-              className="h-9 px-3.5 text-xs font-semibold bg-[#161B22] hover:bg-[#1F242C] border-white/[0.08] text-slate-200"
+              className="h-9 px-3.5 text-xs font-semibold bg-[#131b2e] hover:bg-[#171f33] border-[#2d3449]/70 text-[#dae2fd]"
             >
-              <Printer className="h-3.5 w-3.5 mr-1.5 text-slate-400" />
+              <Printer className="h-3.5 w-3.5 mr-1.5 text-[#94a3b8]" />
               <span>Print Delivery Note</span>
             </Button>
           )}
           <Link href="/deliveries">
             <Button
               variant="ghost"
-              className="h-9 px-3 text-xs text-slate-400 hover:text-white hover:bg-white/[0.04]"
+              className="h-9 px-3 text-xs text-[#94a3b8] hover:text-[#dae2fd] hover:bg-[#171f33]"
             >
               Close
             </Button>
@@ -158,31 +158,31 @@ export default function DeliveryDetailPage() {
       </div>
 
       {/* Main Document Card */}
-      <div className="bg-[#161B22] border border-white/[0.08] rounded-xl shadow-sm overflow-hidden p-6 sm:p-8 space-y-6">
+      <div className="bg-[#131b2e] border border-[#2d3449]/70 rounded-xl shadow-sm overflow-hidden p-6 sm:p-8 space-y-6">
         {/* Document Header & Status Bar */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-5 border-b border-white/[0.08]">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-5 border-b border-[#2d3449]/70">
           <div>
-            <span className="text-[11px] uppercase font-bold tracking-wider text-emerald-400">Outbound Dispatch</span>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-white font-mono mt-1">{delivery.reference}</h1>
+            <span className="text-[11px] uppercase font-bold tracking-wider text-[#ffc174]">Outbound Dispatch</span>
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-[#dae2fd] font-mono mt-1">{delivery.reference}</h1>
           </div>
 
           {/* Stepper (Draft > Waiting > Ready > Done) */}
-          <div className="flex items-center text-xs font-bold rounded-lg border border-white/[0.08] bg-[#0D1117] p-1.5 gap-2">
+          <div className="flex items-center text-xs font-bold rounded-lg border border-[#2d3449]/70 bg-[#0b1326] p-1.5 gap-2">
             <div
               className={`px-2.5 py-1 rounded-md ${
                 !isDone && hasDeficit
                   ? 'bg-red-500/15 text-red-400 border border-red-500/30'
                   : !isDone
                   ? 'bg-sky-500/15 text-sky-400 border border-sky-500/30'
-                  : 'text-slate-500'
+                  : 'text-[#94a3b8]'
               }`}
             >
               {hasDeficit ? '1. Waiting for Stock' : '1. Ready'}
             </div>
-            <span className="text-slate-600">→</span>
+            <span className="text-[#94a3b8]">→</span>
             <div
               className={`px-2.5 py-1 rounded-md ${
-                isDone ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30' : 'text-slate-500'
+                isDone ? 'bg-[#ffc174]/15 text-[#ffc174] border border-[#ffc174]/30' : 'text-[#94a3b8]'
               }`}
             >
               2. Done (Shipped)
@@ -196,7 +196,7 @@ export default function DeliveryDetailPage() {
             <AlertTriangle className="h-4 w-4 text-red-400 shrink-0 mt-0.5" />
             <div>
               <p className="font-semibold text-red-200">Inventory Deficit: Insufficient On-Hand Stock</p>
-              <p className="mt-1 text-slate-300">
+              <p className="mt-1 text-[#b4c6d4]">
                 One or more products on this pick list exceed available stock in warehouse <strong>{delivery.warehouseName}</strong>. You cannot validate and ship this order until stock is replenished via Inbound Receipts.
               </p>
             </div>
@@ -210,26 +210,26 @@ export default function DeliveryDetailPage() {
         )}
 
         {/* Metadata Details */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 bg-[#0D1117] p-5 rounded-xl border border-white/[0.08] text-xs">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 bg-[#0b1326] p-5 rounded-xl border border-[#2d3449]/70 text-xs">
           <div>
-            <div className="text-[11px] text-slate-400 font-medium uppercase tracking-wider">Customer / Address</div>
-            <div className="font-semibold text-white mt-1">{delivery.customer}</div>
+            <div className="text-[11px] text-[#94a3b8] font-medium uppercase tracking-wider">Customer / Address</div>
+            <div className="font-semibold text-[#dae2fd] mt-1">{delivery.customer}</div>
           </div>
           <div>
-            <div className="text-[11px] text-slate-400 font-medium uppercase tracking-wider">Warehouse</div>
-            <div className="font-semibold text-white mt-1">{delivery.warehouseName}</div>
+            <div className="text-[11px] text-[#94a3b8] font-medium uppercase tracking-wider">Warehouse</div>
+            <div className="font-semibold text-[#dae2fd] mt-1">{delivery.warehouseName}</div>
           </div>
           <div>
-            <div className="text-[11px] text-slate-400 font-medium uppercase tracking-wider">Responsible</div>
-            <div className="font-semibold text-slate-300 mt-1">Inventory Manager</div>
+            <div className="text-[11px] text-[#94a3b8] font-medium uppercase tracking-wider">Responsible</div>
+            <div className="font-semibold text-[#b4c6d4] mt-1">Inventory Manager</div>
           </div>
           <div>
-            <div className="text-[11px] text-slate-400 font-medium uppercase tracking-wider">Operational State</div>
+            <div className="text-[11px] text-[#94a3b8] font-medium uppercase tracking-wider">Operational State</div>
             <div className="mt-1">
               <span
                 className={`inline-block px-2 py-0.5 rounded text-[11px] font-bold ${
                   isDone
-                    ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
+                    ? 'bg-[#ffc174]/15 text-[#ffc174] border border-[#ffc174]/30'
                     : hasDeficit
                     ? 'bg-red-500/15 text-red-400 border border-red-500/30'
                     : 'bg-sky-500/15 text-sky-400 border border-sky-500/30'
@@ -243,11 +243,11 @@ export default function DeliveryDetailPage() {
 
         {/* Line Items Table */}
         <div className="space-y-3">
-          <h2 className="text-sm font-semibold text-white">Pick List & Reserved Quantities</h2>
-          <div className="border border-white/[0.08] rounded-xl overflow-hidden bg-[#0D1117]">
+          <h2 className="text-sm font-semibold text-[#dae2fd]">Pick List & Reserved Quantities</h2>
+          <div className="border border-[#2d3449]/70 rounded-xl overflow-hidden bg-[#0b1326]">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
-                <tr className="bg-white/[0.02] border-b border-white/[0.08] text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
+                <tr className="bg-[#131b2e]/60 border-b border-[#2d3449]/70 text-[11px] font-semibold text-[#94a3b8] uppercase tracking-wider">
                   <th className="p-3.5">SKU</th>
                   <th className="p-3.5">Product Name</th>
                   <th className="p-3.5 text-center">Unit</th>
@@ -256,24 +256,24 @@ export default function DeliveryDetailPage() {
                   <th className="p-3.5 text-center">Stock Check</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/[0.06]">
+              <tbody className="divide-y divide-[#2d3449]/50">
                 {delivery.lines.map((line, idx) => {
                   const isLineDeficit = !isDone && line.availableStock < line.quantity;
                   return (
                     <tr
                       key={idx}
-                      className={isLineDeficit ? 'bg-red-500/[0.06] hover:bg-red-500/[0.1]' : 'hover:bg-white/[0.02]'}
+                      className={isLineDeficit ? 'bg-red-500/[0.06] hover:bg-red-500/[0.1]' : 'hover:bg-[#171f33]/60'}
                     >
-                      <td className="p-3.5 font-mono text-slate-400">{line.product?.sku || 'N/A'}</td>
-                      <td className="p-3.5 font-medium text-white">{line.product?.name || line.productId}</td>
-                      <td className="p-3.5 text-center text-slate-400">{line.product?.unit || 'Units'}</td>
-                      <td className="p-3.5 text-right font-mono text-slate-300">
+                      <td className="p-3.5 font-mono text-[#94a3b8]">{line.product?.sku || 'N/A'}</td>
+                      <td className="p-3.5 font-medium text-[#dae2fd]">{line.product?.name || line.productId}</td>
+                      <td className="p-3.5 text-center text-[#94a3b8]">{line.product?.unit || 'Units'}</td>
+                      <td className="p-3.5 text-right font-mono text-[#b4c6d4]">
                         {isDone ? '—' : line.availableStock}
                       </td>
-                      <td className="p-3.5 text-right font-mono font-bold text-white text-sm">{line.quantity}</td>
+                      <td className="p-3.5 text-right font-mono font-bold text-[#dae2fd] text-sm">{line.quantity}</td>
                       <td className="p-3.5 text-center">
                         {isDone ? (
-                          <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                          <span className="text-[10px] font-bold text-[#ffc174] bg-[#ffc174]/10 px-2 py-0.5 rounded border border-[#ffc174]/20">
                             Dispatched
                           </span>
                         ) : isLineDeficit ? (
@@ -281,7 +281,7 @@ export default function DeliveryDetailPage() {
                             Deficit ({line.quantity - line.availableStock} short)
                           </span>
                         ) : (
-                          <span className="text-[10px] font-semibold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                          <span className="text-[10px] font-semibold text-[#ffc174] bg-[#ffc174]/10 px-2 py-0.5 rounded border border-[#ffc174]/20">
                             ✓ In Stock
                           </span>
                         )}
@@ -291,9 +291,9 @@ export default function DeliveryDetailPage() {
                 })}
               </tbody>
               <tfoot>
-                <tr className="bg-white/[0.02] font-bold border-t border-white/[0.08]">
-                  <td colSpan={4} className="p-3.5 text-right text-slate-300">Total Items to Ship:</td>
-                  <td className="p-3.5 text-right font-mono text-emerald-400 text-sm">
+                <tr className="bg-[#131b2e]/60 font-bold border-t border-[#2d3449]/70">
+                  <td colSpan={4} className="p-3.5 text-right text-[#b4c6d4]">Total Items to Ship:</td>
+                  <td className="p-3.5 text-right font-mono text-[#ffc174] text-sm">
                     {delivery.lines.reduce((sum, l) => sum + l.quantity, 0)}
                   </td>
                   <td></td>
@@ -304,9 +304,9 @@ export default function DeliveryDetailPage() {
         </div>
 
         {/* Audit / Note */}
-        <div className="text-[11px] text-slate-400 pt-3 border-t border-white/[0.06] flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-          <span>System Record ID: <span className="font-mono text-slate-300">{delivery.id}</span></span>
-          <span className="text-emerald-400 font-medium">
+        <div className="text-[11px] text-[#94a3b8] pt-3 border-t border-[#2d3449]/50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+          <span>System Record ID: <span className="font-mono text-[#b4c6d4]">{delivery.id}</span></span>
+          <span className="text-[#ffc174] font-medium">
             {isDone ? '✓ Stock deducted and recorded in Stock Ledger' : 'Ledger mutation will occur upon validation'}
           </span>
         </div>

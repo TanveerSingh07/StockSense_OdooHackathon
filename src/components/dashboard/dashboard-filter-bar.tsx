@@ -65,13 +65,13 @@ export function DashboardFilterBar({
   const selectedCategory = categories.find((c) => c.id === activeCategoryId);
 
   return (
-    <div className="bg-[#161B22] border border-white/[0.08] rounded-xl p-4 shadow-sm space-y-3">
+    <div className="bg-[#131b2e] border border-[#2d3449]/70 rounded-xl p-4 shadow-sm space-y-3">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
-        <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-slate-300">
-          <Filter className="h-4 w-4 text-emerald-400" />
+        <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#b4c6d4]">
+          <Filter className="h-4 w-4 text-[#ffc174]" />
           <span>Dashboard Filters</span>
           {isPending && (
-            <span className="text-[10px] lowercase font-normal text-emerald-400 animate-pulse bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+            <span className="text-[10px] lowercase font-normal text-[#ffc174] animate-pulse bg-[#ffc174]/10 px-2 py-0.5 rounded border border-[#ffc174]/20">
               updating...
             </span>
           )}
@@ -80,7 +80,7 @@ export function DashboardFilterBar({
         {hasActiveFilters && (
           <button
             onClick={clearAllFilters}
-            className="flex items-center gap-1.5 text-xs font-medium text-slate-400 hover:text-white transition-colors bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] px-2.5 py-1 rounded-lg cursor-pointer self-start md:self-auto"
+            className="flex items-center gap-1.5 text-xs font-medium text-[#94a3b8] hover:text-[#dae2fd] transition-colors bg-[#131b2e] hover:bg-[#222a3d] border border-[#2d3449]/70 px-2.5 py-1 rounded-lg cursor-pointer self-start md:self-auto"
           >
             <RotateCcw className="h-3 w-3" />
             <span>Reset All Filters</span>
@@ -92,14 +92,14 @@ export function DashboardFilterBar({
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         {/* 1. Warehouse Filter */}
         <div className="space-y-1">
-          <label className="text-[11px] font-medium text-slate-400 flex items-center gap-1">
-            <WarehouseIcon className="h-3 w-3 text-slate-400" />
+          <label className="text-[11px] font-medium text-[#94a3b8] flex items-center gap-1">
+            <WarehouseIcon className="h-3 w-3 text-[#94a3b8]" />
             <span>Warehouse</span>
           </label>
           <select
             value={activeWarehouseId}
             onChange={(e) => handleFilterChange('warehouseId', e.target.value)}
-            className="w-full bg-[#0D1117] border border-white/[0.1] rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-emerald-500 transition-colors cursor-pointer"
+            className="w-full bg-[#0b1326] border border-[#2d3449]/70 rounded-lg px-3 py-1.5 text-xs text-[#dae2fd] focus:outline-none focus:border-[#ffc174] transition-colors cursor-pointer"
           >
             <option value="all">All Warehouses ({warehouses.length})</option>
             {warehouses.map((w) => (
@@ -112,14 +112,14 @@ export function DashboardFilterBar({
 
         {/* 2. Category Filter */}
         <div className="space-y-1">
-          <label className="text-[11px] font-medium text-slate-400 flex items-center gap-1">
-            <Tag className="h-3 w-3 text-slate-400" />
+          <label className="text-[11px] font-medium text-[#94a3b8] flex items-center gap-1">
+            <Tag className="h-3 w-3 text-[#94a3b8]" />
             <span>Category</span>
           </label>
           <select
             value={activeCategoryId}
             onChange={(e) => handleFilterChange('categoryId', e.target.value)}
-            className="w-full bg-[#0D1117] border border-white/[0.1] rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-emerald-500 transition-colors cursor-pointer"
+            className="w-full bg-[#0b1326] border border-[#2d3449]/70 rounded-lg px-3 py-1.5 text-xs text-[#dae2fd] focus:outline-none focus:border-[#ffc174] transition-colors cursor-pointer"
           >
             <option value="all">All Categories ({categories.length})</option>
             {categories.map((c) => (
@@ -132,14 +132,14 @@ export function DashboardFilterBar({
 
         {/* 3. Document Type Filter */}
         <div className="space-y-1">
-          <label className="text-[11px] font-medium text-slate-400 flex items-center gap-1">
-            <FileText className="h-3 w-3 text-slate-400" />
+          <label className="text-[11px] font-medium text-[#94a3b8] flex items-center gap-1">
+            <FileText className="h-3 w-3 text-[#94a3b8]" />
             <span>Document Type</span>
           </label>
           <select
             value={activeDocType}
             onChange={(e) => handleFilterChange('docType', e.target.value)}
-            className="w-full bg-[#0D1117] border border-white/[0.1] rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-emerald-500 transition-colors cursor-pointer"
+            className="w-full bg-[#0b1326] border border-[#2d3449]/70 rounded-lg px-3 py-1.5 text-xs text-[#dae2fd] focus:outline-none focus:border-[#ffc174] transition-colors cursor-pointer"
           >
             <option value="all">All Document Types</option>
             <option value="RECEIPT">Receipts (Incoming)</option>
@@ -149,14 +149,14 @@ export function DashboardFilterBar({
 
         {/* 4. Status Filter */}
         <div className="space-y-1">
-          <label className="text-[11px] font-medium text-slate-400 flex items-center gap-1">
-            <CheckCircle2 className="h-3 w-3 text-slate-400" />
+          <label className="text-[11px] font-medium text-[#94a3b8] flex items-center gap-1">
+            <CheckCircle2 className="h-3 w-3 text-[#94a3b8]" />
             <span>Document Status</span>
           </label>
           <select
             value={activeStatus}
             onChange={(e) => handleFilterChange('status', e.target.value)}
-            className="w-full bg-[#0D1117] border border-white/[0.1] rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-emerald-500 transition-colors cursor-pointer"
+            className="w-full bg-[#0b1326] border border-[#2d3449]/70 rounded-lg px-3 py-1.5 text-xs text-[#dae2fd] focus:outline-none focus:border-[#ffc174] transition-colors cursor-pointer"
           >
             <option value="all">All Statuses</option>
             <option value="DRAFT">Pending / Draft</option>
@@ -167,25 +167,25 @@ export function DashboardFilterBar({
 
       {/* Active Filter Badges */}
       {hasActiveFilters && (
-        <div className="pt-2 border-t border-white/[0.06] flex flex-wrap items-center gap-2">
-          <span className="text-[11px] text-slate-400">Active filters:</span>
+        <div className="pt-2 border-t border-[#2d3449]/50 flex flex-wrap items-center gap-2">
+          <span className="text-[11px] text-[#94a3b8]">Active filters:</span>
           {activeWarehouseId !== 'all' && selectedWarehouse && (
-            <span className="inline-flex items-center gap-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded-md text-[11px]">
+            <span className="inline-flex items-center gap-1 bg-[#ffc174]/10 text-[#ffc174] border border-[#ffc174]/20 px-2 py-0.5 rounded-md text-[11px]">
               <span>Warehouse: {selectedWarehouse.name}</span>
               <button
                 onClick={() => handleFilterChange('warehouseId', 'all')}
-                className="hover:text-emerald-200 cursor-pointer ml-1"
+                className="hover:text-[#ffd49d] cursor-pointer ml-1"
               >
                 <X className="h-3 w-3" />
               </button>
             </span>
           )}
           {activeCategoryId !== 'all' && selectedCategory && (
-            <span className="inline-flex items-center gap-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded-md text-[11px]">
+            <span className="inline-flex items-center gap-1 bg-[#ffc174]/10 text-[#ffc174] border border-[#ffc174]/20 px-2 py-0.5 rounded-md text-[11px]">
               <span>Category: {selectedCategory.name}</span>
               <button
                 onClick={() => handleFilterChange('categoryId', 'all')}
-                className="hover:text-emerald-200 cursor-pointer ml-1"
+                className="hover:text-[#ffd49d] cursor-pointer ml-1"
               >
                 <X className="h-3 w-3" />
               </button>

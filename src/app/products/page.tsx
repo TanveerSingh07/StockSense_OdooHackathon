@@ -233,34 +233,34 @@ export default function ProductsPage() {
 
   const getCategoryIcon = (categoryName?: string) => {
     const name = categoryName?.toLowerCase() || "";
-    if (name.includes("elec")) return <Cpu className="h-4 w-4 text-emerald-400" />;
+    if (name.includes("elec")) return <Cpu className="h-4 w-4 text-[#ffc174]" />;
     if (name.includes("hard") || name.includes("fast")) return <Wrench className="h-4 w-4 text-teal-400" />;
-    if (name.includes("pack")) return <Box className="h-4 w-4 text-slate-400" />;
-    if (name.includes("safe") || name.includes("ppe")) return <HardHat className="h-4 w-4 text-emerald-300" />;
-    return <Layers className="h-4 w-4 text-emerald-400" />;
+    if (name.includes("pack")) return <Box className="h-4 w-4 text-[#94a3b8]" />;
+    if (name.includes("safe") || name.includes("ppe")) return <HardHat className="h-4 w-4 text-[#ffd49d]" />;
+    return <Layers className="h-4 w-4 text-[#ffc174]" />;
   };
 
   const getCategoryBadgeClass = (categoryName?: string) => {
     const name = categoryName?.toLowerCase() || "";
-    if (name.includes("elec")) return "bg-emerald-500/10 text-emerald-300 border-emerald-500/20";
+    if (name.includes("elec")) return "bg-[#ffc174]/10 text-[#ffd49d] border-[#ffc174]/20";
     if (name.includes("hard") || name.includes("fast")) return "bg-teal-500/10 text-teal-300 border-teal-500/20";
-    if (name.includes("pack")) return "bg-slate-500/10 text-slate-300 border-slate-500/20";
-    if (name.includes("safe") || name.includes("ppe")) return "bg-emerald-500/10 text-emerald-400 border-emerald-500/20";
-    return "bg-emerald-500/10 text-emerald-300 border-emerald-500/20";
+    if (name.includes("pack")) return "bg-[#2d3449]/30 text-[#b4c6d4] border-[#2d3449]/50";
+    if (name.includes("safe") || name.includes("ppe")) return "bg-[#ffc174]/10 text-[#ffc174] border-[#ffc174]/20";
+    return "bg-[#ffc174]/10 text-[#ffd49d] border-[#ffc174]/20";
   };
 
   return (
     <OperationsShell>
-      <div className="flex-1 flex flex-col h-full bg-[#0D1117] text-[#F0F6FC]">
+      <div className="flex-1 flex flex-col h-full bg-[#0b1326] text-[#dae2fd]">
         {/* Main Content Area */}
         <div className="p-4 sm:p-8 max-w-7xl mx-auto space-y-6 w-full">
           {/* Page Title & Main Actions */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
+              <h1 className="text-2xl sm:text-3xl font-bold text-[#dae2fd] tracking-tight">
                 Products & Inventory
               </h1>
-              <p className="text-xs sm:text-sm text-slate-400 mt-1">
+              <p className="text-xs sm:text-sm text-[#94a3b8] mt-1">
                 Manage your master catalog, track live warehouse stock, and monitor reorder levels.
               </p>
             </div>
@@ -271,7 +271,7 @@ export default function ProductsPage() {
                 <button
                   onClick={handleSeedDemoData}
                   disabled={seeding}
-                  className="h-9 px-3.5 text-xs font-medium text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/15 border border-emerald-500/20 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer"
+                  className="h-9 px-3.5 text-xs font-medium text-[#ffc174] bg-[#ffc174]/10 hover:bg-[#ffc174]/15 border border-[#ffc174]/20 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer"
                 >
                   <Sparkles className={`h-3.5 w-3.5 ${seeding ? "animate-spin" : ""}`} />
                   <span>{seeding ? "Loading..." : "⚡ Demo Items"}</span>
@@ -282,9 +282,9 @@ export default function ProductsPage() {
               <button
                 onClick={() => handleExportCSV()}
                 disabled={products.length === 0}
-                className="h-9 px-3.5 text-xs font-medium text-slate-300 hover:text-white bg-[#161B22] hover:bg-[#1F242C] border border-white/[0.08] rounded-lg transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-40 shadow-xs"
+                className="h-9 px-3.5 text-xs font-medium text-[#b4c6d4] hover:text-[#dae2fd] bg-[#131b2e] hover:bg-[#171f33] border border-[#2d3449]/70 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-40 shadow-xs"
               >
-                <Download className="h-3.5 w-3.5 text-slate-400" />
+                <Download className="h-3.5 w-3.5 text-[#94a3b8]" />
                 <span>Export CSV</span>
               </button>
 
@@ -294,7 +294,7 @@ export default function ProductsPage() {
                   setProductToEdit(null);
                   setIsPanelOpen(true);
                 }}
-                className="h-9 px-4 text-xs font-semibold bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg shadow-sm shadow-emerald-600/30 transition-all flex items-center gap-1.5 cursor-pointer active:scale-[0.98]"
+                className="h-9 px-4 text-xs font-semibold bg-[#ffc174] hover:bg-[#f59e0b] text-[#090D16] rounded-lg shadow-sm shadow-[#ffc174]/20 transition-all flex items-center gap-1.5 cursor-pointer active:scale-[0.98]"
               >
                 <Plus className="h-4 w-4" />
                 <span>Add Product</span>
@@ -305,65 +305,65 @@ export default function ProductsPage() {
           {/* 4 High-Impact Elevated KPI Summary Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {/* KPI 1: Total SKUs */}
-            <div className="p-4 rounded-xl bg-[#161B22] border border-white/[0.08] shadow-sm hover:border-white/[0.12] transition-colors">
-              <div className="flex items-center justify-between text-slate-400 mb-2">
+            <div className="p-4 rounded-xl bg-[#131b2e] border border-[#2d3449]/70 shadow-sm hover:border-[#2d3449] transition-colors">
+              <div className="flex items-center justify-between text-[#94a3b8] mb-2">
                 <span className="text-xs font-medium">Total SKUs</span>
-                <div className="h-7 w-7 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+                <div className="h-7 w-7 rounded-lg bg-[#ffc174]/10 border border-[#ffc174]/20 flex items-center justify-center text-[#ffc174]">
                   <Package className="h-4 w-4" />
                 </div>
               </div>
-              <div className="text-2xl font-bold text-white tracking-tight">
+              <div className="text-2xl font-bold text-[#dae2fd] tracking-tight">
                 {products.length}
               </div>
-              <div className="text-[11px] text-slate-400 mt-1 flex items-center gap-1">
-                <span className="text-emerald-400 font-medium">Active</span>
+              <div className="text-[11px] text-[#94a3b8] mt-1 flex items-center gap-1">
+                <span className="text-[#ffc174] font-medium">Active</span>
                 <span>catalog products</span>
               </div>
             </div>
 
             {/* KPI 2: Total Inventory */}
-            <div className="p-4 rounded-xl bg-[#161B22] border border-white/[0.08] shadow-sm hover:border-white/[0.12] transition-colors">
-              <div className="flex items-center justify-between text-slate-400 mb-2">
+            <div className="p-4 rounded-xl bg-[#131b2e] border border-[#2d3449]/70 shadow-sm hover:border-[#2d3449] transition-colors">
+              <div className="flex items-center justify-between text-[#94a3b8] mb-2">
                 <span className="text-xs font-medium">Total Inventory</span>
                 <div className="h-7 w-7 rounded-lg bg-teal-500/10 border border-teal-500/20 flex items-center justify-center text-teal-400">
                   <Layers className="h-4 w-4" />
                 </div>
               </div>
-              <div className="text-2xl font-bold text-white tracking-tight">
-                {totalStockUnits} <span className="text-xs font-normal text-slate-400">Units</span>
+              <div className="text-2xl font-bold text-[#dae2fd] tracking-tight">
+                {totalStockUnits} <span className="text-xs font-normal text-[#94a3b8]">Units</span>
               </div>
-              <div className="text-[11px] text-slate-400 mt-1">
+              <div className="text-[11px] text-[#94a3b8] mt-1">
                 {outOfStockCount > 0 ? (
                   <span className="text-amber-400">{outOfStockCount} items need restock</span>
                 ) : (
-                  <span className="text-emerald-400">Stock distributed in DC</span>
+                  <span className="text-[#ffc174]">Stock distributed in DC</span>
                 )}
               </div>
             </div>
 
             {/* KPI 3: Stock Health Score */}
-            <div className="p-4 rounded-xl bg-[#161B22] border border-white/[0.08] shadow-sm hover:border-white/[0.12] transition-colors">
-              <div className="flex items-center justify-between text-slate-400 mb-2">
+            <div className="p-4 rounded-xl bg-[#131b2e] border border-[#2d3449]/70 shadow-sm hover:border-[#2d3449] transition-colors">
+              <div className="flex items-center justify-between text-[#94a3b8] mb-2">
                 <span className="text-xs font-medium">Stock Health</span>
-                <div className="h-7 w-7 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+                <div className="h-7 w-7 rounded-lg bg-[#ffc174]/10 border border-[#ffc174]/20 flex items-center justify-center text-[#ffc174]">
                   <Activity className="h-4 w-4" />
                 </div>
               </div>
               <div className="flex items-baseline gap-2">
                 <span className={`text-2xl font-bold tracking-tight ${
-                  healthPercentage >= 75 ? "text-emerald-400" : healthPercentage >= 40 ? "text-amber-400" : "text-red-400"
+                  healthPercentage >= 75 ? "text-[#ffc174]" : healthPercentage >= 40 ? "text-amber-400" : "text-red-400"
                 }`}>
                   {healthPercentage}%
                 </span>
-                <span className="text-[11px] text-slate-400">
+                <span className="text-[11px] text-[#94a3b8]">
                   ({healthyCount}/{products.length} healthy)
                 </span>
               </div>
               {/* Mini Health Bar */}
-              <div className="w-full h-1.5 bg-white/[0.06] rounded-full overflow-hidden mt-2">
+              <div className="w-full h-1.5 bg-[#2d3449]/40 rounded-full overflow-hidden mt-2">
                 <div
                   className={`h-full transition-all duration-500 ${
-                    healthPercentage >= 75 ? "bg-emerald-500" : healthPercentage >= 40 ? "bg-amber-500" : "bg-red-500"
+                    healthPercentage >= 75 ? "bg-[#ffc174]" : healthPercentage >= 40 ? "bg-amber-500" : "bg-red-500"
                   }`}
                   style={{ width: `${healthPercentage}%` }}
                 />
@@ -374,18 +374,18 @@ export default function ProductsPage() {
             <div className={`p-4 rounded-xl border shadow-sm transition-colors ${
               lowStockCount > 0 
                 ? "bg-amber-500/[0.04] border-amber-500/20 hover:border-amber-500/30" 
-                : "bg-[#161B22] border-white/[0.08]"
+                : "bg-[#131b2e] border-[#2d3449]/70"
             }`}>
-              <div className="flex items-center justify-between text-slate-400 mb-2">
+              <div className="flex items-center justify-between text-[#94a3b8] mb-2">
                 <span className="text-xs font-medium">Attention Needed</span>
                 <div className={`h-7 w-7 rounded-lg flex items-center justify-center ${
-                  lowStockCount > 0 ? "bg-amber-500/10 border border-amber-500/20 text-amber-400" : "bg-emerald-500/10 border border-emerald-500/20 text-emerald-400"
+                  lowStockCount > 0 ? "bg-amber-500/10 border border-amber-500/20 text-amber-400" : "bg-[#ffc174]/10 border border-[#ffc174]/20 text-[#ffc174]"
                 }`}>
                   <AlertTriangle className="h-4 w-4" />
                 </div>
               </div>
-              <div className="text-2xl font-bold text-white tracking-tight">
-                {lowStockCount} <span className="text-xs font-normal text-slate-400">Reorders</span>
+              <div className="text-2xl font-bold text-[#dae2fd] tracking-tight">
+                {lowStockCount} <span className="text-xs font-normal text-[#94a3b8]">Reorders</span>
               </div>
               <div className="mt-1">
                 {lowStockCount > 0 ? (
@@ -397,7 +397,7 @@ export default function ProductsPage() {
                     <span>→</span>
                   </button>
                 ) : (
-                  <span className="text-[11px] text-emerald-400 font-medium">All levels optimal</span>
+                  <span className="text-[11px] text-[#ffc174] font-medium">All levels optimal</span>
                 )}
               </div>
             </div>
@@ -407,19 +407,19 @@ export default function ProductsPage() {
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
             {/* Search Input */}
             <div className="relative flex-1 max-w-sm">
-              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[#94a3b8]" />
               <input
                 id="catalog-search"
                 type="text"
                 placeholder="Search products, SKU, barcode..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full h-9 pl-9.5 pr-8 text-xs bg-[#161B22] border border-white/[0.08] rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all shadow-xs"
+                className="w-full h-9 pl-9.5 pr-8 text-xs bg-[#131b2e] border border-[#2d3449]/70 rounded-lg text-[#dae2fd] placeholder-[#94a3b8] focus:outline-none focus:ring-2 focus:ring-[#ffc174]/20 focus:border-[#ffc174] transition-all shadow-xs"
               />
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery("")}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#94a3b8] hover:text-[#dae2fd]"
                 >
                   <X className="h-3.5 w-3.5" />
                 </button>
@@ -435,15 +435,15 @@ export default function ProductsPage() {
                 }}
                 className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
                   selectedCategory === "all" && !lowStockOnly
-                    ? "bg-white text-slate-900 shadow-sm font-semibold"
-                    : "bg-[#161B22] text-slate-400 hover:text-white hover:bg-white/[0.06] border border-white/[0.06]"
+                    ? "bg-[#ffc174] text-[#090D16] shadow-sm font-semibold"
+                    : "bg-[#131b2e] text-[#94a3b8] hover:text-[#dae2fd] hover:bg-[#222a3d] border border-[#2d3449]/50"
                 }`}
               >
                 <span>All</span>
                 <span className={`px-1.5 py-0.2 rounded-full text-[10px] ${
                   selectedCategory === "all" && !lowStockOnly
-                    ? "bg-slate-200 text-slate-900"
-                    : "bg-white/[0.06] text-slate-400"
+                    ? "bg-[#222a3d] text-[#dae2fd]"
+                    : "bg-[#2d3449]/40 text-[#94a3b8]"
                 }`}>
                   {products.length}
                 </span>
@@ -454,7 +454,7 @@ export default function ProductsPage() {
                   onClick={() => setLowStockOnly(!lowStockOnly)}
                   className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
                     lowStockOnly
-                      ? "bg-amber-500 text-slate-950 font-semibold shadow-sm"
+                      ? "bg-[#ffc174] text-[#090D16] font-semibold shadow-sm"
                       : "bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 border border-amber-500/20"
                   }`}
                 >
@@ -475,16 +475,16 @@ export default function ProductsPage() {
                   }}
                   className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
                     selectedCategory === cat.id && !lowStockOnly
-                      ? "bg-white text-slate-900 shadow-sm font-semibold"
-                      : "bg-[#161B22] text-slate-400 hover:text-white hover:bg-white/[0.06] border border-white/[0.06]"
+                      ? "bg-[#ffc174] text-[#090D16] shadow-sm font-semibold"
+                      : "bg-[#131b2e] text-[#94a3b8] hover:text-[#dae2fd] hover:bg-[#222a3d] border border-[#2d3449]/50"
                   }`}
                 >
                   <span>{cat.name}</span>
                   {cat._count?.products !== undefined && (
                     <span className={`px-1.5 py-0.2 rounded-full text-[10px] ${
                       selectedCategory === cat.id && !lowStockOnly
-                        ? "bg-slate-200 text-slate-900"
-                        : "bg-white/[0.06] text-slate-400"
+                        ? "bg-[#222a3d] text-[#dae2fd]"
+                        : "bg-[#2d3449]/40 text-[#94a3b8]"
                     }`}>
                       {cat._count.products}
                     </span>
@@ -496,27 +496,27 @@ export default function ProductsPage() {
               <button
                 onClick={fetchProducts}
                 disabled={loading}
-                className="h-8 w-8 rounded-lg border border-white/[0.08] bg-[#161B22] hover:bg-white/[0.04] text-slate-400 hover:text-white flex items-center justify-center transition-colors cursor-pointer"
+                className="h-8 w-8 rounded-lg border border-[#2d3449]/70 bg-[#131b2e] hover:bg-[#171f33] text-[#94a3b8] hover:text-[#dae2fd] flex items-center justify-center transition-colors cursor-pointer"
                 title="Refresh inventory"
               >
-                <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin text-emerald-400" : ""}`} />
+                <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin text-[#ffc174]" : ""}`} />
               </button>
             </div>
           </div>
 
           {/* Modern Enterprise Data Table */}
-          <div className="rounded-xl border border-white/[0.08] bg-[#161B22] shadow-sm overflow-hidden">
+          <div className="rounded-xl border border-[#2d3449]/70 bg-[#131b2e] shadow-sm overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 {/* Table Head */}
                 <thead>
-                  <tr className="border-b border-white/[0.08] bg-white/[0.02] text-slate-400 text-xs font-medium">
+                  <tr className="border-b border-[#2d3449]/70 bg-[#131b2e]/60 text-[#94a3b8] text-xs font-medium">
                     <th className="px-4 py-3.5 w-10 text-center">
                       <input
                         type="checkbox"
                         checked={products.length > 0 && selectedProductIds.length === products.length}
                         onChange={toggleSelectAll}
-                        className="rounded border-white/[0.2] bg-[#0D1117] text-emerald-600 focus:ring-emerald-500 cursor-pointer"
+                        className="rounded border-[#2d3449] bg-[#0b1326] text-[#f59e0b] focus:ring-[#ffc174] cursor-pointer"
                       />
                     </th>
                     <th className="px-4 py-3.5">Product & SKU</th>
@@ -528,57 +528,57 @@ export default function ProductsPage() {
                 </thead>
 
                 {/* Table Body */}
-                <tbody className="divide-y divide-white/[0.06] text-sm">
+                <tbody className="divide-y divide-[#2d3449]/50 text-sm">
                   {loading && products.length === 0 ? (
                     // Skeleton Shimmer Loading Rows
                     [1, 2, 3, 4].map((i) => (
                       <tr key={i} className="animate-pulse">
                         <td className="p-4 text-center">
-                          <div className="h-4 w-4 bg-white/[0.06] rounded mx-auto" />
+                          <div className="h-4 w-4 bg-[#2d3449]/40 rounded mx-auto" />
                         </td>
                         <td className="p-4">
                           <div className="flex items-center gap-3">
-                            <div className="h-10 w-10 bg-white/[0.06] rounded-lg" />
+                            <div className="h-10 w-10 bg-[#2d3449]/40 rounded-lg" />
                             <div className="space-y-2">
-                              <div className="h-4 w-40 bg-white/[0.06] rounded" />
-                              <div className="h-3 w-20 bg-white/[0.04] rounded" />
+                              <div className="h-4 w-40 bg-[#2d3449]/40 rounded" />
+                              <div className="h-3 w-20 bg-[#131b2e] rounded" />
                             </div>
                           </div>
                         </td>
                         <td className="p-4 hidden sm:table-cell">
-                          <div className="h-6 w-24 bg-white/[0.06] rounded-full" />
+                          <div className="h-6 w-24 bg-[#2d3449]/40 rounded-full" />
                         </td>
                         <td className="p-4">
-                          <div className="h-4 w-28 bg-white/[0.06] rounded" />
+                          <div className="h-4 w-28 bg-[#2d3449]/40 rounded" />
                         </td>
                         <td className="p-4">
-                          <div className="h-6 w-20 bg-white/[0.06] rounded-full" />
+                          <div className="h-6 w-20 bg-[#2d3449]/40 rounded-full" />
                         </td>
                         <td className="p-4 text-right">
-                          <div className="h-8 w-16 bg-white/[0.06] rounded ml-auto" />
+                          <div className="h-8 w-16 bg-[#2d3449]/40 rounded ml-auto" />
                         </td>
                       </tr>
                     ))
                   ) : products.length === 0 ? (
                     <tr>
-                      <td colSpan={6} className="text-center py-20 text-slate-400">
+                      <td colSpan={6} className="text-center py-20 text-[#94a3b8]">
                         <div className="flex flex-col items-center justify-center gap-3 max-w-md mx-auto p-4">
-                          <div className="h-12 w-12 rounded-2xl bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-slate-400">
+                          <div className="h-12 w-12 rounded-2xl bg-[#131b2e] border border-[#2d3449]/70 flex items-center justify-center text-[#94a3b8]">
                             <Package className="h-6 w-6" />
                           </div>
-                          <p className="text-sm text-slate-200 font-medium">
+                          <p className="text-sm text-[#dae2fd] font-medium">
                             {searchQuery || selectedCategory !== "all" || lowStockOnly
                               ? "No products match your current filters."
                               : "No inventory products registered yet."}
                           </p>
-                          <p className="text-xs text-slate-400 text-center">
+                          <p className="text-xs text-[#94a3b8] text-center">
                             Start adding items to configure stock levels, safety thresholds, and warehouse allocation.
                           </p>
                           <div className="flex items-center gap-2.5 mt-2">
                             <button
                               onClick={handleSeedDemoData}
                               disabled={seeding}
-                              className="px-3.5 py-2 text-xs font-medium text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/15 border border-emerald-500/20 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer"
+                              className="px-3.5 py-2 text-xs font-medium text-[#ffc174] bg-[#ffc174]/10 hover:bg-[#ffc174]/15 border border-[#ffc174]/20 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer"
                             >
                               <Sparkles className="h-3.5 w-3.5" />
                               Seed Demo Items
@@ -588,7 +588,7 @@ export default function ProductsPage() {
                                 setProductToEdit(null);
                                 setIsPanelOpen(true);
                               }}
-                              className="px-3.5 py-2 text-xs font-medium bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg shadow-sm transition-all flex items-center gap-1.5 cursor-pointer"
+                              className="px-3.5 py-2 text-xs font-medium bg-[#ffc174] hover:bg-[#f59e0b] text-[#090D16] rounded-lg shadow-sm transition-all flex items-center gap-1.5 cursor-pointer"
                             >
                               <Plus className="h-3.5 w-3.5" />
                               Add Product
@@ -615,10 +615,10 @@ export default function ProductsPage() {
                             onClick={() => setExpandedProductId(isExpanded ? null : product.id)}
                             className={`transition-all duration-150 cursor-pointer group ${
                               isSelected 
-                                ? "bg-emerald-950/25" 
+                                ? "bg-[#ffc174]/10" 
                                 : isExpanded 
-                                ? "bg-white/[0.04]" 
-                                : "hover:bg-white/[0.02]"
+                                ? "bg-[#131b2e]" 
+                                : "hover:bg-[#171f33]/60"
                             }`}
                           >
                             {/* Row Checkbox */}
@@ -627,7 +627,7 @@ export default function ProductsPage() {
                                 type="checkbox"
                                 checked={isSelected}
                                 onChange={(e) => toggleSelectProduct(product.id, e as any)}
-                                className="rounded border-white/[0.2] bg-[#0D1117] text-emerald-600 focus:ring-emerald-500 cursor-pointer"
+                                className="rounded border-[#2d3449] bg-[#0b1326] text-[#f59e0b] focus:ring-[#ffc174] cursor-pointer"
                               />
                             </td>
 
@@ -635,25 +635,25 @@ export default function ProductsPage() {
                             <td className="px-4 py-3.5">
                               <div className="flex items-center gap-3">
                                 {/* 40x40 Thumbnail / Category Placeholder */}
-                                <div className="h-10 w-10 rounded-lg bg-white/[0.03] border border-white/[0.06] flex items-center justify-center shrink-0 shadow-inner group-hover:border-white/[0.12] transition-colors">
+                                <div className="h-10 w-10 rounded-lg bg-[#131b2e] border border-[#2d3449]/50 flex items-center justify-center shrink-0 shadow-inner group-hover:border-[#2d3449] transition-colors">
                                   {getCategoryIcon(product.category?.name)}
                                 </div>
 
                                 <div>
-                                  <div className="font-medium text-slate-100 text-sm group-hover:text-emerald-300 transition-colors">
+                                  <div className="font-medium text-[#dae2fd] text-sm group-hover:text-[#ffd49d] transition-colors">
                                     {product.name}
                                   </div>
                                   <div className="flex items-center gap-2 mt-0.5">
-                                    <span className="font-mono text-[11px] text-slate-400 bg-[#0D1117] px-1.5 py-0.5 rounded border border-white/[0.06]">
+                                    <span className="font-mono text-[11px] text-[#94a3b8] bg-[#0b1326] px-1.5 py-0.5 rounded border border-[#2d3449]/50">
                                       {product.sku}
                                     </span>
                                     <button
                                       onClick={(e) => handleCopySku(product.sku, e)}
-                                      className="opacity-0 group-hover:opacity-100 p-0.5 text-slate-400 hover:text-white transition-opacity"
+                                      className="opacity-0 group-hover:opacity-100 p-0.5 text-[#94a3b8] hover:text-[#dae2fd] transition-opacity"
                                       title="Copy SKU code"
                                     >
                                       {copiedSku === product.sku ? (
-                                        <Check className="h-3 w-3 text-emerald-400" />
+                                        <Check className="h-3 w-3 text-[#ffc174]" />
                                       ) : (
                                         <Copy className="h-3 w-3" />
                                       )}
@@ -674,22 +674,22 @@ export default function ProductsPage() {
                             <td className="px-4 py-3.5">
                               <div className="space-y-1 max-w-[140px]">
                                 <div className="flex items-center justify-between text-xs">
-                                  <span className="font-semibold text-white">
-                                    {product.totalQuantity} <span className="font-normal text-slate-400">{product.unit}</span>
+                                  <span className="font-semibold text-[#dae2fd]">
+                                    {product.totalQuantity} <span className="font-normal text-[#94a3b8]">{product.unit}</span>
                                   </span>
-                                  <span className="text-[11px] text-slate-400">
+                                  <span className="text-[11px] text-[#94a3b8]">
                                     min {product.reorderPoint}
                                   </span>
                                 </div>
                                 {/* Visual Stock Bar */}
-                                <div className="w-full h-1.5 bg-white/[0.06] rounded-full overflow-hidden">
+                                <div className="w-full h-1.5 bg-[#2d3449]/40 rounded-full overflow-hidden">
                                   <div
                                     className={`h-full rounded-full transition-all ${
                                       isOutOfStock 
                                         ? "bg-red-500 w-full" 
                                         : isLow 
                                         ? "bg-amber-500" 
-                                        : "bg-emerald-500"
+                                        : "bg-[#ffc174]"
                                     }`}
                                     style={{ width: isOutOfStock ? "100%" : `${Math.max(8, stockPercentage)}%` }}
                                   />
@@ -710,8 +710,8 @@ export default function ProductsPage() {
                                   Low Stock
                                 </span>
                               ) : (
-                                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+                                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-[#ffc174]/10 text-[#ffc174] border border-[#ffc174]/20">
+                                  <span className="h-1.5 w-1.5 rounded-full bg-[#ffc174]" />
                                   In Stock
                                 </span>
                               )}
@@ -725,21 +725,21 @@ export default function ProductsPage() {
                                     setProductToEdit(product);
                                     setIsPanelOpen(true);
                                   }}
-                                  className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/[0.08] transition-colors"
+                                  className="p-1.5 rounded-lg text-[#94a3b8] hover:text-[#dae2fd] hover:bg-[#222a3d] transition-colors"
                                   title="Edit Product"
                                 >
                                   <Edit2 className="h-3.5 w-3.5" />
                                 </button>
                                 <button
                                   onClick={() => handleDelete(product.id, product.name)}
-                                  className="p-1.5 rounded-lg text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+                                  className="p-1.5 rounded-lg text-[#94a3b8] hover:text-red-400 hover:bg-red-500/10 transition-colors"
                                   title="Delete Product"
                                 >
                                   <Trash2 className="h-3.5 w-3.5" />
                                 </button>
                                 <button
                                   onClick={() => setExpandedProductId(isExpanded ? null : product.id)}
-                                  className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/[0.08] transition-colors"
+                                  className="p-1.5 rounded-lg text-[#94a3b8] hover:text-[#dae2fd] hover:bg-[#222a3d] transition-colors"
                                   title="Inspect details"
                                 >
                                   {isExpanded ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
@@ -750,41 +750,41 @@ export default function ProductsPage() {
 
                           {/* Expanded Detail Panel */}
                           {isExpanded && (
-                            <tr className="bg-[#12151C] border-b border-white/[0.08]">
+                            <tr className="bg-[#12151C] border-b border-[#2d3449]/70">
                               <td colSpan={6} className="p-4 px-6">
-                                <div className="rounded-lg bg-[#161B22] border border-white/[0.08] p-4 grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+                                <div className="rounded-lg bg-[#131b2e] border border-[#2d3449]/70 p-4 grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
                                   {/* Item Metadata */}
                                   <div className="space-y-1.5">
-                                    <div className="text-[10px] font-mono uppercase tracking-wider text-slate-400">
+                                    <div className="text-[10px] font-mono uppercase tracking-wider text-[#94a3b8]">
                                       Product Details
                                     </div>
-                                    <div className="font-semibold text-white text-sm">
+                                    <div className="font-semibold text-[#dae2fd] text-sm">
                                       {product.name}
                                     </div>
-                                    <div className="text-slate-400 font-mono">
-                                      SKU: <span className="text-emerald-400">{product.sku}</span>
+                                    <div className="text-[#94a3b8] font-mono">
+                                      SKU: <span className="text-[#ffc174]">{product.sku}</span>
                                     </div>
-                                    <div className="text-slate-400">
+                                    <div className="text-[#94a3b8]">
                                       Unit: {product.unit} • Category: {product.category?.name || "Unassigned"}
                                     </div>
                                   </div>
 
                                   {/* Storage breakdown */}
                                   <div className="space-y-1.5">
-                                    <div className="text-[10px] font-mono uppercase tracking-wider text-slate-400">
+                                    <div className="text-[10px] font-mono uppercase tracking-wider text-[#94a3b8]">
                                       Warehouse Distribution
                                     </div>
                                     {product.levels && product.levels.length > 0 ? (
                                       <div className="space-y-1">
                                         {product.levels.map((lvl) => (
-                                          <div key={lvl.id} className="flex items-center justify-between text-slate-300">
+                                          <div key={lvl.id} className="flex items-center justify-between text-[#b4c6d4]">
                                             <span>{lvl.warehouse?.name || "Main Distribution Center"}:</span>
-                                            <span className="font-bold text-white">{lvl.quantity} {product.unit}</span>
+                                            <span className="font-bold text-[#dae2fd]">{lvl.quantity} {product.unit}</span>
                                           </div>
                                         ))}
                                       </div>
                                     ) : (
-                                      <div className="text-slate-500">
+                                      <div className="text-[#94a3b8]">
                                         No storage records. Stock increments automatically when Receipts are processed.
                                       </div>
                                     )}
@@ -793,13 +793,13 @@ export default function ProductsPage() {
                                   {/* Reorder Diagnostic */}
                                   <div className="space-y-1.5 flex flex-col justify-between">
                                     <div>
-                                      <div className="text-[10px] font-mono uppercase tracking-wider text-slate-400">
+                                      <div className="text-[10px] font-mono uppercase tracking-wider text-[#94a3b8]">
                                         Safety Threshold
                                       </div>
-                                      <div className="text-slate-300 mt-1">
-                                        Minimum Threshold: <span className="font-semibold text-white">{product.reorderPoint} {product.unit}</span>
+                                      <div className="text-[#b4c6d4] mt-1">
+                                        Minimum Threshold: <span className="font-semibold text-[#dae2fd]">{product.reorderPoint} {product.unit}</span>
                                       </div>
-                                      <div className="text-slate-400 mt-0.5">
+                                      <div className="text-[#94a3b8] mt-0.5">
                                         {product.totalQuantity <= product.reorderPoint
                                           ? "⚠️ Stock is at or below threshold. Reorder advised."
                                           : "✓ Current inventory levels meet safety margins."}
@@ -812,7 +812,7 @@ export default function ProductsPage() {
                                           setProductToEdit(product);
                                           setIsPanelOpen(true);
                                         }}
-                                        className="text-emerald-400 hover:text-emerald-300 font-medium hover:underline text-xs cursor-pointer"
+                                        className="text-[#ffc174] hover:text-[#ffd49d] font-medium hover:underline text-xs cursor-pointer"
                                       >
                                         Edit product parameters →
                                       </button>
@@ -834,20 +834,20 @@ export default function ProductsPage() {
 
         {/* Floating Bulk Action Toolbar Dock */}
         {selectedProductIds.length > 0 && (
-          <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 bg-[#161B22]/95 backdrop-blur-md border border-white/[0.12] rounded-xl px-4 py-2.5 shadow-2xl flex items-center gap-4 text-xs">
-            <div className="font-medium text-white flex items-center gap-1.5">
-              <span className="h-2 w-2 rounded-full bg-emerald-500" />
+          <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 bg-[#131b2e]/95 backdrop-blur-md border border-[#2d3449]/60 rounded-xl px-4 py-2.5 shadow-2xl flex items-center gap-4 text-xs">
+            <div className="font-medium text-[#dae2fd] flex items-center gap-1.5">
+              <span className="h-2 w-2 rounded-full bg-[#ffc174]" />
               <span>{selectedProductIds.length} item{selectedProductIds.length > 1 ? "s" : ""} selected</span>
             </div>
 
-            <div className="h-4 w-px bg-white/[0.12]" />
+            <div className="h-4 w-px bg-[#2d3449]" />
 
             <button
               onClick={() => {
                 const selectedItems = products.filter((p) => selectedProductIds.includes(p.id));
                 handleExportCSV(selectedItems);
               }}
-              className="font-medium text-slate-300 hover:text-white flex items-center gap-1.5 cursor-pointer"
+              className="font-medium text-[#b4c6d4] hover:text-[#dae2fd] flex items-center gap-1.5 cursor-pointer"
             >
               <Download className="h-3.5 w-3.5" />
               <span>Export Selected</span>
@@ -855,7 +855,7 @@ export default function ProductsPage() {
 
             <button
               onClick={() => setSelectedProductIds([])}
-              className="text-slate-400 hover:text-white text-xs cursor-pointer"
+              className="text-[#94a3b8] hover:text-[#dae2fd] text-xs cursor-pointer"
             >
               Deselect All
             </button>
