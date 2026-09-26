@@ -11,9 +11,7 @@ import {
   ArrowLeftRight, 
   SlidersHorizontal, 
   History,
-  Boxes,
-  Warehouse,
-  Terminal
+  Boxes
 } from "lucide-react";
 
 interface NavItem {
@@ -79,7 +77,7 @@ export function OperationsShell({ children }: { children: React.ReactNode }) {
       {/* Sidebar / Left Navigation Console */}
       <aside className="w-56 shrink-0 flex flex-col border-r border-[#2C332E] bg-[#101312]">
         {/* Console Brand Header */}
-        <div className="h-12 border-b border-[#2C332E] px-4 flex items-center justify-between bg-[#141816]">
+        <div className="h-14 border-b border-[#2C332E] px-4 flex items-center justify-between bg-[#141816]">
           <div className="flex items-center gap-2">
             <Boxes className="h-4 w-4 text-[#E8A33D]" />
             <span className="font-sans text-xs font-black tracking-widest text-[#E7ECE7] uppercase">
@@ -92,8 +90,8 @@ export function OperationsShell({ children }: { children: React.ReactNode }) {
         </div>
 
         {/* Navigation List */}
-        <div className="flex-1 py-3 px-2 space-y-0.5 overflow-y-auto">
-          <div className="px-2 py-1 text-[10px] font-mono font-semibold uppercase tracking-wider text-[#9AA69C]/60">
+        <div className="flex-1 py-3 px-2 space-y-1 overflow-y-auto">
+          <div className="px-2 py-1 text-[11px] font-mono font-semibold uppercase tracking-wider text-[#9AA69C]/60">
             Catalog & Ops
           </div>
 
@@ -105,13 +103,13 @@ export function OperationsShell({ children }: { children: React.ReactNode }) {
               return (
                 <div
                   key={item.name}
-                  className="flex items-center justify-between px-2.5 py-1.5 text-xs text-[#9AA69C]/40 rounded-[3px] cursor-not-allowed"
+                  className="flex items-center justify-between px-2.5 py-2 text-[14px] text-[#9AA69C]/40 rounded-[3px] cursor-not-allowed"
                 >
                   <div className="flex items-center gap-2.5">
-                    <Icon className="h-3.5 w-3.5 opacity-50" />
+                    <Icon className="h-4 w-4 opacity-50" />
                     <span>{item.name}</span>
                   </div>
-                  <span className="text-[9px] font-mono text-[#9AA69C]/30 uppercase">Soon</span>
+                  <span className="text-[10px] font-mono text-[#9AA69C]/30 uppercase">Soon</span>
                 </div>
               );
             }
@@ -120,18 +118,18 @@ export function OperationsShell({ children }: { children: React.ReactNode }) {
               <Link
                 key={item.name}
                 href={item.href}
-                className={`flex items-center justify-between px-2.5 py-1.5 text-xs rounded-[3px] transition-colors focus-visible:outline-2 focus-visible:outline-[#E8A33D] ${
+                className={`flex items-center justify-between px-2.5 py-2 text-[14px] rounded-[3px] transition-colors focus-visible:outline-2 focus-visible:outline-[#E8A33D] ${
                   isActive
                     ? "bg-[#20251F] text-[#E8A33D] font-semibold border-l-2 border-[#E8A33D]"
                     : "text-[#9AA69C] hover:text-[#E7ECE7] hover:bg-[#181C1A]"
                 }`}
               >
                 <div className="flex items-center gap-2.5">
-                  <Icon className={`h-3.5 w-3.5 ${isActive ? "text-[#E8A33D]" : "text-[#9AA69C]"}`} />
+                  <Icon className={`h-4 w-4 ${isActive ? "text-[#E8A33D]" : "text-[#9AA69C]"}`} />
                   <span>{item.name}</span>
                 </div>
                 {item.badge && (
-                  <span className="text-[9px] font-mono font-bold bg-[#E8A33D]/15 text-[#E8A33D] px-1 py-0.2 rounded-[2px]">
+                  <span className="text-[10px] font-mono font-bold bg-[#E8A33D]/15 text-[#E8A33D] px-1.5 py-0.5 rounded-[2px]">
                     {item.badge}
                   </span>
                 )}
@@ -143,13 +141,14 @@ export function OperationsShell({ children }: { children: React.ReactNode }) {
         {/* Terminal / Warehouse Station Info Footer */}
         <div className="p-3 border-t border-[#2C332E] bg-[#141816] text-[11px] font-mono text-[#9AA69C] space-y-1">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] text-[#9AA69C]/70">STATION:</span>
-            <span className="text-[#E7ECE7] text-[10px]">CONSOLE-01</span>
+            <span className="text-[11px] text-[#9AA69C]/70">STATION:</span>
+            <span className="text-[#E7ECE7] text-[11px]">CONSOLE-01</span>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-[10px] text-[#9AA69C]/70">SYS STATUS:</span>
-            <span className="flex items-center gap-1 text-[#6FA66A] text-[10px]">
-              <span className="h-1.5 w-1.5 rounded-full bg-[#6FA66A] animate-pulse"></span>
+            <span className="text-[11px] text-[#9AA69C]/70">SYS STATUS:</span>
+            <span className="flex items-center gap-1.5 text-[#6FA66A] text-[11px]">
+              {/* Slow 2s ambient opacity pulse */}
+              <span className="inline-block h-2 w-2 rounded-full bg-[#6FA66A] animate-[pulse_2s_cubic-bezier(0.4,0,0.6,1)_infinite]"></span>
               ONLINE
             </span>
           </div>

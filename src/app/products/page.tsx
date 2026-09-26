@@ -6,8 +6,7 @@ import {
   Plus, 
   RefreshCw, 
   Edit2, 
-  Trash2,
-  AlertCircle
+  Trash2
 } from "lucide-react";
 import { OperationsShell } from "@/components/layout/operations-shell";
 import { ProductFormSlideOver } from "@/components/products/product-form-slideover";
@@ -120,40 +119,42 @@ export default function ProductsPage() {
     <OperationsShell>
       <div className="flex-1 flex flex-col h-full overflow-hidden bg-[#101312] text-[#E7ECE7]">
         {/* Top Operational Action Bar */}
-        <header className="h-12 px-6 border-b border-[#2C332E] flex items-center justify-between bg-[#141816] shrink-0">
+        <header className="h-16 px-6 border-b border-[#2C332E] flex items-center justify-between bg-[#141816] shrink-0">
           <div className="flex items-center gap-3">
-            <h1 className="text-[20px] font-sans font-semibold text-[#E7ECE7] tracking-tight">
+            {/* Page Title: 26px font-sans */}
+            <h1 className="text-[26px] font-sans font-semibold text-[#E7ECE7] tracking-tight">
               Products
             </h1>
-            <span className="font-mono text-xs text-[#9AA69C] bg-[#181C1A] px-2 py-0.5 rounded-[3px] border border-[#2C332E]">
+            {/* Stat Pills: 13px with expanded horizontal padding */}
+            <span className="font-mono text-[13px] text-[#9AA69C] bg-[#181C1A] px-3.5 py-0.5 rounded-[3px] border border-[#2C332E]">
               {products.length} SKUs
             </span>
             {lowStockCount > 0 && (
-              <span className="font-mono text-xs text-[#E8A33D] bg-[#E8A33D]/10 px-2 py-0.5 rounded-[3px] border border-[#E8A33D]/25 flex items-center gap-1">
+              <span className="font-mono text-[13px] text-[#E8A33D] bg-[#E8A33D]/10 px-3.5 py-0.5 rounded-[3px] border border-[#E8A33D]/25 flex items-center gap-1.5">
                 <span className="h-1.5 w-1.5 rounded-full bg-[#E8A33D]"></span>
                 {lowStockCount} LOW STOCK
               </span>
             )}
           </div>
 
-          <div className="flex items-center gap-2.5">
-            {/* Search Input */}
-            <div className="relative w-64">
-              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[#9AA69C]" />
+          <div className="flex items-center gap-3">
+            {/* Search Input: Clean 1px border switch on focus, no glow */}
+            <div className="relative w-68">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#9AA69C]" />
               <input
                 type="text"
                 placeholder="Search SKU or name..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full h-8 pl-8 pr-3 text-[13px] bg-[#101312] border border-[#2C332E] rounded-[4px] text-[#E7ECE7] placeholder-[#9AA69C]/50 focus:outline-none focus:border-[#E8A33D] focus:ring-1 focus:ring-[#E8A33D]"
+                className="w-full h-9 pl-9 pr-3 text-[14px] bg-[#101312] border border-[#2C332E] rounded-[4px] text-[#E7ECE7] placeholder-[#9AA69C]/50 focus:border-[#E8A33D] focus:outline-none focus:ring-0 transition-colors"
               />
             </div>
 
-            {/* Category Filter */}
+            {/* Category Filter: Clean 1px border switch on focus */}
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="h-8 px-2 text-[13px] bg-[#101312] border border-[#2C332E] rounded-[4px] text-[#9AA69C] focus:text-[#E7ECE7] focus:outline-none focus:border-[#E8A33D]"
+              className="h-9 px-3 text-[14px] bg-[#101312] border border-[#2C332E] rounded-[4px] text-[#9AA69C] focus:text-[#E7ECE7] focus:border-[#E8A33D] focus:outline-none focus:ring-0 transition-colors"
             >
               <option value="all">All Categories</option>
               {categories.map((cat) => (
@@ -167,21 +168,21 @@ export default function ProductsPage() {
             <button
               onClick={fetchProducts}
               disabled={loading}
-              className="h-8 w-8 flex items-center justify-center rounded-[4px] border border-[#2C332E] bg-[#181C1A] text-[#9AA69C] hover:text-[#E7ECE7] transition-colors focus-visible:outline-2 focus-visible:outline-[#E8A33D]"
+              className="h-9 w-9 flex items-center justify-center rounded-[4px] border border-[#2C332E] bg-[#181C1A] text-[#9AA69C] hover:text-[#E7ECE7] hover:border-[#9AA69C]/40 transition-colors focus-visible:outline-2 focus-visible:outline-[#E8A33D]"
               title="Refresh table"
             >
-              <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} />
+              <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
             </button>
 
-            {/* Primary New Product Action */}
+            {/* New Product Button: ~10% darker on hover, 98% scale-down on click (100ms) */}
             <button
               onClick={() => {
                 setProductToEdit(null);
                 setIsPanelOpen(true);
               }}
-              className="h-8 px-3 text-xs font-semibold bg-[#E8A33D] text-[#101312] hover:bg-[#d89430] rounded-[4px] transition-colors flex items-center gap-1.5 focus-visible:outline-2 focus-visible:outline-white"
+              className="h-9 px-4 text-[13.5px] font-semibold bg-[#E8A33D] text-[#101312] hover:bg-[#d89430] active:scale-[0.98] transition-all duration-100 rounded-[4px] flex items-center gap-1.5 focus-visible:outline-2 focus-visible:outline-white select-none"
             >
-              <Plus className="h-3.5 w-3.5" />
+              <Plus className="h-4 w-4" />
               New product
             </button>
           </div>
@@ -189,26 +190,26 @@ export default function ProductsPage() {
 
         {/* Dense Table Viewport */}
         <div className="flex-1 overflow-auto bg-[#101312]">
-          <table className="w-full text-left border-collapse text-[13px]">
-            {/* Table Header */}
-            <thead className="bg-[#181C1A] text-[#9AA69C] text-[11px] font-mono uppercase tracking-wider sticky top-0 border-b border-[#2C332E] z-10">
-              <tr>
-                <th className="py-2.5 px-4 font-semibold w-36">SKU</th>
-                <th className="py-2.5 px-4 font-semibold">Name</th>
-                <th className="py-2.5 px-4 font-semibold w-40">Category</th>
-                <th className="py-2.5 px-4 font-semibold w-24">Unit</th>
-                <th className="py-2.5 px-4 font-semibold w-32 text-right">Stock</th>
-                <th className="py-2.5 px-4 font-semibold w-32 text-right">Reorder Point</th>
-                <th className="py-2.5 px-4 font-semibold w-20 text-right">Actions</th>
+          <table className="w-full text-left border-collapse">
+            {/* Table Header: 12.5px font-medium uppercase tracking-wider */}
+            <thead className="bg-[#181C1A] text-[#9AA69C] text-[12.5px] font-mono font-medium uppercase tracking-wider sticky top-0 border-b border-[#2C332E] z-10">
+              <tr className="h-11">
+                <th className="px-5 font-medium w-44">SKU</th>
+                <th className="px-5 font-medium">Name</th>
+                <th className="px-5 font-medium w-48">Category</th>
+                <th className="px-5 font-medium w-28">Unit</th>
+                <th className="px-5 font-medium w-36 text-right">Stock</th>
+                <th className="px-5 font-medium w-36 text-right">Reorder Point</th>
+                <th className="px-5 font-medium w-24 text-right">Actions</th>
               </tr>
             </thead>
 
-            {/* Table Body */}
-            <tbody className="divide-y divide-[#2C332E] text-[#E7ECE7]">
+            {/* Table Body: 14.5px text, 52px row height */}
+            <tbody className="divide-y divide-[#2C332E] text-[#E7ECE7] text-[14.5px]">
               {loading && products.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="text-center py-16 text-[#9AA69C]">
-                    <div className="flex items-center justify-center gap-2 font-mono text-xs">
+                  <td colSpan={7} className="text-center py-20 text-[#9AA69C]">
+                    <div className="flex items-center justify-center gap-2.5 font-mono text-[13px]">
                       <RefreshCw className="h-4 w-4 animate-spin text-[#E8A33D]" />
                       <span>QUERYING CATALOG...</span>
                     </div>
@@ -216,9 +217,9 @@ export default function ProductsPage() {
                 </tr>
               ) : products.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="text-center py-20 text-[#9AA69C]">
-                    <div className="flex flex-col items-center justify-center gap-3">
-                      <p className="text-[13px] text-[#9AA69C]">
+                  <td colSpan={7} className="text-center py-24 text-[#9AA69C]">
+                    <div className="flex flex-col items-center justify-center gap-3.5">
+                      <p className="text-[14.5px] text-[#9AA69C]">
                         {searchQuery || selectedCategory !== "all"
                           ? "No matching products for current filter criteria."
                           : "No products yet. Add your first one to start tracking stock."}
@@ -229,9 +230,9 @@ export default function ProductsPage() {
                             setProductToEdit(null);
                             setIsPanelOpen(true);
                           }}
-                          className="h-8 px-3 text-xs font-semibold bg-[#E8A33D] text-[#101312] hover:bg-[#d89430] rounded-[4px] transition-colors flex items-center gap-1.5 focus-visible:outline-2 focus-visible:outline-white"
+                          className="h-9 px-4 text-[13.5px] font-semibold bg-[#E8A33D] text-[#101312] hover:bg-[#d89430] active:scale-[0.98] transition-all duration-100 rounded-[4px] flex items-center gap-1.5 focus-visible:outline-2 focus-visible:outline-white"
                         >
-                          <Plus className="h-3.5 w-3.5" />
+                          <Plus className="h-4 w-4" />
                           New product
                         </button>
                       )}
@@ -253,59 +254,61 @@ export default function ProductsPage() {
                   return (
                     <tr
                       key={product.id}
-                      className="hover:bg-[#181C1A] transition-none border-b border-[#2C332E]"
+                      className="h-[52px] hover:bg-[#20251F] transition-none border-b border-[#2C332E] animate-in fade-in duration-150"
                     >
                       {/* SKU (Monospace) */}
-                      <td className="py-2.5 px-4 font-mono text-xs text-[#E7ECE7]">
+                      <td className="px-5 font-mono text-[13.5px] text-[#E7ECE7]">
                         {product.sku}
                       </td>
 
                       {/* Name */}
-                      <td className="py-2.5 px-4 font-medium text-[#E7ECE7]">
+                      <td className="px-5 font-medium text-[#E7ECE7]">
                         {product.name}
                       </td>
 
                       {/* Category */}
-                      <td className="py-2.5 px-4 text-[#9AA69C] text-xs">
+                      <td className="px-5 text-[#9AA69C] text-[13.5px]">
                         {product.category?.name || "—"}
                       </td>
 
                       {/* Unit */}
-                      <td className="py-2.5 px-4 text-[#9AA69C] text-xs">
+                      <td className="px-5 text-[#9AA69C] text-[13.5px]">
                         {product.unit}
                       </td>
 
                       {/* Stock on Hand (Monospace with Threshold color) */}
-                      <td className={`py-2.5 px-4 font-mono text-xs text-right ${stockColorClass}`}>
+                      <td className={`px-5 font-mono text-[14px] text-right ${stockColorClass}`}>
                         {product.totalQuantity}
-                        {isOutOfStock && <span className="ml-1 text-[10px] text-[#C4553F]">(OUT)</span>}
-                        {!isOutOfStock && isLow && <span className="ml-1 text-[10px] text-[#E8A33D]">(LOW)</span>}
+                        {isOutOfStock && <span className="ml-1.5 text-[11px] text-[#C4553F]">(OUT)</span>}
+                        {!isOutOfStock && isLow && <span className="ml-1.5 text-[11px] text-[#E8A33D]">(LOW)</span>}
                       </td>
 
                       {/* Reorder Point (Monospace) */}
-                      <td className="py-2.5 px-4 font-mono text-xs text-right text-[#9AA69C]">
+                      <td className="px-5 font-mono text-[14px] text-right text-[#9AA69C]">
                         {product.reorderPoint}
                       </td>
 
                       {/* Actions */}
-                      <td className="py-2.5 px-4 text-right">
-                        <div className="flex items-center justify-end gap-1">
+                      <td className="px-5 text-right">
+                        <div className="flex items-center justify-end gap-1.5">
+                          {/* Edit Icon: Dim at rest, full text on hover */}
                           <button
                             onClick={() => {
                               setProductToEdit(product);
                               setIsPanelOpen(true);
                             }}
-                            className="p-1 text-[#9AA69C] hover:text-[#E7ECE7] rounded-[3px] transition-colors focus-visible:outline-2 focus-visible:outline-[#E8A33D]"
+                            className="p-1.5 text-[#9AA69C] hover:text-[#E7ECE7] rounded-[3px] transition-colors focus-visible:outline-2 focus-visible:outline-[#E8A33D]"
                             title="Edit Product"
                           >
-                            <Edit2 className="h-3.5 w-3.5" />
+                            <Edit2 className="h-4 w-4" />
                           </button>
+                          {/* Delete Icon: Dim at rest, danger on hover */}
                           <button
                             onClick={() => handleDelete(product.id, product.name)}
-                            className="p-1 text-[#9AA69C] hover:text-[#C4553F] rounded-[3px] transition-colors focus-visible:outline-2 focus-visible:outline-[#C4553F]"
+                            className="p-1.5 text-[#9AA69C] hover:text-[#C4553F] rounded-[3px] transition-colors focus-visible:outline-2 focus-visible:outline-[#C4553F]"
                             title="Delete Product"
                           >
-                            <Trash2 className="h-3.5 w-3.5" />
+                            <Trash2 className="h-4 w-4" />
                           </button>
                         </div>
                       </td>

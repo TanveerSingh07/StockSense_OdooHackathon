@@ -202,7 +202,7 @@ export function ProductFormSlideOver({
                 placeholder="e.g. Standard Steel Bracket"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full h-9 px-3 text-[13px] bg-[#101312] border border-[#2C332E] rounded-[4px] text-[#E7ECE7] placeholder-[#9AA69C]/40 focus:outline-none focus:border-[#E8A33D] focus:ring-1 focus:ring-[#E8A33D]"
+                className="w-full h-9 px-3 text-[14px] bg-[#101312] border border-[#2C332E] rounded-[4px] text-[#E7ECE7] placeholder-[#9AA69C]/40 focus:outline-none focus:border-[#E8A33D] focus:ring-0 transition-colors"
               />
               {fieldErrors.name && (
                 <p className="text-xs text-[#C4553F] pt-0.5">{fieldErrors.name}</p>
@@ -220,7 +220,7 @@ export function ProductFormSlideOver({
                 placeholder="e.g. BRK-001"
                 value={sku}
                 onChange={(e) => setSku(e.target.value.toUpperCase())}
-                className="w-full h-9 px-3 font-mono text-[13px] bg-[#101312] border border-[#2C332E] rounded-[4px] text-[#E7ECE7] placeholder-[#9AA69C]/40 uppercase focus:outline-none focus:border-[#E8A33D] focus:ring-1 focus:ring-[#E8A33D]"
+                className="w-full h-9 px-3 font-mono text-[14px] bg-[#101312] border border-[#2C332E] rounded-[4px] text-[#E7ECE7] placeholder-[#9AA69C]/40 uppercase focus:outline-none focus:border-[#E8A33D] focus:ring-0 transition-colors"
               />
               {fieldErrors.sku && (
                 <p className="text-xs text-[#C4553F] pt-0.5">{fieldErrors.sku}</p>
@@ -250,7 +250,7 @@ export function ProductFormSlideOver({
                     placeholder="New category..."
                     value={newCategoryName}
                     onChange={(e) => setNewCategoryName(e.target.value)}
-                    className="w-full h-9 px-2.5 text-[13px] bg-[#101312] border border-[#2C332E] rounded-[4px] text-[#E7ECE7] placeholder-[#9AA69C]/40 focus:outline-none focus:border-[#E8A33D] focus:ring-1 focus:ring-[#E8A33D]"
+                    className="w-full h-9 px-2.5 text-[14px] bg-[#101312] border border-[#2C332E] rounded-[4px] text-[#E7ECE7] placeholder-[#9AA69C]/40 focus:outline-none focus:border-[#E8A33D] focus:ring-0 transition-colors"
                     autoFocus
                   />
                 ) : (
@@ -258,7 +258,7 @@ export function ProductFormSlideOver({
                     id="prod-cat"
                     value={categoryId}
                     onChange={(e) => setCategoryId(e.target.value)}
-                    className="w-full h-9 px-2 text-[13px] bg-[#101312] border border-[#2C332E] rounded-[4px] text-[#E7ECE7] focus:outline-none focus:border-[#E8A33D] focus:ring-1 focus:ring-[#E8A33D]"
+                    className="w-full h-9 px-2 text-[14px] bg-[#101312] border border-[#2C332E] rounded-[4px] text-[#E7ECE7] focus:outline-none focus:border-[#E8A33D] focus:ring-0 transition-colors"
                   >
                     {categories.length === 0 ? (
                       <option value="">No categories</option>
@@ -287,7 +287,7 @@ export function ProductFormSlideOver({
                   placeholder="Units, pcs, kg"
                   value={unit}
                   onChange={(e) => setUnit(e.target.value)}
-                  className="w-full h-9 px-3 text-[13px] bg-[#101312] border border-[#2C332E] rounded-[4px] text-[#E7ECE7] placeholder-[#9AA69C]/40 focus:outline-none focus:border-[#E8A33D] focus:ring-1 focus:ring-[#E8A33D]"
+                  className="w-full h-9 px-3 text-[14px] bg-[#101312] border border-[#2C332E] rounded-[4px] text-[#E7ECE7] placeholder-[#9AA69C]/40 focus:outline-none focus:border-[#E8A33D] focus:ring-0 transition-colors"
                 />
               </div>
             </div>
@@ -304,9 +304,9 @@ export function ProductFormSlideOver({
                 placeholder="10"
                 value={reorderPoint}
                 onChange={(e) => setReorderPoint(e.target.value)}
-                className="w-full h-9 px-3 font-mono text-[13px] bg-[#101312] border border-[#2C332E] rounded-[4px] text-[#E7ECE7] placeholder-[#9AA69C]/40 focus:outline-none focus:border-[#E8A33D] focus:ring-1 focus:ring-[#E8A33D]"
+                className="w-full h-9 px-3 font-mono text-[14px] bg-[#101312] border border-[#2C332E] rounded-[4px] text-[#E7ECE7] placeholder-[#9AA69C]/40 focus:outline-none focus:border-[#E8A33D] focus:ring-0 transition-colors"
               />
-              <p className="text-[11px] text-[#9AA69C]">
+              <p className="text-[12px] text-[#9AA69C]">
                 Alert threshold: stock at or below this triggers amber indicator.
               </p>
             </div>
@@ -325,9 +325,9 @@ export function ProductFormSlideOver({
             <button
               type="submit"
               disabled={loading}
-              className="px-4 py-1.5 text-xs font-semibold bg-[#E8A33D] text-[#101312] hover:bg-[#d89430] rounded-[4px] transition-colors flex items-center gap-1.5 focus-visible:outline-2 focus-visible:outline-white disabled:opacity-50"
+              className="px-4 py-2 text-[13.5px] font-semibold bg-[#E8A33D] text-[#101312] hover:bg-[#d89430] active:scale-[0.98] transition-all duration-100 rounded-[4px] flex items-center gap-1.5 focus-visible:outline-2 focus-visible:outline-white disabled:opacity-50 select-none"
             >
-              <Check className="h-3.5 w-3.5" />
+              <Check className="h-4 w-4" />
               {loading
                 ? "Saving..."
                 : productToEdit
@@ -340,3 +340,4 @@ export function ProductFormSlideOver({
     </div>
   );
 }
+
