@@ -2,7 +2,8 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { decreaseStock } from '@/lib/stock-engine';
 
-export async function GET(req: Request, { params }: { params: { id: string } }) {
+export async function GET(req: Request, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const delivery = await prisma.deliveryOrder.findUnique({
     where: { id: params.id },
     include: { lines: true }
@@ -11,8 +12,9 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
   return NextResponse.json(delivery);
 }
 
-export async function PATCH(req: Request, { params }: { params: { id: string } }) {
+export async function PATCH(req: Request, props: { params: Promise<{ id: string }> }) {
   try {
+    const params = await props.params;
     const { status } = await req.json();
     const deliveryId = params.id;
 
