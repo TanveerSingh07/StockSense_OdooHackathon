@@ -35,8 +35,8 @@ export async function GET(req: NextRequest) {
     });
 
     // Compute total quantity and check low stock
-    const formattedProducts = products.map((product) => {
-      const totalQuantity = product.levels.reduce((sum, lvl) => sum + lvl.quantity, 0);
+    const formattedProducts = products.map((product: any) => {
+      const totalQuantity = product.levels.reduce((sum: number, lvl: any) => sum + lvl.quantity, 0);
       const isLowStock = totalQuantity <= product.reorderPoint;
       return {
         ...product,
