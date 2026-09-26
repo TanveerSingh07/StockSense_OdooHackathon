@@ -1,69 +1,126 @@
-import Image from "next/image";
+import { prisma } from '@/lib/prisma';
+import Link from 'next/link';
 
-export default function Home() {
+export const dynamic = 'force-dynamic';
+
+export default async function DashboardPage() {
+  const [totalReceipts, totalDeliveries, latestMoves, stockLevels] = await Promise.all([
+    prisma.receipt.count(),
+    prisma.deliveryOrder.count(),
+    prisma.stockLedger.findMany({ take: 5, orderBy: { createdAt: 'desc' } }),
+    prisma.stockLevel.findMany({ take: 5, orderBy: { quantity: 'desc' } })
+  ]);
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div className="p-8 max-w-6xl mx-auto">
+      <h1 className="text-3xl font-bold mb-8">Dashboard</h1>
+      
+      {/* Current Statistics / KPIs */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+        <div className="p-6 border rounded-xl bg-white shadow-sm flex flex-col items-center justify-center">
+          <span className="text-4xl font-bold text-blue-600 mb-2">{totalReceipts}</span>
+          <span className="text-gray-500 font-medium uppercase text-sm tracking-wider">Total Receipts</span>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+        <div className="p-6 border rounded-xl bg-white shadow-sm flex flex-col items-center justify-center">
+          <span className="text-4xl font-bold text-green-600 mb-2">{totalDeliveries}</span>
+          <span className="text-gray-500 font-medium uppercase text-sm tracking-wider">Total Deliveries</span>
         </div>
-      </main>
+        <div className="p-6 border rounded-xl bg-white shadow-sm flex flex-col items-center justify-center">
+          <span className="text-4xl font-bold text-purple-600 mb-2">{stockLevels.reduce((acc, s) => acc + s.quantity, 0)}</span>
+          <span className="text-gray-500 font-medium uppercase text-sm tracking-wider">Total Items in Stock</span>
+        </div>
+      </div>
+
+      {/* Operations Submenu */}
+      <div className="mb-12">
+        <h2 className="text-xl font-bold mb-4">Operations</h2>
+        <div className="flex gap-4">
+          <Link href="/receipts" className="px-6 py-3 bg-blue-50 text-blue-700 font-semibold rounded-lg border border-blue-200 hover:bg-blue-100 transition">
+            1. Receipts
+          </Link>
+          <Link href="/deliveries" className="px-6 py-3 bg-green-50 text-green-700 font-semibold rounded-lg border border-green-200 hover:bg-green-100 transition">
+            2. Deliveries
+          </Link>
+          <Link href="/adjustments/new" className="px-6 py-3 bg-purple-50 text-purple-700 font-semibold rounded-lg border border-purple-200 hover:bg-purple-100 transition">
+            3. Adjustments
+          </Link>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Available Stock */}
+        <div>
+          <div className="flex justify-between items-end mb-4">
+            <h2 className="text-xl font-bold">Available Stock</h2>
+          </div>
+          <div className="border rounded-lg bg-white shadow-sm overflow-hidden">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="border-b bg-gray-50 text-sm">
+                  <th className="p-4">Product ID</th>
+                  <th className="p-4">Warehouse ID</th>
+                  <th className="p-4 text-right">On Hand</th>
+                </tr>
+              </thead>
+              <tbody>
+                {stockLevels.map(s => (
+                  <tr key={s.id} className="border-b hover:bg-gray-50/50">
+                    <td className="p-4 font-medium">{s.productId}</td>
+                    <td className="p-4 text-sm text-gray-500">{s.warehouseId}</td>
+                    <td className="p-4 text-right font-bold">{s.quantity}</td>
+                  </tr>
+                ))}
+                {stockLevels.length === 0 && (
+                  <tr>
+                    <td colSpan={3} className="p-4 text-center text-gray-500">No stock found</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Move History */}
+        <div>
+          <div className="flex justify-between items-end mb-4">
+            <h2 className="text-xl font-bold">Recent Move History</h2>
+            <Link href="/history" className="text-blue-600 hover:underline text-sm font-medium">View All &rarr;</Link>
+          </div>
+          <div className="border rounded-lg bg-white shadow-sm overflow-hidden">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="border-b bg-gray-50 text-sm">
+                  <th className="p-4">Reference</th>
+                  <th className="p-4">Product</th>
+                  <th className="p-4 text-right">Change</th>
+                </tr>
+              </thead>
+              <tbody>
+                {latestMoves.map(m => {
+                  const isIn = m.change > 0;
+                  return (
+                    <tr key={m.id} className="border-b hover:bg-gray-50/50">
+                      <td className="p-4 font-mono text-xs">{m.refId.slice(-6)}</td>
+                      <td className="p-4 text-sm font-medium">{m.productId}</td>
+                      <td className="p-4 text-right">
+                        <span className={`px-2 py-1 rounded text-xs font-bold ${isIn ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                          {isIn ? '+' : ''}{m.change}
+                        </span>
+                      </td>
+                    </tr>
+                  )
+                })}
+                {latestMoves.length === 0 && (
+                  <tr>
+                    <td colSpan={3} className="p-4 text-center text-gray-500">No recent moves</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
     </div>
   );
 }
