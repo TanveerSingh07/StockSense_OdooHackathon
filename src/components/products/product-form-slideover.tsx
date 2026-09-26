@@ -173,46 +173,46 @@ export function ProductFormSlideOver({
 
   return (
     <div className="fixed inset-0 z-50 overflow-hidden select-none">
-      {/* Backdrop */}
+      {/* Flat Backdrop */}
       <div
-        className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity"
+        className="fixed inset-0 bg-black/60 transition-opacity"
         onClick={onClose}
       />
 
       <div className="fixed inset-y-0 right-0 flex max-w-full pl-10">
-        <div className="w-screen max-w-md bg-[#161B22] text-[#F0F6FC] shadow-2xl border-l border-white/[0.08] flex flex-col justify-between">
+        <div className="w-screen max-w-md bg-[#0F172A] text-zinc-100 border-l border-white/[0.08] flex flex-col justify-between">
           {/* Header */}
-          <div className="px-6 py-5 border-b border-white/[0.08] flex items-center justify-between bg-[#161B22]">
+          <div className="px-5 py-4 border-b border-white/[0.08] flex items-center justify-between bg-[#0F172A]">
             <div>
-              <h2 className="text-base font-semibold text-white tracking-tight">
-                {productToEdit ? "Edit Product" : "Add New Product"}
+              <h2 className="text-sm font-semibold text-white tracking-tight">
+                {productToEdit ? "Edit product" : "Add product"}
               </h2>
-              <p className="text-xs text-slate-400 mt-0.5">
+              <p className="text-xs text-zinc-400 mt-0.5">
                 {productToEdit
-                  ? "Update product metadata and reorder threshold"
+                  ? "Update product details and reorder threshold"
                   : "Register a new SKU in your catalog"}
               </p>
             </div>
             <button
               onClick={onClose}
-              className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/[0.06] transition-colors focus:outline-none"
+              className="p-1 rounded text-zinc-400 hover:text-white hover:bg-white/[0.06] transition-colors focus:outline-none cursor-pointer"
             >
               <X className="h-4 w-4" />
             </button>
           </div>
 
           {/* Form Content */}
-          <form id="product-form" onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6 space-y-4">
+          <form id="product-form" onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-5 space-y-4 text-xs">
             {generalError && (
-              <div className="p-3 text-xs bg-red-500/10 border border-red-500/20 text-red-400 rounded-lg">
+              <div className="p-3 text-xs bg-rose-500/10 border border-rose-500/20 text-rose-400 rounded-lg">
                 {generalError}
               </div>
             )}
 
             {/* Product Name */}
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1.5">
-                Product Name <span className="text-red-400">*</span>
+              <label className="block text-xs font-medium text-zinc-300 mb-1.5">
+                Product name <span className="text-rose-400">*</span>
               </label>
               <input
                 ref={nameInputRef}
@@ -220,99 +220,99 @@ export function ProductFormSlideOver({
                 placeholder="e.g. Wireless Barcode Scanner"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className={`w-full px-3 py-2 text-sm bg-[#0D1117] border rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-colors ${
-                  fieldErrors.name ? "border-red-500" : "border-white/[0.08]"
+                className={`w-full px-3 py-2 text-xs bg-[#1E293B] border rounded-lg text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-colors ${
+                  fieldErrors.name ? "border-rose-500" : "border-white/[0.08]"
                 }`}
               />
               {fieldErrors.name && (
-                <p className="mt-1 text-xs text-red-400">{fieldErrors.name}</p>
+                <p className="mt-1 text-xs text-rose-400">{fieldErrors.name}</p>
               )}
             </div>
 
             {/* SKU */}
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1.5">
-                SKU / Barcode <span className="text-red-400">*</span>
+              <label className="block text-xs font-medium text-zinc-300 mb-1.5">
+                SKU <span className="text-rose-400">*</span>
               </label>
               <input
                 type="text"
                 placeholder="e.g. ELEC-SCN-001"
                 value={sku}
                 onChange={(e) => setSku(e.target.value)}
-                className={`w-full px-3 py-2 text-sm font-mono bg-[#0D1117] border rounded-lg text-white placeholder-slate-500 uppercase focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-colors ${
-                  fieldErrors.sku ? "border-red-500" : "border-white/[0.08]"
+                className={`w-full px-3 py-2 text-xs font-mono bg-[#1E293B] border rounded-lg text-white placeholder-zinc-500 uppercase focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-colors ${
+                  fieldErrors.sku ? "border-rose-500" : "border-white/[0.08]"
                 }`}
               />
               {fieldErrors.sku && (
-                <p className="mt-1 text-xs text-red-400">{fieldErrors.sku}</p>
+                <p className="mt-1 text-xs text-rose-400">{fieldErrors.sku}</p>
               )}
             </div>
 
             {/* Category */}
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <label className="block text-xs font-medium text-slate-300">
-                  Category <span className="text-red-400">*</span>
+                <label className="block text-xs font-medium text-zinc-300">
+                  Category <span className="text-rose-400">*</span>
                 </label>
                 <button
                   type="button"
                   onClick={() => setIsAddingNewCategory(!isAddingNewCategory)}
-                  className="text-xs text-emerald-400 hover:text-emerald-300 flex items-center gap-1 font-medium"
+                  className="text-xs text-zinc-400 hover:text-white flex items-center gap-1 font-medium cursor-pointer"
                 >
                   <FolderPlus className="h-3.5 w-3.5" />
-                  {isAddingNewCategory ? "Choose existing" : "+ New Category"}
+                  {isAddingNewCategory ? "Choose existing" : "+ New category"}
                 </button>
               </div>
 
               {isAddingNewCategory ? (
                 <input
                   type="text"
-                  placeholder="Enter new category name..."
+                  placeholder="Category name..."
                   value={newCategoryName}
                   onChange={(e) => setNewCategoryName(e.target.value)}
-                  className={`w-full px-3 py-2 text-sm bg-[#0D1117] border rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-colors ${
-                    fieldErrors.category ? "border-red-500" : "border-white/[0.08]"
+                  className={`w-full px-3 py-2 text-xs bg-[#1E293B] border rounded-lg text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-colors ${
+                    fieldErrors.category ? "border-rose-500" : "border-white/[0.08]"
                   }`}
                 />
               ) : (
                 <select
                   value={categoryId}
                   onChange={(e) => setCategoryId(e.target.value)}
-                  className={`w-full px-3 py-2 text-sm bg-[#0D1117] border rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-colors ${
-                    fieldErrors.category ? "border-red-500" : "border-white/[0.08]"
+                  className={`w-full px-3 py-2 text-xs bg-[#1E293B] border rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-colors cursor-pointer ${
+                    fieldErrors.category ? "border-rose-500" : "border-white/[0.08]"
                   }`}
                 >
                   <option value="" disabled>Select category...</option>
                   {categories.map((c) => (
-                    <option key={c.id} value={c.id} className="bg-[#161B22] text-white">
+                    <option key={c.id} value={c.id} className="bg-[#1E293B] text-white">
                       {c.name}
                     </option>
                   ))}
                 </select>
               )}
               {fieldErrors.category && (
-                <p className="mt-1 text-xs text-red-400">{fieldErrors.category}</p>
+                <p className="mt-1 text-xs text-rose-400">{fieldErrors.category}</p>
               )}
             </div>
 
             {/* Unit & Reorder Point Row */}
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-medium text-slate-300 mb-1.5">
-                  Unit of Measure
+                <label className="block text-xs font-medium text-zinc-300 mb-1.5">
+                  Unit of measure
                 </label>
                 <input
                   type="text"
                   placeholder="e.g. Units, Boxes"
                   value={unit}
                   onChange={(e) => setUnit(e.target.value)}
-                  className="w-full px-3 py-2 text-sm bg-[#0D1117] border border-white/[0.08] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-colors"
+                  className="w-full px-3 py-2 text-xs bg-[#1E293B] border border-white/[0.08] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-colors"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-slate-300 mb-1.5">
-                  Reorder Threshold
+                <label className="block text-xs font-medium text-zinc-300 mb-1.5">
+                  Reorder threshold
                 </label>
                 <input
                   type="number"
@@ -320,7 +320,7 @@ export function ProductFormSlideOver({
                   placeholder="10"
                   value={reorderPoint}
                   onChange={(e) => setReorderPoint(e.target.value)}
-                  className="w-full px-3 py-2 text-sm font-mono bg-[#0D1117] border border-white/[0.08] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-colors"
+                  className="w-full px-3 py-2 text-xs font-mono bg-[#1E293B] border border-white/[0.08] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-colors"
                 />
               </div>
             </div>
@@ -328,8 +328,8 @@ export function ProductFormSlideOver({
             {/* Initial Stock (Only for new products) */}
             {!productToEdit && (
               <div>
-                <label className="block text-xs font-medium text-slate-300 mb-1.5">
-                  Initial Starting Stock
+                <label className="block text-xs font-medium text-zinc-300 mb-1.5">
+                  Initial starting stock
                 </label>
                 <input
                   type="number"
@@ -337,21 +337,21 @@ export function ProductFormSlideOver({
                   placeholder="0"
                   value={initialStock}
                   onChange={(e) => setInitialStock(e.target.value)}
-                  className="w-full px-3 py-2 text-sm font-mono bg-[#0D1117] border border-white/[0.08] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-colors"
+                  className="w-full px-3 py-2 text-xs font-mono bg-[#1E293B] border border-white/[0.08] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-colors"
                 />
-                <p className="mt-1 text-[11px] text-slate-400">
-                  Sets the starting quantity in the Main Warehouse.
+                <p className="mt-1 text-[11px] text-zinc-500">
+                  Sets initial on-hand quantity for your default warehouse.
                 </p>
               </div>
             )}
           </form>
 
           {/* Footer Actions */}
-          <div className="p-4 px-6 border-t border-white/10 bg-[#0F172A] flex items-center justify-end gap-3">
+          <div className="p-4 px-5 border-t border-white/[0.08] bg-[#0F172A] flex items-center justify-end gap-2.5">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-xs font-semibold text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-colors cursor-pointer"
+              className="px-3 py-1.5 text-xs font-medium text-zinc-300 hover:text-white bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] rounded-lg transition-colors cursor-pointer"
             >
               Cancel
             </button>
@@ -359,14 +359,14 @@ export function ProductFormSlideOver({
               type="submit"
               form="product-form"
               disabled={loading}
-              className="px-4.5 py-2 text-xs font-bold bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 rounded-xl shadow-lg shadow-amber-500/20 transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50 active:scale-[0.97]"
+              className="px-3.5 py-1.5 text-xs font-medium bg-amber-500 hover:bg-amber-400 text-zinc-950 rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
             >
               {loading ? (
                 <span>Saving...</span>
               ) : (
                 <>
-                  <Check className="h-4 w-4 stroke-[3]" />
-                  <span>{productToEdit ? "Save Changes" : "Create Product"}</span>
+                  <Check className="h-3.5 w-3.5 stroke-[2.5]" />
+                  <span>{productToEdit ? "Save changes" : "Create product"}</span>
                 </>
               )}
             </button>
