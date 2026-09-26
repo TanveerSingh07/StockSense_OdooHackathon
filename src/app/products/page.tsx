@@ -16,17 +16,12 @@ import {
   Package,
   AlertTriangle,
   X,
-  Boxes,
   Activity,
   Layers,
-  ShieldCheck,
-  SlidersHorizontal,
-  Bell,
   Cpu,
   Wrench,
   Box,
-  HardHat,
-  MoreHorizontal
+  HardHat
 } from "lucide-react";
 import { OperationsShell } from "@/components/layout/operations-shell";
 import { ProductFormSlideOver } from "@/components/products/product-form-slideover";
@@ -256,56 +251,16 @@ export default function ProductsPage() {
 
   return (
     <OperationsShell>
-      <div className="flex-1 flex flex-col h-full overflow-hidden bg-[#0D1117] text-[#F0F6FC] relative">
-        {/* Top Header & Search Bar */}
-        <header className="h-16 px-4 md:px-8 border-b border-white/[0.08] flex items-center justify-between bg-[#090C10]/80 backdrop-blur-md shrink-0 gap-4">
-          {/* Universal Search (Cmd+K) */}
-          <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-            <input
-              id="catalog-search"
-              type="text"
-              placeholder="Search products, SKU, or barcode..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full h-9.5 pl-10 pr-12 text-xs bg-[#161B22] border border-white/[0.08] rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all shadow-xs"
-            />
-            <span className="hidden sm:inline-flex absolute right-2.5 top-1/2 -translate-y-1/2 items-center px-1.5 py-0.5 text-[10px] font-mono text-slate-400 bg-white/[0.04] border border-white/[0.08] rounded">
-              ⌘K
-            </span>
-          </div>
-
-          {/* Right Header Badges */}
-          <div className="flex items-center gap-3">
-            {/* Notification Bell */}
-            <button className="h-9 w-9 relative rounded-lg border border-white/[0.08] bg-[#161B22] hover:bg-white/[0.04] text-slate-400 hover:text-white flex items-center justify-center transition-colors">
-              <Bell className="h-4 w-4" />
-              {lowStockCount > 0 && (
-                <span className="absolute top-2 right-2 h-2 w-2 rounded-full bg-amber-400 ring-2 ring-[#161B22]" />
-              )}
-            </button>
-
-            {/* Quick Refresh */}
-            <button
-              onClick={fetchProducts}
-              disabled={loading}
-              className="h-9 w-9 rounded-lg border border-white/[0.08] bg-[#161B22] hover:bg-white/[0.04] text-slate-400 hover:text-white flex items-center justify-center transition-colors"
-              title="Refresh inventory"
-            >
-              <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} />
-            </button>
-          </div>
-        </header>
-
-        {/* Scrollable Main Area */}
-        <div className="flex-1 overflow-y-auto px-4 md:px-8 py-6 space-y-6">
+      <div className="flex-1 flex flex-col h-full bg-[#0D1117] text-[#F0F6FC]">
+        {/* Main Content Area */}
+        <div className="p-4 sm:p-8 max-w-7xl mx-auto space-y-6 w-full">
           {/* Page Title & Main Actions */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <h1 className="text-xl md:text-2xl font-semibold text-white tracking-tight">
+              <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
                 Products & Inventory
               </h1>
-              <p className="text-xs md:text-sm text-slate-400 mt-1">
+              <p className="text-xs sm:text-sm text-slate-400 mt-1">
                 Manage your master catalog, track live warehouse stock, and monitor reorder levels.
               </p>
             </div>
@@ -448,8 +403,30 @@ export default function ProductsPage() {
             </div>
           </div>
 
-          {/* Filter Pills Navigation */}
-          <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
+          {/* Search Toolbar & Filter Pills */}
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+            {/* Search Input */}
+            <div className="relative flex-1 max-w-sm">
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+              <input
+                id="catalog-search"
+                type="text"
+                placeholder="Search products, SKU, barcode..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full h-9 pl-9.5 pr-8 text-xs bg-[#161B22] border border-white/[0.08] rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all shadow-xs"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery("")}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
+                >
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              )}
+            </div>
+
+            {/* Filter Pills */}
             <div className="flex flex-wrap items-center gap-2">
               <button
                 onClick={() => {
@@ -462,7 +439,7 @@ export default function ProductsPage() {
                     : "bg-[#161B22] text-slate-400 hover:text-white hover:bg-white/[0.06] border border-white/[0.06]"
                 }`}
               >
-                <span>All Products</span>
+                <span>All</span>
                 <span className={`px-1.5 py-0.2 rounded-full text-[10px] ${
                   selectedCategory === "all" && !lowStockOnly
                     ? "bg-slate-200 text-slate-900"
@@ -482,7 +459,7 @@ export default function ProductsPage() {
                   }`}
                 >
                   <AlertTriangle className="h-3 w-3" />
-                  <span>Low Stock Alerts</span>
+                  <span>Low Stock</span>
                   <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-amber-950/40 text-amber-200">
                     {lowStockCount}
                   </span>
@@ -514,10 +491,16 @@ export default function ProductsPage() {
                   )}
                 </button>
               ))}
-            </div>
 
-            <div className="text-xs text-slate-400">
-              Showing <span className="font-medium text-white">{products.length}</span> items
+              {/* Refresh Button */}
+              <button
+                onClick={fetchProducts}
+                disabled={loading}
+                className="h-8 w-8 rounded-lg border border-white/[0.08] bg-[#161B22] hover:bg-white/[0.04] text-slate-400 hover:text-white flex items-center justify-center transition-colors cursor-pointer"
+                title="Refresh inventory"
+              >
+                <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin text-emerald-400" : ""}`} />
+              </button>
             </div>
           </div>
 
@@ -829,7 +812,7 @@ export default function ProductsPage() {
                                           setProductToEdit(product);
                                           setIsPanelOpen(true);
                                         }}
-                                        className="text-emerald-400 hover:text-emerald-300 font-medium hover:underline text-xs"
+                                        className="text-emerald-400 hover:text-emerald-300 font-medium hover:underline text-xs cursor-pointer"
                                       >
                                         Edit product parameters →
                                       </button>
