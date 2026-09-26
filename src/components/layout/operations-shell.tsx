@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { 
@@ -13,7 +13,12 @@ import {
   History,
   Boxes,
   Menu,
-  X
+  X,
+  Bell,
+  Search,
+  ChevronDown,
+  User,
+  ShieldCheck
 } from "lucide-react";
 
 interface NavItem {
@@ -27,32 +32,21 @@ interface NavItem {
 
 export function OperationsShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const [time, setTime] = useState<string>("");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  useEffect(() => {
-    const updateTime = () => {
-      const now = new Date();
-      setTime(now.toLocaleTimeString("en-US", { hour12: false, hour: "2-digit", minute: "2-digit", second: "2-digit" }));
-    };
-    updateTime();
-    const interval = setInterval(updateTime, 1000);
-    return () => clearInterval(interval);
-  }, []);
-
   const navItems: NavItem[] = [
-    { 
-      name: "Products", 
-      href: "/products", 
-      icon: Package, 
-      active: pathname.startsWith("/products"),
-      badge: "ACTIVE"
-    },
     { 
       name: "Dashboard", 
       href: "/dashboard", 
       icon: LayoutDashboard, 
       disabled: true 
+    },
+    { 
+      name: "Products", 
+      href: "/products", 
+      icon: Package, 
+      active: pathname.startsWith("/products"),
+      badge: "LIVE"
     },
     { 
       name: "Receipts", 
@@ -87,63 +81,68 @@ export function OperationsShell({ children }: { children: React.ReactNode }) {
   ];
 
   return (
-    <div className="flex flex-col md:flex-row h-screen w-screen overflow-hidden bg-[#1C1B18] text-[#EDEAE3] font-sans antialiased select-none relative">
-      {/* 1px Repeating Diagonal Hairline Pattern Background */}
-      <div 
-        className="absolute inset-0 pointer-events-none z-0 opacity-25"
-        style={{
-          backgroundImage: `repeating-linear-gradient(45deg, #3A3733 0, #3A3733 1px, transparent 0, transparent 14px)`
-        }}
-      />
-
-      {/* Mobile Top Navbar with Hamburger */}
-      <div className="md:hidden h-14 border-b border-[#3A3733] px-4 flex items-center justify-between bg-[#242320] z-30 shrink-0">
-        <div className="flex items-center gap-2">
-          <div className="h-7 w-7 rounded-[2px] bg-[#F2B705] text-[#1C1B18] flex items-center justify-center font-bold">
-            <Boxes className="h-4 w-4 stroke-[2.5]" />
+    <div className="flex flex-col md:flex-row h-screen w-screen overflow-hidden bg-[#0D1117] text-[#F0F6FC] font-sans antialiased select-none">
+      {/* Mobile Top Header */}
+      <div className="md:hidden h-14 border-b border-white/[0.08] px-4 flex items-center justify-between bg-[#090C10] z-30 shrink-0">
+        <div className="flex items-center gap-2.5">
+          <div className="h-7 w-7 rounded-lg bg-indigo-600 text-white flex items-center justify-center font-bold shadow-sm shadow-indigo-500/20">
+            <Boxes className="h-4 w-4" />
           </div>
-          <span className="font-sans text-[14px] font-bold tracking-wider text-[#EDEAE3] uppercase">
-            STOCKSENSE
+          <span className="font-semibold text-sm tracking-tight text-white">
+            StockSense
           </span>
         </div>
 
-        <button
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="p-2 text-[#938E83] hover:text-[#EDEAE3] focus:outline-none"
-        >
-          {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="p-2 text-slate-400 hover:text-white focus:outline-none"
+          >
+            {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
+        </div>
       </div>
 
-      {/* Sidebar (Desktop persistent, Mobile drawer) */}
+      {/* Sidebar Navigation */}
       <aside className={`
         ${mobileMenuOpen ? "flex" : "hidden"} 
-        md:flex w-full md:w-56 shrink-0 flex-col border-r border-[#3A3733] bg-[#242320] relative z-20 transition-all
+        md:flex w-full md:w-60 shrink-0 flex-col border-r border-white/[0.08] bg-[#090C10] relative z-20 transition-all
       `}>
-        {/* Console Brand Header (Desktop) */}
-        <div className="hidden md:flex h-16 border-b border-[#3A3733] px-4 items-center justify-between bg-[#242320]">
+        {/* Brand Header */}
+        <div className="hidden md:flex h-16 border-b border-white/[0.08] px-4 items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="h-7 w-7 rounded-[2px] bg-[#F2B705] text-[#1C1B18] flex items-center justify-center font-bold">
-              <Boxes className="h-4 w-4 stroke-[2.5]" />
+            <div className="h-8 w-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center font-bold shadow-md shadow-indigo-600/30">
+              <Boxes className="h-4.5 w-4.5" />
             </div>
             <div>
-              <span className="font-sans text-[13px] font-bold tracking-widest text-[#EDEAE3] uppercase block leading-none">
-                STOCKSENSE
+              <span className="font-semibold text-[14px] text-white tracking-tight block leading-tight">
+                StockSense
               </span>
-              <span className="text-[10px] font-mono text-[#938E83] tracking-widest block mt-1">
-                WAREHOUSE OS
+              <span className="text-[11px] text-slate-400 block">
+                Warehouse Operations
               </span>
             </div>
           </div>
-          <span className="font-mono text-[10px] font-bold text-[#F2B705] bg-[#F2B705]/10 px-1.5 py-0.5 rounded-[2px] border border-[#F2B705]/25">
+          <span className="text-[10px] font-mono font-medium text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded-full border border-emerald-500/20">
             v1.0
           </span>
         </div>
 
-        {/* Navigation List */}
-        <div className="flex-1 py-3 px-2 space-y-0.5 overflow-y-auto">
-          <div className="px-2.5 py-1 text-[10px] font-mono font-semibold uppercase tracking-widest text-[#938E83]">
-            MENU
+        {/* Workspace Quick Selector */}
+        <div className="px-3 pt-3 pb-1">
+          <div className="w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg bg-white/[0.03] border border-white/[0.06] text-xs text-slate-300">
+            <div className="flex items-center gap-2 truncate">
+              <span className="h-2 w-2 rounded-full bg-emerald-400"></span>
+              <span className="truncate font-medium">Main Distribution Center</span>
+            </div>
+            <ChevronDown className="h-3.5 w-3.5 text-slate-500 shrink-0" />
+          </div>
+        </div>
+
+        {/* Navigation Items */}
+        <div className="flex-1 py-3 px-3 space-y-1 overflow-y-auto">
+          <div className="px-2 py-1 text-[10px] font-mono font-semibold uppercase tracking-wider text-slate-400">
+            Navigation
           </div>
 
           {navItems.map((item) => {
@@ -154,13 +153,14 @@ export function OperationsShell({ children }: { children: React.ReactNode }) {
               return (
                 <div
                   key={item.name}
-                  className="flex items-center justify-between px-2.5 py-2 text-[13.5px] text-[#938E83]/40 rounded-[2px] cursor-not-allowed"
+                  className="flex items-center justify-between px-2.5 py-2 text-xs text-slate-400/50 rounded-lg cursor-not-allowed group"
+                  title="Coming in next sprint"
                 >
                   <div className="flex items-center gap-2.5">
-                    <Icon className="h-3.5 w-3.5 opacity-40" />
+                    <Icon className="h-4 w-4 opacity-40 group-hover:opacity-60 transition-opacity" />
                     <span>{item.name}</span>
                   </div>
-                  <span className="text-[9px] font-mono text-[#938E83]/30 uppercase">
+                  <span className="text-[9px] font-mono text-slate-400/40 bg-white/[0.02] px-1.5 py-0.5 rounded border border-white/[0.04]">
                     SOON
                   </span>
                 </div>
@@ -172,18 +172,18 @@ export function OperationsShell({ children }: { children: React.ReactNode }) {
                 key={item.name}
                 href={item.href}
                 onClick={() => setMobileMenuOpen(false)}
-                className={`flex items-center justify-between px-2.5 py-2 text-[13.5px] rounded-[2px] transition-colors focus-visible:outline-2 focus-visible:outline-[#F2B705] ${
+                className={`flex items-center justify-between px-2.5 py-2 text-xs font-medium rounded-lg transition-all ${
                   isActive
-                    ? "bg-[#2D2B27] text-[#F2B705] font-semibold border-l-2 border-[#F2B705]"
-                    : "text-[#938E83] hover:text-[#EDEAE3] hover:bg-[#2D2B27]/50"
+                    ? "bg-indigo-600/15 text-indigo-400 border border-indigo-500/30 shadow-xs"
+                    : "text-slate-400 hover:text-white hover:bg-white/[0.04]"
                 }`}
               >
                 <div className="flex items-center gap-2.5">
-                  <Icon className={`h-3.5 w-3.5 ${isActive ? "text-[#F2B705]" : "text-[#938E83]"}`} />
+                  <Icon className={`h-4 w-4 ${isActive ? "text-indigo-400" : "text-slate-400"}`} />
                   <span>{item.name}</span>
                 </div>
                 {item.badge && (
-                  <span className="text-[9px] font-mono font-bold bg-[#F2B705] text-[#1C1B18] px-1 py-0.2 rounded-[2px]">
+                  <span className="text-[9px] font-semibold bg-indigo-600 text-white px-1.5 py-0.2 rounded-full">
                     {item.badge}
                   </span>
                 )}
@@ -192,32 +192,30 @@ export function OperationsShell({ children }: { children: React.ReactNode }) {
           })}
         </div>
 
-        {/* Terminal Station Telemetry Status Strip */}
-        <div className="p-3 border-t border-[#3A3733] bg-[#242320] text-[11px] font-mono text-[#938E83] space-y-1.5">
-          <div className="flex items-center justify-between">
-            <span className="text-[10px] text-[#938E83] uppercase">LOCAL TIME:</span>
-            <span className="text-[#EDEAE3] font-mono text-[11px] font-semibold tracking-wider">
-              {time || "12:00:00"}
-            </span>
-          </div>
-
-          <div className="flex items-center justify-between">
-            <span className="text-[10px] text-[#938E83] uppercase">WORKSTATION:</span>
-            <span className="text-[#EDEAE3] text-[11px]">CONSOLE-01</span>
-          </div>
-
-          <div className="flex items-center justify-between pt-1 border-t border-[#3A3733]">
-            <span className="text-[10px] text-[#938E83] uppercase">STATUS:</span>
-            <span className="flex items-center gap-1.5 text-[#5C9A63] text-[11px] font-bold">
-              <span className="inline-block h-2 w-2 rounded-full bg-[#5C9A63] animate-[pulse_2s_cubic-bezier(0.4,0,0.6,1)_infinite]"></span>
-              CONNECTED
-            </span>
+        {/* Bottom User Profile Section */}
+        <div className="p-3 border-t border-white/[0.08] bg-[#090C10]">
+          <div className="flex items-center justify-between p-2 rounded-lg bg-white/[0.02] hover:bg-white/[0.05] border border-white/[0.04] transition-colors cursor-pointer">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <div className="h-7 w-7 rounded-full bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center text-white text-xs font-semibold shrink-0 shadow-inner">
+                AD
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="text-xs font-medium text-white truncate flex items-center gap-1">
+                  <span>Admin User</span>
+                  <ShieldCheck className="h-3 w-3 text-indigo-400" />
+                </div>
+                <div className="text-[10px] text-slate-400 truncate">
+                  ops@stocksense.io
+                </div>
+              </div>
+            </div>
+            <div className="h-2 w-2 rounded-full bg-emerald-500" title="Online" />
           </div>
         </div>
       </aside>
 
-      {/* Main Content Viewport */}
-      <main className="flex-1 flex flex-col min-w-0 bg-transparent overflow-hidden relative z-10">
+      {/* Main Content Area */}
+      <main className="flex-1 flex flex-col min-w-0 bg-[#0D1117] overflow-hidden relative z-10">
         {children}
       </main>
     </div>
