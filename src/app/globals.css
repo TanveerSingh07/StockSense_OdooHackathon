@@ -21,12 +21,12 @@
   --surface: #161B22;
   --surface-raised: #1F242C;
   --border: rgba(255, 255, 255, 0.08);
-  --border-focus: rgba(99, 102, 241, 0.5);
+  --border-focus: rgba(16, 185, 129, 0.5);
   --text: #F0F6FC;
   --text-muted: #8B949E;
-  --primary: #6366F1;
-  --primary-hover: #4F46E5;
-  --accent: #6366F1;
+  --primary: #10B981;
+  --primary-hover: #059669;
+  --accent: #10B981;
   --danger: #EF4444;
   --warning: #F59E0B;
   --success: #10B981;
@@ -41,7 +41,7 @@
     color: #F0F6FC;
     font-family: var(--font-sans);
     min-height: 100vh;
-    background-image: radial-gradient(circle at 50% 0%, rgba(99, 102, 241, 0.035) 0%, transparent 60%);
+    background-image: radial-gradient(circle at 50% 0%, rgba(16, 185, 129, 0.04) 0%, transparent 60%);
     background-attachment: fixed;
   }
 }

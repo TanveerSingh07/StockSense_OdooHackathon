@@ -14,10 +14,7 @@ import {
   Boxes,
   Menu,
   X,
-  Bell,
-  Search,
   ChevronDown,
-  User,
   ShieldCheck
 } from "lucide-react";
 
@@ -85,7 +82,7 @@ export function OperationsShell({ children }: { children: React.ReactNode }) {
       {/* Mobile Top Header */}
       <div className="md:hidden h-14 border-b border-white/[0.08] px-4 flex items-center justify-between bg-[#090C10] z-30 shrink-0">
         <div className="flex items-center gap-2.5">
-          <div className="h-7 w-7 rounded-lg bg-indigo-600 text-white flex items-center justify-center font-bold shadow-sm shadow-indigo-500/20">
+          <div className="h-7 w-7 rounded-lg bg-emerald-600 text-white flex items-center justify-center font-bold shadow-sm shadow-emerald-500/20">
             <Boxes className="h-4 w-4" />
           </div>
           <span className="font-semibold text-sm tracking-tight text-white">
@@ -111,7 +108,7 @@ export function OperationsShell({ children }: { children: React.ReactNode }) {
         {/* Brand Header */}
         <div className="hidden md:flex h-16 border-b border-white/[0.08] px-4 items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="h-8 w-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center font-bold shadow-md shadow-indigo-600/30">
+            <div className="h-8 w-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center font-bold shadow-md shadow-emerald-600/30">
               <Boxes className="h-4.5 w-4.5" />
             </div>
             <div>
@@ -174,16 +171,16 @@ export function OperationsShell({ children }: { children: React.ReactNode }) {
                 onClick={() => setMobileMenuOpen(false)}
                 className={`flex items-center justify-between px-2.5 py-2 text-xs font-medium rounded-lg transition-all ${
                   isActive
-                    ? "bg-indigo-600/15 text-indigo-400 border border-indigo-500/30 shadow-xs"
+                    ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 shadow-xs"
                     : "text-slate-400 hover:text-white hover:bg-white/[0.04]"
                 }`}
               >
                 <div className="flex items-center gap-2.5">
-                  <Icon className={`h-4 w-4 ${isActive ? "text-indigo-400" : "text-slate-400"}`} />
+                  <Icon className={`h-4 w-4 ${isActive ? "text-emerald-400" : "text-slate-400"}`} />
                   <span>{item.name}</span>
                 </div>
                 {item.badge && (
-                  <span className="text-[9px] font-semibold bg-indigo-600 text-white px-1.5 py-0.2 rounded-full">
+                  <span className="text-[9px] font-semibold bg-emerald-600 text-white px-1.5 py-0.2 rounded-full">
                     {item.badge}
                   </span>
                 )}
@@ -196,20 +193,20 @@ export function OperationsShell({ children }: { children: React.ReactNode }) {
         <div className="p-3 border-t border-white/[0.08] bg-[#090C10]">
           <div className="flex items-center justify-between p-2 rounded-lg bg-white/[0.02] hover:bg-white/[0.05] border border-white/[0.04] transition-colors cursor-pointer">
             <div className="flex items-center gap-2.5 min-w-0">
-              <div className="h-7 w-7 rounded-full bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center text-white text-xs font-semibold shrink-0 shadow-inner">
+              <div className="h-7 w-7 rounded-full bg-gradient-to-tr from-emerald-600 to-teal-500 flex items-center justify-center text-white text-xs font-semibold shrink-0 shadow-inner">
                 AD
               </div>
               <div className="min-w-0 flex-1">
                 <div className="text-xs font-medium text-white truncate flex items-center gap-1">
                   <span>Admin User</span>
-                  <ShieldCheck className="h-3 w-3 text-indigo-400" />
+                  <ShieldCheck className="h-3 w-3 text-emerald-400" />
                 </div>
                 <div className="text-[10px] text-slate-400 truncate">
                   ops@stocksense.io
                 </div>
               </div>
             </div>
-            <div className="h-2 w-2 rounded-full bg-emerald-500" title="Online" />
+            <div className="h-2 w-2 rounded-full bg-emerald-400" title="Online" />
           </div>
         </div>
       </aside>

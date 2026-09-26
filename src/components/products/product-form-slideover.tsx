@@ -220,7 +220,7 @@ export function ProductFormSlideOver({
                 placeholder="e.g. Wireless Barcode Scanner"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className={`w-full px-3 py-2 text-sm bg-[#0D1117] border rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors ${
+                className={`w-full px-3 py-2 text-sm bg-[#0D1117] border rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-colors ${
                   fieldErrors.name ? "border-red-500" : "border-white/[0.08]"
                 }`}
               />
@@ -239,7 +239,7 @@ export function ProductFormSlideOver({
                 placeholder="e.g. ELEC-SCN-001"
                 value={sku}
                 onChange={(e) => setSku(e.target.value)}
-                className={`w-full px-3 py-2 text-sm font-mono bg-[#0D1117] border rounded-lg text-white placeholder-slate-500 uppercase focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors ${
+                className={`w-full px-3 py-2 text-sm font-mono bg-[#0D1117] border rounded-lg text-white placeholder-slate-500 uppercase focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-colors ${
                   fieldErrors.sku ? "border-red-500" : "border-white/[0.08]"
                 }`}
               />
@@ -257,7 +257,7 @@ export function ProductFormSlideOver({
                 <button
                   type="button"
                   onClick={() => setIsAddingNewCategory(!isAddingNewCategory)}
-                  className="text-xs text-indigo-400 hover:text-indigo-300 flex items-center gap-1 font-medium"
+                  className="text-xs text-emerald-400 hover:text-emerald-300 flex items-center gap-1 font-medium"
                 >
                   <FolderPlus className="h-3.5 w-3.5" />
                   {isAddingNewCategory ? "Choose existing" : "+ New Category"}
@@ -270,7 +270,7 @@ export function ProductFormSlideOver({
                   placeholder="Enter new category name..."
                   value={newCategoryName}
                   onChange={(e) => setNewCategoryName(e.target.value)}
-                  className={`w-full px-3 py-2 text-sm bg-[#0D1117] border rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors ${
+                  className={`w-full px-3 py-2 text-sm bg-[#0D1117] border rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-colors ${
                     fieldErrors.category ? "border-red-500" : "border-white/[0.08]"
                   }`}
                 />
@@ -278,7 +278,7 @@ export function ProductFormSlideOver({
                 <select
                   value={categoryId}
                   onChange={(e) => setCategoryId(e.target.value)}
-                  className={`w-full px-3 py-2 text-sm bg-[#0D1117] border rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors ${
+                  className={`w-full px-3 py-2 text-sm bg-[#0D1117] border rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-colors ${
                     fieldErrors.category ? "border-red-500" : "border-white/[0.08]"
                   }`}
                 >
@@ -306,7 +306,7 @@ export function ProductFormSlideOver({
                   placeholder="e.g. Units, Boxes"
                   value={unit}
                   onChange={(e) => setUnit(e.target.value)}
-                  className="w-full px-3 py-2 text-sm bg-[#0D1117] border border-white/[0.08] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors"
+                  className="w-full px-3 py-2 text-sm bg-[#0D1117] border border-white/[0.08] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-colors"
                 />
               </div>
 
@@ -320,7 +320,7 @@ export function ProductFormSlideOver({
                   placeholder="10"
                   value={reorderPoint}
                   onChange={(e) => setReorderPoint(e.target.value)}
-                  className="w-full px-3 py-2 text-sm font-mono bg-[#0D1117] border border-white/[0.08] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors"
+                  className="w-full px-3 py-2 text-sm font-mono bg-[#0D1117] border border-white/[0.08] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-colors"
                 />
               </div>
             </div>
@@ -337,7 +337,7 @@ export function ProductFormSlideOver({
                   placeholder="0"
                   value={initialStock}
                   onChange={(e) => setInitialStock(e.target.value)}
-                  className="w-full px-3 py-2 text-sm font-mono bg-[#0D1117] border border-white/[0.08] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors"
+                  className="w-full px-3 py-2 text-sm font-mono bg-[#0D1117] border border-white/[0.08] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-colors"
                 />
                 <p className="mt-1 text-[11px] text-slate-400">
                   Sets the starting quantity in the Main Warehouse.
@@ -359,7 +359,7 @@ export function ProductFormSlideOver({
               type="submit"
               form="product-form"
               disabled={loading}
-              className="px-4 py-2 text-xs font-medium bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg shadow-sm shadow-indigo-600/30 transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+              className="px-4 py-2 text-xs font-medium bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg shadow-sm shadow-emerald-600/30 transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
             >
               {loading ? (
                 <span>Saving...</span>
