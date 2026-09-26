@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { loginSchema, LoginInput } from "@/lib/auth";
+import { loginSchema, type LoginInput } from "@/lib/validation/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -62,7 +62,10 @@ export default function LoginPage() {
           {isSubmitting ? "Logging in..." : "Log in"}
         </Button>
 
-        <a href="/forgot-password" className="block text-center text-sm underline">
+        <a
+          href="/forgot-password"
+          className="block text-center text-sm underline"
+        >
           Forgot password?
         </a>
       </form>

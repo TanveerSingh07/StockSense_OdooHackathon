@@ -2,39 +2,7 @@ import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
-import { z } from "zod";
-
-// Login validation
-export const loginSchema = z.object({
-  email: z
-    .string()
-    .email("Invalid email address"),
-
-  password: z
-    .string()
-    .min(1, "Password is required"),
-});
-
-// Signup validation
-export const signupSchema = z.object({
-  name: z
-    .string()
-    .min(2, "Name must be at least 2 characters")
-    .max(100, "Name is too long"),
-
-  email: z
-    .string()
-    .email("Invalid email address"),
-
-  password: z
-    .string()
-    .min(8, "Password must be at least 8 characters")
-    .max(100, "Password is too long"),
-});
-
-
-export type LoginInput = z.infer<typeof loginSchema>;
-export type SignupInput = z.infer<typeof signupSchema>;
+import { loginSchema } from "@/lib/validation/auth";
 
 export const authOptions: NextAuthOptions = {
   session: {
@@ -114,7 +82,6 @@ export const authOptions: NextAuthOptions = {
 
   callbacks: {
     async jwt({ token, user }) {
-      // Runs when user successfully logs in
       if (user) {
         token.id = user.id;
         token.role = (user as any).role;
@@ -124,7 +91,6 @@ export const authOptions: NextAuthOptions = {
     },
 
     async session({ session, token }) {
-      // Add custom user information to session
       if (session.user) {
         (session.user as any).id = token.id;
         (session.user as any).role = token.role;
