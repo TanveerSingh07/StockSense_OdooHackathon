@@ -347,11 +347,11 @@ export function ProductFormSlideOver({
           </form>
 
           {/* Footer Actions */}
-          <div className="p-4 px-6 border-t border-white/[0.08] bg-[#161B22] flex items-center justify-end gap-3">
+          <div className="p-4 px-6 border-t border-white/10 bg-[#0F172A] flex items-center justify-end gap-3">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-xs font-medium text-slate-300 hover:text-white bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] rounded-lg transition-colors cursor-pointer"
+              className="px-4 py-2 text-xs font-semibold text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-colors cursor-pointer"
             >
               Cancel
             </button>
@@ -359,13 +359,13 @@ export function ProductFormSlideOver({
               type="submit"
               form="product-form"
               disabled={loading}
-              className="px-4 py-2 text-xs font-medium bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg shadow-sm shadow-emerald-600/30 transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+              className="px-4.5 py-2 text-xs font-bold bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 rounded-xl shadow-lg shadow-amber-500/20 transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50 active:scale-[0.97]"
             >
               {loading ? (
                 <span>Saving...</span>
               ) : (
                 <>
-                  <Check className="h-3.5 w-3.5" />
+                  <Check className="h-4 w-4 stroke-[3]" />
                   <span>{productToEdit ? "Save Changes" : "Create Product"}</span>
                 </>
               )}

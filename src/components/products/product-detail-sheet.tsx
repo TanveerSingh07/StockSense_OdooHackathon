@@ -17,7 +17,9 @@ import {
   HelpCircle,
   TrendingUp,
   Tag,
-  Boxes
+  Boxes,
+  ShieldCheck,
+  Calendar
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Product } from '@/app/products/page';
@@ -127,95 +129,134 @@ export function ProductDetailSheet({
 
   const isOutOfStock = product.totalQuantity === 0;
   const isLowStock = product.totalQuantity <= product.reorderPoint;
+  const ratio = product.reorderPoint > 0 ? Math.min(100, Math.round((product.totalQuantity / product.reorderPoint) * 100)) : 100;
+
+  // Format relative time helper
+  const getRelativeTime = (dateStr: string) => {
+    try {
+      const d = new Date(dateStr);
+      const diffMs = Date.now() - d.getTime();
+      const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+      if (diffHours < 1) return 'Just now';
+      if (diffHours < 24) return `${diffHours}h ago`;
+      const diffDays = Math.floor(diffHours / 24);
+      return `${diffDays}d ago`;
+    } catch {
+      return 'Recently';
+    }
+  };
 
   return (
     <div className="fixed inset-0 z-50 overflow-hidden select-none">
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity animate-in fade-in duration-200"
+        className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm transition-opacity animate-in fade-in duration-200"
         onClick={onClose}
       />
 
       {/* Drawer Container */}
       <div className="fixed inset-y-0 right-0 flex max-w-full pl-6 sm:pl-10">
-        <div className="w-screen max-w-lg bg-[#0E131A] text-[#F0F6FC] shadow-2xl border-l border-white/[0.08] flex flex-col justify-between animate-in slide-in-from-right duration-200">
-          {/* Header */}
-          <div className="p-5 sm:p-6 border-b border-white/[0.08] bg-[#121720] flex items-start justify-between gap-3">
-            <div className="flex items-start gap-3">
-              <div className="h-10 w-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 shrink-0 mt-0.5">
-                <Package className="h-5 w-5" />
-              </div>
-              <div>
-                <h2 className="text-base sm:text-lg font-bold text-white tracking-tight leading-snug">
-                  {product.name}
-                </h2>
-                <div className="flex flex-wrap items-center gap-2 mt-1">
-                  <span className="font-mono text-xs text-slate-300 bg-white/[0.06] px-2 py-0.5 rounded border border-white/[0.08] flex items-center gap-1">
-                    <span>{product.sku}</span>
-                    <button
-                      onClick={handleCopySku}
-                      className="hover:text-emerald-400 transition-colors cursor-pointer"
-                      title="Copy SKU"
-                    >
-                      {copied ? <Check className="h-3 w-3 text-emerald-400" /> : <Copy className="h-3 w-3" />}
-                    </button>
-                  </span>
-                  <span className="text-xs text-slate-400">
-                    Category: <strong className="text-slate-200">{product.category?.name || 'General'}</strong>
-                  </span>
+        <div className="w-screen max-w-lg bg-[#0F172A] text-slate-100 shadow-2xl border-l border-white/10 flex flex-col justify-between animate-in slide-in-from-right duration-200">
+          
+          {/* Top Gradient Header Banner */}
+          <div className="relative p-6 border-b border-white/10 bg-gradient-to-br from-amber-500/15 via-[#1E293B] to-[#0F172A] overflow-hidden">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/10 rounded-full blur-2xl pointer-events-none" />
+            
+            <div className="flex items-start justify-between gap-3 relative z-10">
+              <div className="flex items-start gap-3.5">
+                <div className="h-12 w-12 rounded-2xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-400 shrink-0 shadow-lg shadow-amber-500/10">
+                  <Package className="h-6 w-6" />
+                </div>
+                <div>
+                  <h2 className="text-lg font-bold text-white tracking-tight leading-snug">
+                    {product.name}
+                  </h2>
+                  <div className="flex flex-wrap items-center gap-2 mt-1.5">
+                    {/* SKU JetBrains Mono chip */}
+                    <span className="font-mono text-xs text-amber-300 bg-amber-500/10 border border-amber-500/25 px-2 py-0.5 rounded-lg flex items-center gap-1.5 shadow-xs">
+                      <span>{product.sku}</span>
+                      <button
+                        onClick={handleCopySku}
+                        className="hover:text-white transition-colors cursor-pointer"
+                        title="Copy SKU code"
+                      >
+                        {copied ? <Check className="h-3 w-3 text-emerald-400" /> : <Copy className="h-3 w-3" />}
+                      </button>
+                    </span>
+                    <span className="text-xs text-slate-300 font-medium">
+                      {product.category?.name || 'Unassigned Category'}
+                    </span>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <button
-              onClick={onClose}
-              className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/[0.08] transition-colors cursor-pointer"
-            >
-              <X className="h-4 w-4" />
-            </button>
+              <button
+                onClick={onClose}
+                className="p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
           </div>
 
           {/* Drawer Body Scroll Area */}
           <div className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-6 text-xs">
-            {/* Stock Summary Banner */}
-            <div className="p-4 rounded-xl bg-[#151B24] border border-white/[0.08] grid grid-cols-2 sm:grid-cols-3 gap-3">
-              <div>
-                <div className="text-[11px] text-slate-400">Total On-Hand</div>
-                <div className="text-xl font-bold text-white mt-0.5">
-                  {product.totalQuantity} <span className="text-xs font-normal text-slate-400">{product.unit}</span>
+            
+            {/* Radial Stock Card (On-hand vs Min) */}
+            <div className="p-4 rounded-2xl bg-[#1E293B]/80 border border-white/10 backdrop-blur-md grid grid-cols-1 sm:grid-cols-3 gap-4 items-center">
+              {/* Left: Numbers */}
+              <div className="sm:col-span-2 space-y-1">
+                <div className="text-[11px] uppercase font-bold text-slate-400 tracking-wider">
+                  Live Stock Balance
+                </div>
+                <div className="text-2xl font-black text-white font-mono flex items-baseline gap-1.5">
+                  <span>{product.totalQuantity}</span>
+                  <span className="text-xs font-normal text-slate-400">{product.unit} on hand</span>
+                </div>
+                <div className="text-xs text-slate-400 flex items-center gap-2 pt-1">
+                  <span>Safety threshold:</span>
+                  <strong className="text-slate-200 font-mono">{product.reorderPoint} {product.unit}</strong>
                 </div>
               </div>
-              <div>
-                <div className="text-[11px] text-slate-400">Min Safety Reorder</div>
-                <div className="text-xl font-bold text-slate-200 mt-0.5">
-                  {product.reorderPoint} <span className="text-xs font-normal text-slate-400">{product.unit}</span>
+
+              {/* Right: Radial Ring */}
+              <div className="flex flex-col items-center justify-center p-2">
+                <div className="relative h-16 w-16 flex items-center justify-center">
+                  <svg className="h-16 w-16 -rotate-90 transform" viewBox="0 0 36 36">
+                    <path
+                      className="text-white/10"
+                      strokeWidth="3.5"
+                      stroke="currentColor"
+                      fill="none"
+                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                    />
+                    <path
+                      className={`${
+                        isOutOfStock ? 'text-rose-500' : isLowStock ? 'text-amber-500' : 'text-emerald-500'
+                      }`}
+                      strokeDasharray={`${ratio}, 100`}
+                      strokeWidth="3.5"
+                      strokeLinecap="round"
+                      stroke="currentColor"
+                      fill="none"
+                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                    />
+                  </svg>
+                  <span className="absolute font-mono font-bold text-xs text-white">
+                    {ratio}%
+                  </span>
                 </div>
-              </div>
-              <div className="col-span-2 sm:col-span-1">
-                <div className="text-[11px] text-slate-400">Health State</div>
-                <div className="mt-1">
-                  {isOutOfStock ? (
-                    <span className="inline-flex items-center gap-1 text-[11px] font-bold text-red-400 bg-red-500/10 px-2 py-0.5 rounded border border-red-500/20">
-                      Out of Stock
-                    </span>
-                  ) : isLowStock ? (
-                    <span className="inline-flex items-center gap-1 text-[11px] font-bold text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">
-                      Low Stock Alert
-                    </span>
-                  ) : (
-                    <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
-                      Optimal Level
-                    </span>
-                  )}
-                </div>
+                <span className="text-[10px] font-semibold text-slate-400 mt-1">
+                  {isOutOfStock ? 'Empty' : isLowStock ? 'Low Stock' : 'Fulfilled'}
+                </span>
               </div>
             </div>
 
             {/* Warehouse Stock Breakdown with Stepper */}
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <h3 className="font-semibold text-white text-xs uppercase tracking-wider flex items-center gap-1.5">
-                  <WarehouseIcon className="h-3.5 w-3.5 text-emerald-400" />
+                <h3 className="font-bold text-white text-xs uppercase tracking-wider flex items-center gap-1.5">
+                  <WarehouseIcon className="h-3.5 w-3.5 text-amber-400" />
                   <span>Stock by Warehouse Location</span>
                 </h3>
                 <span className="text-[11px] text-slate-400">Quick adjust (+/−)</span>
@@ -230,21 +271,21 @@ export function ProductDetailSheet({
                   return (
                     <div
                       key={wh.id}
-                      className="p-3 bg-[#151B24] border border-white/[0.08] rounded-xl flex items-center justify-between gap-3"
+                      className="p-3 bg-[#1E293B]/60 border border-white/10 rounded-xl flex items-center justify-between gap-3 hover:border-white/20 transition"
                     >
                       <div>
-                        <div className="font-medium text-slate-100">{wh.name}</div>
-                        <div className="text-[10px] text-slate-400 font-mono">ID: {wh.id}</div>
+                        <div className="font-semibold text-slate-100">{wh.name}</div>
+                        <div className="text-[11px] text-slate-400">Warehouse location</div>
                       </div>
 
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => handleQuickDelta(wh.id, qty, -1)}
                           disabled={qty <= 0 || isAdjusting}
-                          className="h-7 w-7 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] flex items-center justify-center text-slate-300 hover:text-white disabled:opacity-30 transition-colors cursor-pointer"
+                          className="h-8 w-8 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 flex items-center justify-center text-slate-200 hover:text-white disabled:opacity-30 transition-colors cursor-pointer"
                           title="Decrease 1 unit"
                         >
-                          <Minus className="h-3 w-3" />
+                          <Minus className="h-3.5 w-3.5" />
                         </button>
 
                         <div className="w-12 text-center font-mono font-bold text-sm text-white">
@@ -254,10 +295,10 @@ export function ProductDetailSheet({
                         <button
                           onClick={() => handleQuickDelta(wh.id, qty, 1)}
                           disabled={isAdjusting}
-                          className="h-7 w-7 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 flex items-center justify-center text-emerald-400 hover:text-emerald-300 disabled:opacity-30 transition-colors cursor-pointer"
+                          className="h-8 w-8 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-400 hover:text-amber-300 disabled:opacity-30 transition-colors cursor-pointer"
                           title="Increase 1 unit"
                         >
-                          <Plus className="h-3 w-3" />
+                          <Plus className="h-3.5 w-3.5" />
                         </button>
                       </div>
                     </div>
@@ -265,7 +306,7 @@ export function ProductDetailSheet({
                 })}
 
                 {warehouses.length === 0 && (
-                  <div className="p-4 text-center text-slate-400 bg-[#151B24] rounded-xl border border-white/[0.06]">
+                  <div className="p-4 text-center text-slate-400 bg-[#1E293B]/50 rounded-xl border border-white/5">
                     No warehouses configured in settings.
                   </div>
                 )}
@@ -273,74 +314,95 @@ export function ProductDetailSheet({
             </div>
 
             {/* Quick Operations Submenu */}
-            <div className="space-y-2">
-              <h3 className="font-semibold text-white text-xs uppercase tracking-wider">
-                Quick Warehouse Actions
+            <div className="space-y-2.5">
+              <h3 className="font-bold text-white text-xs uppercase tracking-wider">
+                Operation Triggers
               </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              <div className="grid grid-cols-3 gap-2">
                 <Link
                   href="/receipts/new"
-                  className="p-2.5 rounded-lg bg-sky-500/10 hover:bg-sky-500/15 border border-sky-500/20 text-sky-300 hover:text-sky-200 transition-colors flex flex-col items-center justify-center text-center gap-1"
+                  className="p-3 rounded-xl bg-sky-500/10 hover:bg-sky-500/20 border border-sky-500/25 text-sky-300 hover:text-sky-100 transition-colors flex flex-col items-center justify-center text-center gap-1.5 shadow-sm"
                 >
-                  <ArrowDownLeft className="h-4 w-4 text-sky-400" />
-                  <span className="font-medium text-[11px]">Receive Stock</span>
+                  <ArrowDownLeft className="h-4.5 w-4.5 text-sky-400" />
+                  <span className="font-semibold text-[11px]">Receive Stock</span>
                 </Link>
 
                 <Link
                   href="/deliveries/new"
-                  className="p-2.5 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/15 border border-emerald-500/20 text-emerald-300 hover:text-emerald-200 transition-colors flex flex-col items-center justify-center text-center gap-1"
+                  className="p-3 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/25 text-emerald-300 hover:text-emerald-100 transition-colors flex flex-col items-center justify-center text-center gap-1.5 shadow-sm"
                 >
-                  <ArrowUpRight className="h-4 w-4 text-emerald-400" />
-                  <span className="font-medium text-[11px]">Create Delivery</span>
+                  <ArrowUpRight className="h-4.5 w-4.5 text-emerald-400" />
+                  <span className="font-semibold text-[11px]">Create Delivery</span>
                 </Link>
 
                 <Link
                   href="/adjustments/new"
-                  className="p-2.5 rounded-lg bg-purple-500/10 hover:bg-purple-500/15 border border-purple-500/20 text-purple-300 hover:text-purple-200 transition-colors flex flex-col items-center justify-center text-center gap-1"
+                  className="p-3 rounded-xl bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/25 text-indigo-300 hover:text-indigo-100 transition-colors flex flex-col items-center justify-center text-center gap-1.5 shadow-sm"
                 >
-                  <SlidersHorizontal className="h-4 w-4 text-purple-400" />
-                  <span className="font-medium text-[11px]">Adjust Count</span>
+                  <SlidersHorizontal className="h-4.5 w-4.5 text-indigo-400" />
+                  <span className="font-semibold text-[11px]">Adjust Stock</span>
                 </Link>
               </div>
             </div>
 
-            {/* Recent Movement Mini Timeline */}
+            {/* Recent Movement Vertical Icon Timeline */}
             <div className="space-y-3">
-              <h3 className="font-semibold text-white text-xs uppercase tracking-wider flex items-center gap-1.5">
+              <h3 className="font-bold text-white text-xs uppercase tracking-wider flex items-center gap-1.5">
                 <Clock className="h-3.5 w-3.5 text-slate-400" />
-                <span>Recent Stock Movements</span>
+                <span>Move History Timeline</span>
               </h3>
 
               {loadingHistory ? (
                 <div className="p-4 text-center text-slate-400 animate-pulse">Loading movements...</div>
               ) : recentMoves.length === 0 ? (
-                <div className="p-4 bg-[#151B24] border border-white/[0.06] rounded-xl text-slate-400 text-center text-[11px]">
-                  No movement history recorded yet for this product.
+                <div className="p-4 bg-[#1E293B]/40 border border-white/5 rounded-xl text-slate-400 text-center text-[11px]">
+                  No recent movements recorded for this item.
                 </div>
               ) : (
-                <div className="space-y-2">
+                <div className="relative pl-6 space-y-4 before:absolute before:left-2.5 before:top-2 before:bottom-2 before:w-0.5 before:bg-white/10">
                   {recentMoves.map((m) => {
                     const isIn = m.change > 0;
                     return (
-                      <div
-                        key={m.id}
-                        className="p-2.5 bg-[#151B24] border border-white/[0.06] rounded-lg flex items-center justify-between text-xs"
-                      >
-                        <div>
-                          <div className="font-medium text-slate-200">{m.reason}</div>
-                          <div className="text-[10px] text-slate-400 font-mono">
-                            {new Date(m.createdAt).toLocaleDateString()} • {m.refId}
-                          </div>
-                        </div>
-                        <span
-                          className={`font-mono font-bold text-xs px-2 py-0.5 rounded ${
+                      <div key={m.id} className="relative group">
+                        {/* Timeline Icon Node */}
+                        <div
+                          className={`absolute -left-6 top-0.5 h-5 w-5 rounded-full flex items-center justify-center border ${
                             isIn
-                              ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
-                              : 'bg-red-500/15 text-red-400 border border-red-500/30'
+                              ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-400'
+                              : 'bg-rose-500/20 border-rose-500/40 text-rose-400'
                           }`}
                         >
-                          {isIn ? `+${m.change}` : m.change} {product.unit}
-                        </span>
+                          {isIn ? <ArrowDownLeft className="h-3 w-3" /> : <ArrowUpRight className="h-3 w-3" />}
+                        </div>
+
+                        <div className="p-2.5 bg-[#1E293B]/60 border border-white/10 rounded-xl flex items-center justify-between text-xs">
+                          <div>
+                            <div className="font-semibold text-slate-200">
+                              {m.reason === 'RECEIPT'
+                                ? 'Inbound Receipt'
+                                : m.reason === 'DELIVERY'
+                                ? 'Outbound Delivery'
+                                : m.reason === 'ADJUSTMENT'
+                                ? 'Stock Adjustment'
+                                : m.reason}
+                            </div>
+                            <div className="text-[10px] text-slate-400 flex items-center gap-1.5 mt-0.5">
+                              <span>{getRelativeTime(m.createdAt)}</span>
+                              <span>•</span>
+                              <span className="font-mono">{m.refId}</span>
+                            </div>
+                          </div>
+
+                          <span
+                            className={`font-mono font-bold text-xs px-2 py-0.5 rounded ${
+                              isIn
+                                ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
+                                : 'bg-rose-500/15 text-rose-400 border border-rose-500/30'
+                            }`}
+                          >
+                            {isIn ? `+${m.change}` : m.change} {product.unit}
+                          </span>
+                        </div>
                       </div>
                     );
                   })}
@@ -350,13 +412,13 @@ export function ProductDetailSheet({
           </div>
 
           {/* Footer */}
-          <div className="p-4 sm:p-5 border-t border-white/[0.08] bg-[#121720] flex items-center justify-between">
+          <div className="p-4 sm:p-5 border-t border-white/10 bg-[#0F172A] flex items-center justify-between">
             <span className="text-[11px] text-slate-400">
-              ID: <span className="font-mono text-slate-300">{product.id}</span>
+              Product SKU: <strong className="font-mono text-amber-300">{product.sku}</strong>
             </span>
             <button
               onClick={onClose}
-              className="px-4 py-1.5 text-xs font-semibold bg-white/[0.06] hover:bg-white/[0.1] border border-white/[0.1] text-white rounded-lg transition-colors cursor-pointer"
+              className="px-4 py-2 text-xs font-semibold bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-xl transition-colors cursor-pointer"
             >
               Close Drawer
             </button>

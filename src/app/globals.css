@@ -7,29 +7,39 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  --radius-sm: 4px;
-  --radius-md: 6px;
-  --radius-lg: 8px;
-  --radius-xl: 12px;
+  --font-sans: var(--font-geist-sans), Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: var(--font-geist-mono), "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
 }
 
 :root {
-  --bg: #0D1117;
-  --sidebar-bg: #090C10;
-  --surface: #161B22;
-  --surface-raised: #1F242C;
+  --background: #0F172A;
+  --foreground: #F8FAFC;
+  --card: #1E293B;
+  --card-foreground: #F8FAFC;
+  --popover: #1E293B;
+  --popover-foreground: #F8FAFC;
+  --primary: #F59E0B;
+  --primary-foreground: #0F172A;
+  --secondary: #0284C7;
+  --secondary-foreground: #FFFFFF;
+  --tertiary: #6366F1;
+  --muted: #334155;
+  --muted-foreground: #94A3B8;
+  --accent: #F59E0B;
+  --accent-foreground: #0F172A;
+  --destructive: #F43F5E;
+  --destructive-foreground: #FFFFFF;
   --border: rgba(255, 255, 255, 0.08);
-  --border-focus: rgba(16, 185, 129, 0.5);
-  --text: #F0F6FC;
-  --text-muted: #8B949E;
-  --primary: #10B981;
-  --primary-hover: #059669;
-  --accent: #10B981;
-  --danger: #EF4444;
-  --warning: #F59E0B;
-  --success: #10B981;
+  --input: rgba(255, 255, 255, 0.1);
+  --ring: #F59E0B;
+  
+  --status-emerald: #10B981;
+  --status-amber: #F59E0B;
+  --status-rose: #F43F5E;
 }
 
 @layer base {
@@ -37,11 +47,11 @@
     border-color: var(--border);
   }
   body {
-    background-color: #0D1117;
-    color: #F0F6FC;
+    background-color: #0F172A;
+    color: #F8FAFC;
     font-family: var(--font-sans);
     min-height: 100vh;
-    background-image: radial-gradient(circle at 50% 0%, rgba(16, 185, 129, 0.04) 0%, transparent 60%);
+    background-image: radial-gradient(circle at 50% 0%, rgba(245, 158, 11, 0.05) 0%, rgba(99, 102, 241, 0.03) 35%, transparent 70%);
     background-attachment: fixed;
   }
 }
