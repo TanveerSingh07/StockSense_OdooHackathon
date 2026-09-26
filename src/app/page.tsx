@@ -1,6 +1,5 @@
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
-import { formatReference } from '@/lib/reference';
 import { 
   ArrowDownLeft, 
   ArrowUpRight, 
@@ -10,16 +9,20 @@ import {
   ArrowRight,
   TrendingUp,
   Activity,
+  AlertTriangle,
+  FileText,
+  Warehouse,
   CheckCircle2,
   Clock,
-  Layers
+  Layers,
+  ShieldCheck
 } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
 export default async function DashboardPage() {
   const [receipts, deliveries, latestMoves, stockLevels, products, warehouses] = await Promise.all([
-    prisma.receipt.findMany({ include: { lines: true }, orderBy: { id: 'asc' } }),
+    prisma.receipt.findMany({ include: { lines: true, supplier: true }, orderBy: { id: 'asc' } }),
     prisma.deliveryOrder.findMany({ include: { lines: true }, orderBy: { id: 'asc' } }),
     prisma.stockLedger.findMany({ take: 6, orderBy: { createdAt: 'desc' } }),
     prisma.stockLevel.findMany({
@@ -27,7 +30,12 @@ export default async function DashboardPage() {
       orderBy: { quantity: 'desc' },
       take: 6,
     }),
-    prisma.product.findMany(),
+    prisma.product.findMany({
+      include: {
+        category: true,
+        levels: true,
+      }
+    }),
     prisma.warehouse.findMany(),
   ]);
 
@@ -55,7 +63,21 @@ export default async function DashboardPage() {
     }
   });
   const totalDeliveryOperations = deliveries.length;
+  const totalPendingDocs = toReceiveCount + toDeliverCount + waitingCount;
   const totalItemsInStock = stockLevels.reduce((acc, s) => acc + s.quantity, 0);
+
+  // Low stock calculation
+  const formattedProducts = products.map((p) => {
+    const totalQty = (p.levels || []).reduce((sum, lvl) => sum + lvl.quantity, 0);
+    const isLow = totalQty <= p.reorderPoint;
+    return { ...p, totalQuantity: totalQty, isLowStock: isLow };
+  });
+
+  const lowStockProducts = formattedProducts.filter((p) => p.isLowStock);
+  const healthyCount = formattedProducts.filter((p) => !p.isLowStock && p.totalQuantity > 0).length;
+  const healthPercentage = formattedProducts.length > 0
+    ? Math.round((healthyCount / formattedProducts.length) * 100)
+    : 0;
 
   return (
     <div className="p-4 sm:p-8 max-w-7xl mx-auto space-y-8 text-[#F0F6FC]">
@@ -83,127 +105,137 @@ export default async function DashboardPage() {
         </div>
       </div>
 
-      {/* Operations Overview Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-        {/* Receipts Card */}
-        <div className="bg-[#161B22] p-5 sm:p-6 rounded-xl border border-white/[0.08] shadow-sm hover:border-white/[0.14] transition flex flex-col justify-between">
-          <div>
-            <div className="flex justify-between items-center mb-3">
-              <span className="text-[11px] font-semibold tracking-wider text-sky-400 bg-sky-500/10 px-2 py-0.5 rounded-md border border-sky-500/20 flex items-center gap-1">
-                <ArrowDownLeft className="h-3 w-3" />
-                Inbound Shipments
-              </span>
-              <span className="text-xs text-slate-400 font-mono">{totalReceiptOperations} ops</span>
-            </div>
-            <h2 className="text-xl font-bold text-white tracking-tight">Receipts</h2>
-
-            <div className="mt-4 space-y-2 text-xs">
-              <div className="flex justify-between items-center py-1.5 border-b border-white/[0.06]">
-                <span className="text-slate-400">To Receive / Ready</span>
-                <span className="font-bold text-sky-400 bg-sky-500/10 border border-sky-500/20 px-2 py-0.5 rounded font-mono">
-                  {toReceiveCount}
-                </span>
-              </div>
-              <div className="flex justify-between items-center py-1.5 border-b border-white/[0.06]">
-                <span className="text-slate-400">Total Inbound Runs</span>
-                <span className="font-bold text-white font-mono">{totalReceiptOperations}</span>
-              </div>
+      {/* 4 High-Impact KPI Cards (Products, Low Stock, Pending Docs, Total Inventory) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* KPI 1: Total SKUs / Products */}
+        <div className="p-4.5 rounded-xl bg-[#161B22] border border-white/[0.08] shadow-sm hover:border-white/[0.14] transition-all flex flex-col justify-between">
+          <div className="flex items-center justify-between text-slate-400 mb-2">
+            <span className="text-xs font-medium">Total Products</span>
+            <div className="h-7 w-7 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+              <Package className="h-4 w-4" />
             </div>
           </div>
-
-          <div className="mt-5 pt-3 border-t border-white/[0.06]">
-            <Link
-              href="/receipts"
-              className="w-full inline-flex justify-center items-center gap-1.5 px-4 py-2 bg-sky-600/15 hover:bg-sky-600/25 border border-sky-500/30 text-sky-300 text-xs font-semibold rounded-lg transition cursor-pointer"
-            >
-              <span>Open Receipts</span>
-              <ArrowRight className="h-3.5 w-3.5" />
+          <div>
+            <div className="text-2xl font-bold text-white tracking-tight">
+              {products.length}
+            </div>
+            <div className="text-[11px] text-slate-400 mt-1 flex items-center gap-1">
+              <span className="text-emerald-400 font-medium">Active</span>
+              <span>across {warehouses.length} warehouse(s)</span>
+            </div>
+          </div>
+          <div className="mt-3 pt-2.5 border-t border-white/[0.06]">
+            <Link href="/products" className="text-[11px] font-semibold text-emerald-400 hover:underline flex items-center gap-1">
+              <span>View catalog</span>
+              <span>→</span>
             </Link>
           </div>
         </div>
 
-        {/* Deliveries Card */}
-        <div className="bg-[#161B22] p-5 sm:p-6 rounded-xl border border-white/[0.08] shadow-sm hover:border-white/[0.14] transition flex flex-col justify-between">
-          <div>
-            <div className="flex justify-between items-center mb-3">
-              <span className="text-[11px] font-semibold tracking-wider text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20 flex items-center gap-1">
-                <ArrowUpRight className="h-3 w-3" />
-                Outbound Logistics
-              </span>
-              <span className="text-xs text-slate-400 font-mono">{totalDeliveryOperations} ops</span>
-            </div>
-            <h2 className="text-xl font-bold text-white tracking-tight">Deliveries</h2>
-
-            <div className="mt-4 space-y-2 text-xs">
-              <div className="flex justify-between items-center py-1.5 border-b border-white/[0.06]">
-                <span className="text-slate-400">Ready to Dispatch</span>
-                <span className="font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded font-mono">
-                  {toDeliverCount}
-                </span>
-              </div>
-              <div className="flex justify-between items-center py-1.5 border-b border-white/[0.06]">
-                <span className="text-slate-400">Waiting for Stock</span>
-                <span className={`font-bold px-2 py-0.5 rounded font-mono ${
-                  waitingCount > 0 
-                    ? 'text-red-400 bg-red-500/10 border border-red-500/20' 
-                    : 'text-slate-400 bg-white/[0.04]'
-                }`}>
-                  {waitingCount}
-                </span>
-              </div>
+        {/* KPI 2: Low Stock Alerts */}
+        <div className={`p-4.5 rounded-xl border shadow-sm transition-all flex flex-col justify-between ${
+          lowStockProducts.length > 0 
+            ? 'bg-amber-500/[0.04] border-amber-500/20 hover:border-amber-500/30' 
+            : 'bg-[#161B22] border-white/[0.08]'
+        }`}>
+          <div className="flex items-center justify-between text-slate-400 mb-2">
+            <span className="text-xs font-medium">Low Stock Alerts</span>
+            <div className={`h-7 w-7 rounded-lg flex items-center justify-center ${
+              lowStockProducts.length > 0 ? 'bg-amber-500/10 border border-amber-500/20 text-amber-400' : 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-400'
+            }`}>
+              <AlertTriangle className="h-4 w-4" />
             </div>
           </div>
-
-          <div className="mt-5 pt-3 border-t border-white/[0.06]">
-            <Link
-              href="/deliveries"
-              className="w-full inline-flex justify-center items-center gap-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold rounded-lg shadow-sm shadow-emerald-600/30 transition cursor-pointer"
-            >
-              <span>Open Deliveries</span>
-              <ArrowRight className="h-3.5 w-3.5" />
+          <div>
+            <div className="text-2xl font-bold text-white tracking-tight">
+              {lowStockProducts.length} <span className="text-xs font-normal text-slate-400">Items</span>
+            </div>
+            <div className="text-[11px] text-slate-400 mt-1">
+              {lowStockProducts.length > 0 ? (
+                <span className="text-amber-400">Needs replenishment</span>
+              ) : (
+                <span className="text-emerald-400">All levels optimal</span>
+              )}
+            </div>
+          </div>
+          <div className="mt-3 pt-2.5 border-t border-white/[0.06]">
+            <Link href="/products" className="text-[11px] font-semibold text-amber-400 hover:underline flex items-center gap-1">
+              <span>Filter low stock</span>
+              <span>→</span>
             </Link>
           </div>
         </div>
 
-        {/* Inventory Summary Card */}
-        <div className="bg-[#161B22] p-5 sm:p-6 rounded-xl border border-white/[0.08] shadow-sm hover:border-white/[0.14] transition flex flex-col justify-between">
-          <div>
-            <div className="flex justify-between items-center mb-3">
-              <span className="text-[11px] font-semibold tracking-wider text-teal-400 bg-teal-500/10 px-2 py-0.5 rounded-md border border-teal-500/20 flex items-center gap-1">
-                <Boxes className="h-3 w-3" />
-                Stock Catalog
-              </span>
-              <span className="text-xs text-slate-400 font-mono">{products.length} SKUs</span>
-            </div>
-            <h2 className="text-xl font-bold text-white tracking-tight">Inventory Stock</h2>
-
-            <div className="mt-4 space-y-2 text-xs">
-              <div className="flex justify-between items-center py-1.5 border-b border-white/[0.06]">
-                <span className="text-slate-400">Total Units On Hand</span>
-                <span className="font-bold text-teal-400 bg-teal-500/10 border border-teal-500/20 px-2 py-0.5 rounded font-mono">
-                  {totalItemsInStock}
-                </span>
-              </div>
-              <div className="flex justify-between items-center py-1.5 border-b border-white/[0.06]">
-                <span className="text-slate-400">Warehouses Active</span>
-                <span className="font-bold text-white font-mono">{warehouses.length}</span>
-              </div>
+        {/* KPI 3: Pending Inbound & Outbound Docs */}
+        <div className="p-4.5 rounded-xl bg-[#161B22] border border-white/[0.08] shadow-sm hover:border-white/[0.14] transition-all flex flex-col justify-between">
+          <div className="flex items-center justify-between text-slate-400 mb-2">
+            <span className="text-xs font-medium">Pending Documents</span>
+            <div className="h-7 w-7 rounded-lg bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-400">
+              <FileText className="h-4 w-4" />
             </div>
           </div>
-
-          <div className="mt-5 pt-3 border-t border-white/[0.06]">
-            <Link
-              href="/products"
-              className="w-full inline-flex justify-center items-center gap-1.5 px-4 py-2 bg-teal-600/15 hover:bg-teal-600/25 border border-teal-500/30 text-teal-300 text-xs font-semibold rounded-lg transition cursor-pointer"
-            >
-              <span>View Stock Catalog</span>
-              <ArrowRight className="h-3.5 w-3.5" />
+          <div>
+            <div className="text-2xl font-bold text-white tracking-tight">
+              {totalPendingDocs} <span className="text-xs font-normal text-slate-400">Orders</span>
+            </div>
+            <div className="text-[11px] text-slate-400 mt-1 flex items-center gap-2">
+              <span className="text-sky-400">{toReceiveCount} in</span>
+              <span>•</span>
+              <span className="text-emerald-400">{toDeliverCount} ready out</span>
+              {waitingCount > 0 && (
+                <>
+                  <span>•</span>
+                  <span className="text-red-400">{waitingCount} wait</span>
+                </>
+              )}
+            </div>
+          </div>
+          <div className="mt-3 pt-2.5 border-t border-white/[0.06] flex items-center justify-between text-[11px]">
+            <Link href="/receipts" className="text-sky-400 hover:underline font-medium">
+              Receipts ({toReceiveCount})
             </Link>
+            <Link href="/deliveries" className="text-emerald-400 hover:underline font-medium">
+              Deliveries ({toDeliverCount})
+            </Link>
+          </div>
+        </div>
+
+        {/* KPI 4: Total Inventory & Stock Health */}
+        <div className="p-4.5 rounded-xl bg-[#161B22] border border-white/[0.08] shadow-sm hover:border-white/[0.14] transition-all flex flex-col justify-between">
+          <div className="flex items-center justify-between text-slate-400 mb-2">
+            <span className="text-xs font-medium">Total On-Hand</span>
+            <div className="h-7 w-7 rounded-lg bg-teal-500/10 border border-teal-500/20 flex items-center justify-center text-teal-400">
+              <Layers className="h-4 w-4" />
+            </div>
+          </div>
+          <div>
+            <div className="flex items-baseline gap-2">
+              <span className="text-2xl font-bold text-white tracking-tight">
+                {totalItemsInStock}
+              </span>
+              <span className="text-xs font-semibold text-emerald-400">
+                ({healthPercentage}% healthy)
+              </span>
+            </div>
+            {/* Progress Bar */}
+            <div className="w-full h-1.5 bg-white/[0.06] rounded-full overflow-hidden mt-2">
+              <div
+                className={`h-full transition-all duration-500 ${
+                  healthPercentage >= 75 ? 'bg-emerald-500' : healthPercentage >= 40 ? 'bg-amber-500' : 'bg-red-500'
+                }`}
+                style={{ width: `${healthPercentage}%` }}
+              />
+            </div>
+          </div>
+          <div className="mt-3 pt-2.5 border-t border-white/[0.06]">
+            <span className="text-[11px] text-slate-400">
+              {healthyCount} of {formattedProducts.length} items stocked
+            </span>
           </div>
         </div>
       </div>
 
-      {/* Operations Submenu Action Strip */}
+      {/* Operations Quick Action Submenu */}
       <div className="bg-[#161B22] p-5 rounded-xl border border-white/[0.08] shadow-sm">
         <h2 className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-3">Quick Operation Triggers</h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -248,7 +280,7 @@ export default async function DashboardPage() {
         </div>
       </div>
 
-      {/* Available Stock & Move History */}
+      {/* Available Stock & Move History Highlights */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Available Stock Table */}
         <div className="space-y-3">
