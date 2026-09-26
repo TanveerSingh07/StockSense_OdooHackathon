@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { History, ArrowDownLeft, ArrowUpRight } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 
 interface MoveEntry {
@@ -35,28 +36,22 @@ export default function MoveHistoryPage() {
   const loadData = async () => {
     try {
       setLoading(true);
-      const [historyRes, wRes, pRes] = await Promise.all([
-        fetch('/api/receipts'), // We can use an endpoint or query ledger
+      const [wRes, hRes] = await Promise.all([
         fetch('/api/warehouses'),
-        fetch('/api/products'),
+        fetch('/api/history'),
       ]);
 
-      const [wData, pData] = await Promise.all([
+      const [wData, hData] = await Promise.all([
         wRes.json().catch(() => ({})),
-        pRes.json().catch(() => ({})),
+        hRes.json().catch(() => ({})),
       ]);
 
       if (wData.success && wData.data) {
         setWarehouses(wData.data);
       }
 
-      // Fetch moves directly via a dedicated route or load
-      const res = await fetch('/api/history');
-      if (res.ok) {
-        const data = await res.json();
-        if (data.success) {
-          setEntries(data.data);
-        }
+      if (hData.success && hData.data) {
+        setEntries(hData.data);
       }
     } catch (err) {
       console.error('Failed to load history:', err);
@@ -92,12 +87,17 @@ export default function MoveHistoryPage() {
     .reduce((sum, e) => sum + Math.abs(e.change), 0);
 
   return (
-    <div className="p-8 max-w-7xl mx-auto space-y-6">
+    <div className="p-4 sm:p-8 max-w-7xl mx-auto space-y-6 text-[#F0F6FC]">
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">Stock Move History</h1>
-          <p className="text-sm text-gray-500 mt-1">
+          <div className="flex items-center gap-2">
+            <span className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+              <History className="w-4 h-4" />
+            </span>
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white">Stock Move History</h1>
+          </div>
+          <p className="text-xs sm:text-sm text-slate-400 mt-1">
             Complete audit trail of inventory mutations with interactive filters for receipts, deliveries, and adjustments.
           </p>
         </div>
@@ -105,28 +105,32 @@ export default function MoveHistoryPage() {
 
       {/* KPI Overview */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="bg-white p-4 rounded-xl border shadow-sm">
-          <div className="text-xs text-gray-500 font-medium uppercase tracking-wider">Total Recorded Movements</div>
-          <div className="text-2xl font-bold text-gray-900 mt-1">{filteredEntries.length}</div>
+        <div className="bg-[#161B22] p-4 rounded-xl border border-white/[0.08] shadow-sm">
+          <div className="text-xs text-slate-400 font-medium uppercase tracking-wider">Total Recorded Movements</div>
+          <div className="text-2xl font-bold text-white mt-1">{filteredEntries.length}</div>
         </div>
-        <div className="bg-emerald-50/70 p-4 rounded-xl border border-emerald-200 shadow-sm">
-          <div className="text-xs text-emerald-800 font-medium uppercase tracking-wider">Total Inflow (+)</div>
-          <div className="text-2xl font-bold text-emerald-700 mt-1">+{totalIn} units</div>
+        <div className="bg-emerald-500/10 p-4 rounded-xl border border-emerald-500/20 shadow-sm">
+          <div className="text-xs text-emerald-400 font-medium uppercase tracking-wider flex items-center gap-1">
+            <ArrowDownLeft className="w-3.5 h-3.5" /> Total Inflow (+)
+          </div>
+          <div className="text-2xl font-bold text-emerald-300 mt-1">+{totalIn} units</div>
         </div>
-        <div className="bg-red-50/70 p-4 rounded-xl border border-red-200 shadow-sm">
-          <div className="text-xs text-red-800 font-medium uppercase tracking-wider">Total Outflow (−)</div>
-          <div className="text-2xl font-bold text-red-700 mt-1">−{totalOut} units</div>
+        <div className="bg-red-500/10 p-4 rounded-xl border border-red-500/20 shadow-sm">
+          <div className="text-xs text-red-400 font-medium uppercase tracking-wider flex items-center gap-1">
+            <ArrowUpRight className="w-3.5 h-3.5" /> Total Outflow (−)
+          </div>
+          <div className="text-2xl font-bold text-red-300 mt-1">−{totalOut} units</div>
         </div>
       </div>
 
       {/* Filter Bar */}
-      <div className="bg-white p-4 rounded-xl border shadow-sm flex flex-col md:flex-row gap-4 items-center">
+      <div className="bg-[#161B22] p-4 rounded-xl border border-white/[0.08] shadow-sm flex flex-col md:flex-row gap-4 items-center">
         <div className="flex-1 w-full">
           <Input
             placeholder="Search by Reference (e.g. WH/IN/0001, ADJ/...) or Product SKU/Name..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full bg-white shadow-none"
+            className="w-full bg-[#0D1117] border-white/[0.08] text-white text-xs placeholder-slate-500"
           />
         </div>
 
@@ -135,23 +139,23 @@ export default function MoveHistoryPage() {
           <select
             value={selectedReason}
             onChange={(e) => setSelectedReason(e.target.value)}
-            className="h-10 px-3 border rounded-md text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="h-9 px-3 text-xs bg-[#0D1117] border border-white/[0.08] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-colors"
           >
-            <option value="ALL">All Operations</option>
-            <option value="RECEIPT">Inbound Receipts</option>
-            <option value="DELIVERY">Outbound Deliveries</option>
-            <option value="ADJUSTMENT">Stock Adjustments</option>
+            <option value="ALL" className="bg-[#161B22] text-white">All Operations</option>
+            <option value="RECEIPT" className="bg-[#161B22] text-white">Inbound Receipts</option>
+            <option value="DELIVERY" className="bg-[#161B22] text-white">Outbound Deliveries</option>
+            <option value="ADJUSTMENT" className="bg-[#161B22] text-white">Stock Adjustments</option>
           </select>
 
           {/* Warehouse Filter */}
           <select
             value={selectedWarehouse}
             onChange={(e) => setSelectedWarehouse(e.target.value)}
-            className="h-10 px-3 border rounded-md text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="h-9 px-3 text-xs bg-[#0D1117] border border-white/[0.08] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-colors"
           >
-            <option value="ALL">All Warehouses</option>
+            <option value="ALL" className="bg-[#161B22] text-white">All Warehouses</option>
             {warehouses.map((w) => (
-              <option key={w.id} value={w.id}>
+              <option key={w.id} value={w.id} className="bg-[#161B22] text-white">
                 {w.name}
               </option>
             ))}
@@ -161,78 +165,81 @@ export default function MoveHistoryPage() {
 
       {/* Moves Table */}
       {loading ? (
-        <div className="p-12 text-center text-gray-400 bg-white rounded-xl border">Loading move history...</div>
+        <div className="p-12 text-center text-slate-500 bg-[#161B22] rounded-xl border border-white/[0.08]">
+          Loading move history...
+        </div>
       ) : (
-        <div className="border rounded-2xl bg-white shadow-sm overflow-hidden">
-          <table className="w-full text-left border-collapse text-sm">
-            <thead>
-              <tr className="border-b bg-gray-50/80 text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                <th className="p-4">Timestamp</th>
-                <th className="p-4">Reference / Order</th>
-                <th className="p-4">Product Details</th>
-                <th className="p-4">Warehouse</th>
-                <th className="p-4">Operation Type</th>
-                <th className="p-4 text-right">Quantity Change</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100">
-              {filteredEntries.map((entry) => {
-                const isIn = entry.change > 0;
-                return (
-                  <tr key={entry.id} className="hover:bg-gray-50/50 transition">
-                    <td className="p-4 text-xs text-gray-500 whitespace-nowrap">
-                      {new Date(entry.createdAt).toLocaleString(undefined, {
-                        month: 'short',
-                        day: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit',
-                      })}
-                    </td>
-                    <td className="p-4 font-mono text-xs font-bold text-gray-800">
-                      {entry.refId}
-                    </td>
-                    <td className="p-4">
-                      <div className="font-semibold text-gray-900">{entry.product?.name || entry.productId}</div>
-                      <div className="text-xs font-mono text-gray-400">{entry.product?.sku || 'N/A'}</div>
-                    </td>
-                    <td className="p-4 text-xs font-medium text-gray-600">
-                      {entry.warehouse?.name || entry.warehouseId}
-                    </td>
-                    <td className="p-4">
-                      <span className={`inline-flex px-2 py-0.5 rounded text-xs font-semibold ${
-                        entry.reason === 'RECEIPT'
-                          ? 'bg-blue-50 text-blue-700 border border-blue-200'
-                          : entry.reason === 'DELIVERY'
-                          ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                          : 'bg-purple-50 text-purple-700 border border-purple-200'
-                      }`}>
-                        {entry.reason}
-                      </span>
-                    </td>
-                    <td className="p-4 text-right">
-                      {/* Excalidraw requirement: In events green, Out events red */}
-                      <span
-                        className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-mono font-bold ${
-                          isIn
-                            ? 'bg-emerald-100 text-emerald-800 border border-emerald-200'
-                            : 'bg-red-100 text-red-800 border border-red-200'
-                        }`}
-                      >
-                        {isIn ? `+${entry.change}` : entry.change} {entry.product?.unit || 'units'}
-                      </span>
+        <div className="border border-white/[0.08] rounded-xl bg-[#161B22] shadow-sm overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse text-xs">
+              <thead>
+                <tr className="border-b border-white/[0.08] bg-white/[0.02] text-slate-400 font-semibold uppercase tracking-wider text-[11px]">
+                  <th className="p-3.5">Timestamp</th>
+                  <th className="p-3.5">Reference / Order</th>
+                  <th className="p-3.5">Product Details</th>
+                  <th className="p-3.5">Warehouse</th>
+                  <th className="p-3.5">Operation Type</th>
+                  <th className="p-3.5 text-right">Quantity Change</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-white/[0.06]">
+                {filteredEntries.map((entry) => {
+                  const isIn = entry.change > 0;
+                  return (
+                    <tr key={entry.id} className="hover:bg-white/[0.02] transition-colors">
+                      <td className="p-3.5 text-slate-400 whitespace-nowrap text-[11px] font-mono">
+                        {new Date(entry.createdAt).toLocaleString(undefined, {
+                          month: 'short',
+                          day: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })}
+                      </td>
+                      <td className="p-3.5 font-mono text-[11px] font-bold text-white">
+                        {entry.refId}
+                      </td>
+                      <td className="p-3.5">
+                        <div className="font-medium text-white">{entry.product?.name || entry.productId}</div>
+                        <div className="text-[11px] font-mono text-slate-400">{entry.product?.sku || 'N/A'}</div>
+                      </td>
+                      <td className="p-3.5 text-slate-300">
+                        {entry.warehouse?.name || entry.warehouseId}
+                      </td>
+                      <td className="p-3.5">
+                        <span className={`inline-flex px-2 py-0.5 rounded text-[10px] font-semibold tracking-wide uppercase border ${
+                          entry.reason === 'RECEIPT'
+                            ? 'bg-blue-500/10 text-blue-300 border-blue-500/20'
+                            : entry.reason === 'DELIVERY'
+                            ? 'bg-emerald-500/10 text-emerald-300 border-emerald-500/20'
+                            : 'bg-purple-500/10 text-purple-300 border-purple-500/20'
+                        }`}>
+                          {entry.reason}
+                        </span>
+                      </td>
+                      <td className="p-3.5 text-right font-mono font-bold">
+                        <span
+                          className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] border ${
+                            isIn
+                              ? 'bg-emerald-500/10 text-emerald-300 border-emerald-500/20'
+                              : 'bg-red-500/10 text-red-300 border-red-500/20'
+                          }`}
+                        >
+                          {isIn ? '+' : ''}{entry.change} {entry.product?.unit || 'units'}
+                        </span>
+                      </td>
+                    </tr>
+                  );
+                })}
+                {filteredEntries.length === 0 && (
+                  <tr>
+                    <td colSpan={6} className="p-8 text-center text-slate-500">
+                      No movements found matching the current search & filters.
                     </td>
                   </tr>
-                );
-              })}
-              {filteredEntries.length === 0 && (
-                <tr>
-                  <td colSpan={6} className="p-8 text-center text-gray-400">
-                    No movements found matching the current search & filters.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
     </div>

@@ -131,31 +131,31 @@ export default function NewAdjustmentPage() {
   };
 
   return (
-    <div className="p-8 max-w-3xl mx-auto space-y-6">
+    <div className="p-4 sm:p-8 max-w-3xl mx-auto space-y-6 text-[#F0F6FC]">
       {/* Top Bar */}
       <div>
-        <Link href="/" className="text-sm font-semibold text-gray-500 hover:text-gray-900">
+        <Link href="/" className="text-xs font-semibold text-emerald-400 hover:text-emerald-300">
           ← Back to Dashboard
         </Link>
-        <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight mt-2">Physical Stock Adjustment</h1>
-        <p className="text-sm text-gray-500 mt-1">
-          Reconcile physical warehouse counts against system recorded stock levels. Auto-logs diffs to the ledger.
+        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white mt-1">Physical Stock Adjustment</h1>
+        <p className="text-xs sm:text-sm text-slate-400 mt-1">
+          Perform a physical inventory audit adjustment to reconcile counted vs recorded stock. Auto-logs diffs to the ledger.
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="bg-white p-8 rounded-2xl border shadow-sm space-y-8">
+      <form onSubmit={handleSubmit} className="space-y-6 bg-[#161B22] p-6 sm:p-8 rounded-xl border border-white/[0.08] shadow-sm">
         {/* Warehouse & Product Selection */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
           <div>
-            <Label className="mb-2 block font-semibold text-gray-700">Warehouse Location *</Label>
+            <Label className="mb-1.5 block text-xs font-medium text-slate-300">Warehouse Location *</Label>
             <select
               value={warehouseId}
               onChange={(e) => setWarehouseId(e.target.value)}
-              className="w-full h-10 px-3 border rounded-md text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full h-10 px-3 text-xs bg-[#0D1117] border border-white/[0.08] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-colors"
               required
             >
               {warehouses.map((w) => (
-                <option key={w.id} value={w.id}>
+                <option key={w.id} value={w.id} className="bg-[#161B22] text-white">
                   {w.name}
                 </option>
               ))}
@@ -164,15 +164,15 @@ export default function NewAdjustmentPage() {
           </div>
 
           <div>
-            <Label className="mb-2 block font-semibold text-gray-700">Product to Adjust *</Label>
+            <Label className="mb-1.5 block text-xs font-medium text-slate-300">Product to Adjust *</Label>
             <select
               value={productId}
               onChange={(e) => setProductId(e.target.value)}
-              className="w-full h-10 px-3 border rounded-md text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full h-10 px-3 text-xs bg-[#0D1117] border border-white/[0.08] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-colors"
               required
             >
               {products.map((p) => (
-                <option key={p.id} value={p.id}>
+                <option key={p.id} value={p.id} className="bg-[#161B22] text-white">
                   [{p.sku}] {p.name}
                 </option>
               ))}
@@ -182,23 +182,23 @@ export default function NewAdjustmentPage() {
         </div>
 
         {/* Counted vs System Diff Calculation Card */}
-        <div className="bg-gray-50/80 p-6 rounded-2xl border border-gray-200 space-y-4">
-          <h2 className="text-xs font-bold uppercase tracking-wider text-gray-500">
+        <div className="bg-[#0D1117] p-5 rounded-xl border border-white/[0.08] space-y-4">
+          <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400">
             Inventory Reconciliation Metrics
           </h2>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-center">
             {/* System Quantity */}
-            <div className="bg-white p-4 rounded-xl border shadow-sm">
-              <div className="text-xs text-gray-500 font-medium">System Recorded (On Hand)</div>
-              <div className="text-3xl font-mono font-bold text-gray-900 mt-1">
-                {systemQty} <span className="text-xs font-normal text-gray-400">{selectedProduct?.unit || 'units'}</span>
+            <div className="bg-[#161B22] p-4 rounded-lg border border-white/[0.06]">
+              <div className="text-xs text-slate-400 font-medium">System Recorded (On Hand)</div>
+              <div className="text-2xl font-mono font-bold text-white mt-1">
+                {systemQty} <span className="text-xs font-normal text-slate-500">{selectedProduct?.unit || 'units'}</span>
               </div>
             </div>
 
             {/* Counted Quantity */}
-            <div className="bg-white p-4 rounded-xl border border-blue-200 shadow-sm ring-2 ring-blue-100">
-              <Label className="text-xs text-blue-700 font-bold block mb-1">
+            <div className="bg-[#161B22] p-4 rounded-lg border border-emerald-500/30 ring-1 ring-emerald-500/20">
+              <Label className="text-xs text-emerald-400 font-bold block mb-1">
                 Counted (Physical Stock) *
               </Label>
               <Input
@@ -207,23 +207,23 @@ export default function NewAdjustmentPage() {
                 value={countedQty}
                 onChange={(e) => setCountedQty(e.target.value === '' ? '' : Number(e.target.value))}
                 required
-                className="font-mono text-2xl font-bold text-blue-900 h-10 bg-white"
+                className="font-mono text-xl font-bold text-emerald-300 h-9 bg-[#0D1117] border-white/[0.1]"
               />
             </div>
 
             {/* Computed Difference */}
-            <div className={`p-4 rounded-xl border shadow-sm ${
+            <div className={`p-4 rounded-lg border ${
               diff > 0
-                ? 'bg-emerald-50/80 border-emerald-200 text-emerald-900'
+                ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300'
                 : diff < 0
-                ? 'bg-red-50/80 border-red-200 text-red-900'
-                : 'bg-white border-gray-200 text-gray-600'
+                ? 'bg-red-500/10 border-red-500/30 text-red-300'
+                : 'bg-[#161B22] border-white/[0.06] text-slate-400'
             }`}>
               <div className="text-xs font-medium">Computed Adjustment Diff</div>
-              <div className="text-3xl font-mono font-bold mt-1">
+              <div className="text-2xl font-mono font-bold mt-1">
                 {diff > 0 ? `+${diff}` : diff}
               </div>
-              <div className="text-[11px] mt-0.5 font-medium">
+              <div className="text-[11px] mt-0.5 font-medium opacity-80">
                 {diff > 0 ? 'Surplus (+ Stock)' : diff < 0 ? 'Deficit (− Stock)' : 'Balanced (No Diff)'}
               </div>
             </div>
@@ -232,30 +232,30 @@ export default function NewAdjustmentPage() {
 
         {/* Reason / Notes */}
         <div>
-          <Label className="mb-2 block font-semibold text-gray-700">Reason for Adjustment</Label>
+          <Label className="mb-1.5 block text-xs font-medium text-slate-300">Reason for Adjustment</Label>
           <select
             value={reasonNote}
             onChange={(e) => setReasonNote(e.target.value)}
-            className="w-full h-10 px-3 border rounded-md text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 mb-2"
+            className="w-full h-10 px-3 text-xs bg-[#0D1117] border border-white/[0.08] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-colors"
           >
-            <option value="Annual Physical Count">Physical Inventory Count Reconciliation</option>
-            <option value="Damaged Goods">Damaged / Expired Inventory Write-off</option>
-            <option value="Inventory Found">Unrecorded Surplus Found</option>
-            <option value="Packaging Discrepancy">Packaging Discrepancy</option>
+            <option value="Annual Physical Count" className="bg-[#161B22] text-white">Physical Inventory Count Reconciliation</option>
+            <option value="Damaged Goods" className="bg-[#161B22] text-white">Damaged / Expired Inventory Write-off</option>
+            <option value="Inventory Found" className="bg-[#161B22] text-white">Unrecorded Surplus Found</option>
+            <option value="Packaging Discrepancy" className="bg-[#161B22] text-white">Packaging Discrepancy</option>
           </select>
         </div>
 
         {/* Actions */}
-        <div className="flex justify-end gap-3 pt-6 border-t">
+        <div className="flex justify-end gap-3 pt-5 border-t border-white/[0.08]">
           <Link href="/">
-            <Button type="button" variant="outline">
+            <Button type="button" variant="outline" className="border-white/[0.1] text-slate-300 hover:bg-white/[0.05]">
               Cancel
             </Button>
           </Link>
           <Button
             type="submit"
             disabled={loading || fetching || diff === 0}
-            className="bg-purple-600 hover:bg-purple-700 text-white font-medium"
+            className="bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-xs h-9 px-4 rounded-lg shadow-sm"
           >
             {loading ? 'Submitting...' : 'Apply Stock Adjustment'}
           </Button>

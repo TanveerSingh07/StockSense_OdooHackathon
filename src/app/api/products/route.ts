@@ -117,6 +117,19 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const initialQty = Number(body.initialStock) || 0;
+
+    let warehouseId: string | null = null;
+    if (initialQty > 0) {
+      let warehouse = await prisma.warehouse.findFirst();
+      if (!warehouse) {
+        warehouse = await prisma.warehouse.create({
+          data: { name: "Main Distribution Center" },
+        });
+      }
+      warehouseId = warehouse.id;
+    }
+
     const product = await prisma.product.create({
       data: {
         name: name.trim(),
@@ -124,6 +137,16 @@ export async function POST(req: NextRequest) {
         categoryId: resolvedCategoryId,
         unit: unit?.trim() || "Units",
         reorderPoint: Number(reorderPoint) || 0,
+        ...(initialQty > 0 && warehouseId
+          ? {
+              levels: {
+                create: {
+                  warehouseId,
+                  quantity: initialQty,
+                },
+              },
+            }
+          : {}),
       },
       include: {
         category: true,
@@ -135,18 +158,21 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    const totalQuantity = product.levels.reduce((sum, lvl) => sum + lvl.quantity, 0);
+
     return NextResponse.json(
       {
         success: true,
         message: "Product created successfully",
         data: {
           ...product,
-          totalQuantity: 0,
-          isLowStock: 0 <= product.reorderPoint,
+          totalQuantity,
+          isLowStock: totalQuantity <= product.reorderPoint,
         },
       },
       { status: 201 }
     );
+
   } catch (error: any) {
     console.error("Error creating product:", error);
     return NextResponse.json(
