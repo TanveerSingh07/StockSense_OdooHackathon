@@ -9,6 +9,7 @@ import {
   ChevronDown, 
   ArrowDownLeft, 
   ArrowUpRight, 
+  ArrowLeftRight,
   SlidersHorizontal,
   Package,
   History,
@@ -40,7 +41,8 @@ export function Navbar() {
   const isOperationsActive = 
     pathname.startsWith('/receipts') ||
     pathname.startsWith('/deliveries') ||
-    pathname.startsWith('/adjustments');
+    pathname.startsWith('/adjustments') ||
+    pathname.startsWith('/transfers');
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -131,6 +133,20 @@ export function Navbar() {
                     <div>
                       <div className="font-semibold text-[#dae2fd]">Deliveries</div>
                       <div className="text-[10px] text-[#94a3b8]">Outbound customer dispatches</div>
+                    </div>
+                  </Link>
+
+                  <Link
+                    href="/transfers"
+                    className="flex items-center gap-3 p-2 rounded-lg text-xs text-[#94a3b8] hover:text-[#dae2fd] hover:bg-[#222a3d] transition"
+                    onClick={() => setOperationsOpen(false)}
+                  >
+                    <div className="h-7 w-7 rounded-lg bg-[#38bdf8]/10 border border-[#38bdf8]/20 text-[#38bdf8] flex items-center justify-center shrink-0">
+                      <ArrowLeftRight className="h-4 w-4" />
+                    </div>
+                    <div>
+                      <div className="font-semibold text-[#dae2fd]">Internal Transfers</div>
+                      <div className="text-[10px] text-[#94a3b8]">Inter-warehouse stock relocation</div>
                     </div>
                   </Link>
 
