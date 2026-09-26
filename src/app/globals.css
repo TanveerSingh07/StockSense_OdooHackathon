@@ -71,3 +71,45 @@
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.2);
 }
+
+/* Ambient Background Drift Animations */
+@keyframes ambient-drift-amber {
+  0%, 100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  35% {
+    transform: translate3d(50px, 40px, 0) scale(1.08);
+  }
+  70% {
+    transform: translate3d(-35px, 25px, 0) scale(0.96);
+  }
+}
+
+@keyframes ambient-drift-indigo {
+  0%, 100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  40% {
+    transform: translate3d(-45px, -35px, 0) scale(0.94);
+  }
+  75% {
+    transform: translate3d(30px, -20px, 0) scale(1.06);
+  }
+}
+
+.animate-ambient-drift-amber {
+  animation: ambient-drift-amber 50s ease-in-out infinite;
+  will-change: transform;
+}
+
+.animate-ambient-drift-indigo {
+  animation: ambient-drift-indigo 60s ease-in-out infinite;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-ambient-drift-amber,
+  .animate-ambient-drift-indigo {
+    animation: none !important;
+  }
+}
