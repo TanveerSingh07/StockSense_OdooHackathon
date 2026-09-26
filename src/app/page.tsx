@@ -11,32 +11,82 @@ import {
   Activity,
   AlertTriangle,
   FileText,
-  Warehouse,
+  Warehouse as WarehouseIcon,
   CheckCircle2,
   Clock,
   Layers,
   ShieldCheck
 } from 'lucide-react';
+import { DashboardFilterBar } from '@/components/dashboard/dashboard-filter-bar';
 
 export const dynamic = 'force-dynamic';
 
-export default async function DashboardPage() {
-  const [receipts, deliveries, latestMoves, stockLevels, products, warehouses] = await Promise.all([
-    prisma.receipt.findMany({ include: { lines: true, supplier: true }, orderBy: { id: 'asc' } }),
-    prisma.deliveryOrder.findMany({ include: { lines: true }, orderBy: { id: 'asc' } }),
-    prisma.stockLedger.findMany({ take: 6, orderBy: { createdAt: 'desc' } }),
+interface DashboardPageProps {
+  searchParams?: Promise<{
+    warehouseId?: string;
+    categoryId?: string;
+    docType?: string;
+    status?: string;
+  }>;
+}
+
+export default async function DashboardPage({ searchParams }: DashboardPageProps) {
+  const resolvedParams = searchParams ? await searchParams : {};
+  const warehouseId = resolvedParams.warehouseId || 'all';
+  const categoryId = resolvedParams.categoryId || 'all';
+  const docType = resolvedParams.docType || 'all';
+  const status = resolvedParams.status || 'all';
+
+  const [categories, warehouses, receipts, deliveries, latestMoves, stockLevels, products] = await Promise.all([
+    prisma.category.findMany({ orderBy: { name: 'asc' } }),
+    prisma.warehouse.findMany({ orderBy: { name: 'asc' } }),
+    prisma.receipt.findMany({
+      where: {
+        ...(warehouseId !== 'all' ? { warehouseId } : {}),
+        ...(status !== 'all' ? { status: status as 'DRAFT' | 'DONE' } : {}),
+      },
+      include: { lines: true, supplier: true },
+      orderBy: { id: 'asc' },
+    }),
+    prisma.deliveryOrder.findMany({
+      where: {
+        ...(warehouseId !== 'all' ? { warehouseId } : {}),
+        ...(status !== 'all' ? { status: status as 'DRAFT' | 'DONE' } : {}),
+      },
+      include: { lines: true },
+      orderBy: { id: 'asc' },
+    }),
+    prisma.stockLedger.findMany({
+      where: {
+        ...(warehouseId !== 'all' ? { warehouseId } : {}),
+        ...(docType !== 'all'
+          ? docType === 'RECEIPT'
+            ? { reason: 'RECEIPT' }
+            : docType === 'DELIVERY'
+            ? { reason: 'DELIVERY' }
+            : {}
+          : {}),
+      },
+      take: 8,
+      orderBy: { createdAt: 'desc' },
+    }),
     prisma.stockLevel.findMany({
-      include: { product: true, warehouse: true },
+      where: {
+        ...(warehouseId !== 'all' ? { warehouseId } : {}),
+        ...(categoryId !== 'all' ? { product: { categoryId } } : {}),
+      },
+      include: { product: { include: { category: true } }, warehouse: true },
       orderBy: { quantity: 'desc' },
-      take: 6,
+      take: 8,
     }),
     prisma.product.findMany({
+      where: categoryId !== 'all' ? { categoryId } : undefined,
       include: {
         category: true,
-        levels: true,
-      }
+        levels: warehouseId !== 'all' ? { where: { warehouseId } } : true,
+      },
+      orderBy: { name: 'asc' },
     }),
-    prisma.warehouse.findMany(),
   ]);
 
   const productMap = new Map(products.map((p) => [p.id, p]));
@@ -80,7 +130,7 @@ export default async function DashboardPage() {
     : 0;
 
   return (
-    <div className="p-4 sm:p-8 max-w-7xl mx-auto space-y-8 text-[#F0F6FC]">
+    <div className="p-4 sm:p-8 max-w-7xl mx-auto space-y-6 text-[#F0F6FC]">
       {/* Dashboard Heading */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -105,6 +155,16 @@ export default async function DashboardPage() {
         </div>
       </div>
 
+      {/* Dashboard Filters Bar */}
+      <DashboardFilterBar
+        warehouses={warehouses}
+        categories={categories}
+        activeWarehouseId={warehouseId}
+        activeCategoryId={categoryId}
+        activeDocType={docType}
+        activeStatus={status}
+      />
+
       {/* 4 High-Impact KPI Cards (Products, Low Stock, Pending Docs, Total Inventory) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* KPI 1: Total SKUs / Products */}
@@ -120,8 +180,10 @@ export default async function DashboardPage() {
               {products.length}
             </div>
             <div className="text-[11px] text-slate-400 mt-1 flex items-center gap-1">
-              <span className="text-emerald-400 font-medium">Active</span>
-              <span>across {warehouses.length} warehouse(s)</span>
+              <span className="text-emerald-400 font-medium">
+                {categoryId !== 'all' ? 'Filtered category' : 'Active'}
+              </span>
+              <span>across {warehouseId !== 'all' ? 'selected' : warehouses.length} warehouse(s)</span>
             </div>
           </div>
           <div className="mt-3 pt-2.5 border-t border-white/[0.06]">
@@ -192,10 +254,10 @@ export default async function DashboardPage() {
           </div>
           <div className="mt-3 pt-2.5 border-t border-white/[0.06] flex items-center justify-between text-[11px]">
             <Link href="/receipts" className="text-sky-400 hover:underline font-medium">
-              Receipts ({toReceiveCount})
+              Receipts ({totalReceiptOperations})
             </Link>
             <Link href="/deliveries" className="text-emerald-400 hover:underline font-medium">
-              Deliveries ({toDeliverCount})
+              Deliveries ({totalDeliveryOperations})
             </Link>
           </div>
         </div>
@@ -304,7 +366,9 @@ export default async function DashboardPage() {
                   <tr key={s.id} className="hover:bg-white/[0.02] transition-colors">
                     <td className="p-3.5">
                       <div className="font-medium text-slate-100">{s.product?.name || s.productId}</div>
-                      <div className="text-[11px] font-mono text-slate-400">{s.product?.sku}</div>
+                      <div className="text-[11px] font-mono text-slate-400">
+                        {s.product?.sku} {s.product?.category ? `• ${s.product.category.name}` : ''}
+                      </div>
                     </td>
                     <td className="p-3.5 text-slate-300 text-[11px]">{s.warehouse?.name || s.warehouseId}</td>
                     <td className="p-3.5 text-right font-mono font-bold text-emerald-400">{s.quantity}</td>
@@ -313,7 +377,7 @@ export default async function DashboardPage() {
                 {stockLevels.length === 0 && (
                   <tr>
                     <td colSpan={3} className="p-6 text-center text-slate-400">
-                      No stock records found.
+                      No stock records matching current filters.
                     </td>
                   </tr>
                 )}
