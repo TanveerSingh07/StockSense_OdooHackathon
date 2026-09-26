@@ -1,0 +1,25 @@
+feat: add Warehouse model + warehouse settings CRUD
+
+# Conflicts:
+#	.gitignore
+#	src/app/(dashboard)/settings/warehouses/page.tsx
+#	src/app/api/warehouses/route.ts
+
+# Please enter the commit message for your changes. Lines starting
+# with '#' will be ignored, and an empty message aborts the commit.
+#
+# Author:    unknown <vanshjethi192005@gmail.com>
+#
+# interactive rebase in progress; onto 6416374
+# Last command done (1 command done):
+#    pick 3503d11 # feat: add Warehouse model + warehouse settings CRUD
+# Next command to do (1 remaining command):
+#    pick 3980689 # feat: add InternalTransfer, TransferLine models
+# You are currently rebasing branch 'feature/transfers-ledger' on '6416374'.
+#
+# Changes to be committed:
+#	modified:   .gitignore
+#	modified:   src/app/(dashboard)/settings/warehouses/page.tsx
+#	new file:   src/app/api/warehouses/[id]/route.ts
+#	modified:   src/app/api/warehouses/route.ts
+#
