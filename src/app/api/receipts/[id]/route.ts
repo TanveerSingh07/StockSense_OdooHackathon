@@ -21,7 +21,7 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
     }
 
     // Wrap in a transaction to ensure stock ledger and receipt status update together atomically
-    const updated = await prisma.$transaction(async (tx) => {
+    const updated = await prisma.$transaction(async (tx: any) => {
       const receipt = await tx.receipt.findUnique({
         where: { id: receiptId },
         include: { lines: true }

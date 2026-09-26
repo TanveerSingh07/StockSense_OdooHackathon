@@ -31,7 +31,7 @@ export default async function ReceiptsPage() {
             </tr>
           </thead>
           <tbody>
-            {receipts.map((r) => (
+            {receipts.map((r: any) => (
               <tr key={r.id} className="border-b">
                 <td className="p-4 font-mono text-sm">{r.id.slice(-6)}</td>
                 <td className="p-4">{r.supplier?.name || r.supplierId}</td>
