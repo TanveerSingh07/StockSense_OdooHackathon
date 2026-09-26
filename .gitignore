@@ -41,5 +41,15 @@ yarn-error.log*
 next-env.d.ts
 
 /src/generated/prisma
+
+# AI tools & agent configs
+.dual-graph/
+opencode.json
+.gemini/
+.claude/
+.windsurf/
+skills-lock.json
+AGENTS.md
+CLAUDE.md
 StockSense-Dev-Guide.md
 *.jpeg
