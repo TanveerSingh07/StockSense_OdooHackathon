@@ -30,6 +30,89 @@ model OtpToken {
 }
 
 model Warehouse {
-  id   String @id @default(cuid())
-  name String
+  id     String       @id @default(cuid())
+  name   String
+  levels StockLevel[]
+}
+
+model Category {
+  id       String    @id @default(cuid())
+  name     String
+  products Product[]
+}
+
+model Product {
+  id           String       @id @default(cuid())
+  name         String
+  sku          String       @unique
+  categoryId   String
+  category     Category     @relation(fields: [categoryId], references: [id])
+  unit         String
+  reorderPoint Int          @default(0)
+  levels       StockLevel[]
+}
+
+model StockLevel {
+  id          String    @id @default(cuid())
+  productId   String
+  warehouseId String
+  quantity    Int       @default(0)
+  product     Product   @relation(fields: [productId], references: [id])
+  warehouse   Warehouse @relation(fields: [warehouseId], references: [id])
+
+  @@unique([productId, warehouseId])
+}
+
+model Supplier {
+  id       String    @id @default(cuid())
+  name     String
+  receipts Receipt[]
+}
+
+enum DocStatus {
+  DRAFT
+  DONE
+}
+
+model Receipt {
+  id          String        @id @default(cuid())
+  supplierId  String
+  supplier    Supplier      @relation(fields: [supplierId], references: [id])
+  warehouseId String
+  status      DocStatus     @default(DRAFT)
+  lines       ReceiptLine[]
+}
+
+model ReceiptLine {
+  id        String  @id @default(cuid())
+  receiptId String
+  receipt   Receipt @relation(fields: [receiptId], references: [id])
+  productId String
+  quantity  Int
+}
+
+model DeliveryOrder {
+  id          String         @id @default(cuid())
+  customer    String
+  warehouseId String
+  status      DocStatus      @default(DRAFT)
+  lines       DeliveryLine[]
+}
+
+model DeliveryLine {
+  id        String        @id @default(cuid())
+  orderId   String
+  order     DeliveryOrder @relation(fields: [orderId], references: [id])
+  productId String
+  quantity  Int
+}
+
+model StockLedger {
+  id          String   @id @default(cuid())
+  productId   String
+  warehouseId String
+  change      Int
+  reason      String
+  refId       String
+  createdAt   DateTime @default(now())
 }
