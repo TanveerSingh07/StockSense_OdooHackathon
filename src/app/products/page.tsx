@@ -1,30 +1,38 @@
-"use client";
+'use client';
 
-import React, { useState, useEffect, useTransition, useMemo, Fragment } from "react";
+import React, { useState, useEffect, useMemo, useTransition } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { 
   Search, 
   Plus, 
   RefreshCw, 
   Edit2, 
-  Trash2,
-  Copy,
-  Check,
-  Download,
-  Sparkles,
+  Trash2, 
+  Copy, 
+  Check, 
+  Download, 
+  Sparkles, 
+  Package, 
+  AlertTriangle, 
+  X, 
+  Activity, 
+  Layers, 
+  HelpCircle,
+  MoreVertical,
+  SlidersHorizontal,
   ChevronDown,
-  ChevronUp,
-  Package,
-  AlertTriangle,
-  X,
-  Activity,
-  Layers,
-  Cpu,
-  Wrench,
-  Box,
-  HardHat
-} from "lucide-react";
-import { OperationsShell } from "@/components/layout/operations-shell";
-import { ProductFormSlideOver } from "@/components/products/product-form-slideover";
+  Warehouse as WarehouseIcon,
+  Tag,
+  Boxes,
+  ArrowDownLeft,
+  ArrowUpRight
+} from 'lucide-react';
+import { toast } from 'sonner';
+import { OperationsShell } from '@/components/layout/operations-shell';
+import { ProductFormSlideOver } from '@/components/products/product-form-slideover';
+import { ProductDetailSheet } from '@/components/products/product-detail-sheet';
+import { FloatingBulkBar } from '@/components/products/floating-bulk-bar';
+import { AnimatedCounter } from '@/components/products/animated-counter';
 
 export interface Category {
   id: string;
@@ -52,249 +60,523 @@ export interface Product {
   levels: StockLevel[];
 }
 
+interface Warehouse {
+  id: string;
+  name: string;
+}
+
 const DEMO_PRODUCTS = [
-  { name: "Wireless Barcode Scanner Handheld", sku: "ELEC-SCN-001", categoryName: "Electronics", unit: "Units", reorderPoint: 5, initialStock: 18 },
-  { name: "Industrial Label Printer Thermal", sku: "ELEC-PRN-002", categoryName: "Electronics", unit: "Units", reorderPoint: 3, initialStock: 2 },
-  { name: "M8 Hex Bolts Grade 8.8 (100-pack)", sku: "FSTN-BLT-M8", categoryName: "Hardware", unit: "Boxes", reorderPoint: 25, initialStock: 60 },
-  { name: "Heavy Duty Stainless Steel Hinges", sku: "FSTN-HNG-SS", categoryName: "Hardware", unit: "Pieces", reorderPoint: 40, initialStock: 0 },
-  { name: "Aluminum Extrusion Profile 2020 (1m)", sku: "RAW-ALU-2020", categoryName: "Raw Materials", unit: "Pieces", reorderPoint: 50, initialStock: 110 },
-  { name: "Corrugated Shipping Cartons (Large)", sku: "PKG-BOX-LRG", categoryName: "Packaging", unit: "Bundles", reorderPoint: 20, initialStock: 15 },
-  { name: "Stretch Film Roll 500mm x 300m", sku: "PKG-FLM-500", categoryName: "Packaging", unit: "Rolls", reorderPoint: 15, initialStock: 42 },
-  { name: "Kevlar Cut-Resistant Work Gloves (L)", sku: "PPE-GLV-002", categoryName: "Safety Gear", unit: "Pairs", reorderPoint: 12, initialStock: 35 },
+  { name: 'Wireless Barcode Scanner Handheld', sku: 'ELEC-SCN-001', categoryName: 'Electronics', unit: 'Units', reorderPoint: 5, initialStock: 18 },
+  { name: 'Industrial Label Printer Thermal', sku: 'ELEC-PRN-002', categoryName: 'Electronics', unit: 'Units', reorderPoint: 3, initialStock: 2 },
+  { name: 'M8 Hex Bolts Grade 8.8 (100-pack)', sku: 'FSTN-BLT-M8', categoryName: 'Hardware', unit: 'Boxes', reorderPoint: 25, initialStock: 60 },
+  { name: 'Heavy Duty Stainless Steel Hinges', sku: 'FSTN-HNG-SS', categoryName: 'Hardware', unit: 'Pieces', reorderPoint: 40, initialStock: 0 },
+  { name: 'Aluminum Extrusion Profile 2020 (1m)', sku: 'RAW-ALU-2020', categoryName: 'Raw Materials', unit: 'Pieces', reorderPoint: 50, initialStock: 110 },
+  { name: 'Corrugated Shipping Cartons (Large)', sku: 'PKG-BOX-LRG', categoryName: 'Packaging', unit: 'Bundles', reorderPoint: 20, initialStock: 15 },
+  { name: 'Stretch Film Roll 500mm x 300m', sku: 'PKG-FLM-500', categoryName: 'Packaging', unit: 'Rolls', reorderPoint: 15, initialStock: 42 },
+  { name: 'Kevlar Cut-Resistant Work Gloves (L)', sku: 'PPE-GLV-002', categoryName: 'Safety Gear', unit: 'Pairs', reorderPoint: 12, initialStock: 35 },
 ];
 
 export default function ProductsPage() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [seeding, setSeeding] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("all");
-  const [lowStockOnly, setLowStockOnly] = useState(false);
-  const [copiedSku, setCopiedSku] = useState<string | null>(null);
-  const [expandedProductId, setExpandedProductId] = useState<string | null>(null);
-  const [selectedProductIds, setSelectedProductIds] = useState<string[]>([]);
-  const [isPending, startTransition] = useTransition();
+  const queryClient = useQueryClient();
 
-  // Slide-over panel state
+  // Filters state
+  const [searchQuery, setSearchQuery] = useState('');
+  const [activeTab, setActiveTab] = useState<'ALL' | 'LOW_STOCK' | 'OUT_OF_STOCK'>('ALL');
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedWarehouse, setSelectedWarehouse] = useState('all');
+  const [activeKpiFilter, setActiveKpiFilter] = useState<'NONE' | 'TOTAL' | 'UNITS' | 'HEALTH' | 'LOW'>('NONE');
+
+  // UI States
+  const [copiedSku, setCopiedSku] = useState<string | null>(null);
+  const [selectedProductIds, setSelectedProductIds] = useState<string[]>([]);
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [productToEdit, setProductToEdit] = useState<Product | null>(null);
+  const [sheetProduct, setSheetProduct] = useState<Product | null>(null);
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
+  const [showExportMenu, setShowExportMenu] = useState(false);
+  const [seeding, setSeeding] = useState(false);
 
-  const fetchCategories = async () => {
-    try {
-      const res = await fetch("/api/categories");
+  // TanStack Query: Fetch Categories
+  const { data: categories = [] } = useQuery<Category[]>({
+    queryKey: ['categories'],
+    queryFn: async () => {
+      const res = await fetch('/api/categories');
       const json = await res.json();
-      if (json.success) {
-        setCategories(json.data);
-      }
-    } catch (err) {
-      console.error("Error loading categories:", err);
-    }
-  };
+      return json.success ? json.data : [];
+    },
+  });
 
-  const fetchProducts = async () => {
-    setLoading(true);
-    try {
-      const params = new URLSearchParams();
-      if (searchQuery) params.set("search", searchQuery);
-      if (selectedCategory && selectedCategory !== "all") params.set("categoryId", selectedCategory);
-      if (lowStockOnly) params.set("lowStock", "true");
-
-      const res = await fetch(`/api/products?${params.toString()}`);
+  // TanStack Query: Fetch Warehouses
+  const { data: warehouses = [] } = useQuery<Warehouse[]>({
+    queryKey: ['warehouses'],
+    queryFn: async () => {
+      const res = await fetch('/api/warehouses');
       const json = await res.json();
-      if (json.success) {
-        setProducts(json.data);
-      }
-    } catch (err) {
-      console.error("Error loading products:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
+      return json.success ? json.data : [];
+    },
+  });
 
-  useEffect(() => {
-    fetchCategories();
-  }, []);
+  // TanStack Query: Fetch Products
+  const {
+    data: products = [],
+    isLoading,
+    isRefetching,
+    refetch,
+  } = useQuery<Product[]>({
+    queryKey: ['products'],
+    queryFn: async () => {
+      const res = await fetch('/api/products');
+      const json = await res.json();
+      return json.success ? json.data : [];
+    },
+  });
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      startTransition(() => {
-        fetchProducts();
-      });
-    }, 150);
-    return () => clearTimeout(timer);
-  }, [searchQuery, selectedCategory, lowStockOnly]);
-
+  // Keyboard shortcut ⌘K / Ctrl+K
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
         e.preventDefault();
-        document.getElementById("catalog-search")?.focus();
+        document.getElementById('catalog-search')?.focus();
       }
     };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  const handleDelete = async (id: string, name: string) => {
-    if (!confirm(`Are you sure you want to remove "${name}" from your catalog?`)) {
-      return;
-    }
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handleClickOutside = () => {
+      setOpenDropdownId(null);
+      setShowExportMenu(false);
+    };
+    window.addEventListener('click', handleClickOutside);
+    return () => window.removeEventListener('click', handleClickOutside);
+  }, []);
 
-    try {
-      const res = await fetch(`/api/products/${id}`, { method: "DELETE" });
-      const json = await res.json();
-      if (json.success) {
-        setProducts((prev) => prev.filter((p) => p.id !== id));
-        setSelectedProductIds((prev) => prev.filter((item) => item !== id));
-      } else {
-        alert(json.message || "Failed to delete product");
-      }
-    } catch (err) {
-      alert("An error occurred while deleting the product");
-    }
-  };
-
-  const handleCopySku = (sku: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    navigator.clipboard.writeText(sku);
-    setCopiedSku(sku);
-    setTimeout(() => setCopiedSku(null), 1500);
-  };
-
-  const handleSeedDemoData = async () => {
-    setSeeding(true);
-    try {
-      for (const item of DEMO_PRODUCTS) {
-        await fetch("/api/products", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(item),
-        });
-      }
-      await fetchProducts();
-      await fetchCategories();
-    } catch (err) {
-      console.error("Failed to seed demo products:", err);
-    } finally {
-      setSeeding(false);
-    }
-  };
-
-  const handleExportCSV = (specificItems?: Product[]) => {
-    const exportList = specificItems || products;
-    if (exportList.length === 0) return;
-    const headers = ["SKU / Code", "Product Name", "Category", "Unit", "Current Stock", "Min Reorder Point", "Health Status"];
-    const rows = exportList.map((p) => [
-      p.sku,
-      `"${p.name.replace(/"/g, '""')}"`,
-      p.category?.name || "Uncategorized",
-      p.unit,
-      p.totalQuantity,
-      p.reorderPoint,
-      p.totalQuantity === 0 ? "Out of Stock" : p.isLowStock ? "Low Stock" : "In Stock",
-    ]);
-
-    const csvContent = [headers.join(","), ...rows.map((r) => r.join(","))].join("\n");
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.setAttribute("href", url);
-    link.setAttribute("download", `stocksense-inventory-${new Date().toISOString().slice(0, 10)}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
-
-  const toggleSelectAll = () => {
-    if (selectedProductIds.length === products.length) {
-      setSelectedProductIds([]);
-    } else {
-      setSelectedProductIds(products.map((p) => p.id));
-    }
-  };
-
-  const toggleSelectProduct = (id: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    setSelectedProductIds((prev) => 
-      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
-    );
-  };
-
-  // Metrics
-  const lowStockCount = useMemo(() => products.filter((p) => p.isLowStock).length, [products]);
-  const outOfStockCount = useMemo(() => products.filter((p) => p.totalQuantity === 0).length, [products]);
-  const totalStockUnits = useMemo(() => products.reduce((sum, p) => sum + (p.totalQuantity || 0), 0), [products]);
-  const healthyCount = useMemo(() => products.filter((p) => !p.isLowStock && p.totalQuantity > 0).length, [products]);
+  // KPI Metrics Calculation
+  const totalProductsCount = products.length;
+  const totalStockUnits = useMemo(
+    () => products.reduce((sum, p) => sum + (p.totalQuantity || 0), 0),
+    [products]
+  );
+  const lowStockCount = useMemo(
+    () => products.filter((p) => p.isLowStock && p.totalQuantity > 0).length,
+    [products]
+  );
+  const outOfStockCount = useMemo(
+    () => products.filter((p) => p.totalQuantity === 0).length,
+    [products]
+  );
+  const healthyCount = useMemo(
+    () => products.filter((p) => !p.isLowStock && p.totalQuantity > 0).length,
+    [products]
+  );
   const healthPercentage = useMemo(() => {
     if (products.length === 0) return 0;
     return Math.round((healthyCount / products.length) * 100);
   }, [products, healthyCount]);
 
-  const getCategoryIcon = (categoryName?: string) => {
-    const name = categoryName?.toLowerCase() || "";
-    if (name.includes("elec")) return <Cpu className="h-4 w-4 text-emerald-400" />;
-    if (name.includes("hard") || name.includes("fast")) return <Wrench className="h-4 w-4 text-teal-400" />;
-    if (name.includes("pack")) return <Box className="h-4 w-4 text-slate-400" />;
-    if (name.includes("safe") || name.includes("ppe")) return <HardHat className="h-4 w-4 text-emerald-300" />;
-    return <Layers className="h-4 w-4 text-emerald-400" />;
+  // Handle KPI Strip Click Filtering
+  const handleKpiCardClick = (kpi: 'TOTAL' | 'UNITS' | 'HEALTH' | 'LOW') => {
+    if (activeKpiFilter === kpi) {
+      // Toggle off
+      setActiveKpiFilter('NONE');
+      setActiveTab('ALL');
+    } else {
+      setActiveKpiFilter(kpi);
+      if (kpi === 'TOTAL') setActiveTab('ALL');
+      else if (kpi === 'LOW') setActiveTab('LOW_STOCK');
+      else if (kpi === 'HEALTH') setActiveTab('ALL');
+      else if (kpi === 'UNITS') setActiveTab('ALL');
+    }
   };
 
-  const getCategoryBadgeClass = (categoryName?: string) => {
-    const name = categoryName?.toLowerCase() || "";
-    if (name.includes("elec")) return "bg-emerald-500/10 text-emerald-300 border-emerald-500/20";
-    if (name.includes("hard") || name.includes("fast")) return "bg-teal-500/10 text-teal-300 border-teal-500/20";
-    if (name.includes("pack")) return "bg-slate-500/10 text-slate-300 border-slate-500/20";
-    if (name.includes("safe") || name.includes("ppe")) return "bg-emerald-500/10 text-emerald-400 border-emerald-500/20";
-    return "bg-emerald-500/10 text-emerald-300 border-emerald-500/20";
+  // Filtered Products List
+  const filteredProducts = useMemo(() => {
+    return products.filter((p) => {
+      // Search
+      if (searchQuery.trim()) {
+        const q = searchQuery.toLowerCase();
+        const matchName = p.name.toLowerCase().includes(q);
+        const matchSku = p.sku.toLowerCase().includes(q);
+        const matchCategory = p.category?.name?.toLowerCase().includes(q);
+        if (!matchName && !matchSku && !matchCategory) return false;
+      }
+
+      // Tab filter
+      if (activeTab === 'LOW_STOCK' && (!p.isLowStock || p.totalQuantity === 0)) return false;
+      if (activeTab === 'OUT_OF_STOCK' && p.totalQuantity > 0) return false;
+
+      // Category filter
+      if (selectedCategory !== 'all' && p.categoryId !== selectedCategory) return false;
+
+      // Warehouse filter
+      if (selectedWarehouse !== 'all') {
+        const hasWarehouseStock = (p.levels || []).some(
+          (lvl) => lvl.warehouseId === selectedWarehouse && lvl.quantity > 0
+        );
+        if (!hasWarehouseStock) return false;
+      }
+
+      // KPI Specific Filter
+      if (activeKpiFilter === 'HEALTH' && (p.isLowStock || p.totalQuantity === 0)) return false;
+      if (activeKpiFilter === 'LOW' && !p.isLowStock) return false;
+
+      return true;
+    });
+  }, [products, searchQuery, activeTab, selectedCategory, selectedWarehouse, activeKpiFilter]);
+
+  // Copy SKU
+  const handleCopySku = (sku: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(sku);
+    setCopiedSku(sku);
+    toast.success(`SKU "${sku}" copied`);
+    setTimeout(() => setCopiedSku(null), 1500);
+  };
+
+  // Delete Mutation
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const res = await fetch(`/api/products/${id}`, { method: 'DELETE' });
+      const json = await res.json();
+      if (!res.ok || !json.success) throw new Error(json.message || 'Failed to delete product');
+      return id;
+    },
+    onSuccess: (deletedId) => {
+      queryClient.setQueryData<Product[]>(['products'], (old = []) =>
+        old.filter((p) => p.id !== deletedId)
+      );
+      setSelectedProductIds((prev) => prev.filter((id) => id !== deletedId));
+      toast.success('Product removed from catalog');
+    },
+    onError: (err: any) => {
+      toast.error(err.message || 'Error deleting product');
+    },
+  });
+
+  const handleDelete = (id: string, name: string, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    if (confirm(`Are you sure you want to remove "${name}"?`)) {
+      deleteMutation.mutate(id);
+    }
+  };
+
+  // Bulk Delete
+  const handleBulkDelete = async () => {
+    if (
+      !confirm(
+        `Are you sure you want to delete ${selectedProductIds.length} selected product(s)?`
+      )
+    )
+      return;
+
+    const toastId = toast.loading(`Deleting ${selectedProductIds.length} products...`);
+    try {
+      for (const id of selectedProductIds) {
+        await fetch(`/api/products/${id}`, { method: 'DELETE' });
+      }
+      queryClient.setQueryData<Product[]>(['products'], (old = []) =>
+        old.filter((p) => !selectedProductIds.includes(p.id))
+      );
+      setSelectedProductIds([]);
+      toast.success('Selected products deleted successfully', { id: toastId });
+    } catch (err: any) {
+      toast.error('Failed to delete some products', { id: toastId });
+    }
+  };
+
+  // Bulk Change Category
+  const handleBulkChangeCategory = async (newCategoryId: string) => {
+    const targetCat = categories.find((c) => c.id === newCategoryId);
+    const toastId = toast.loading(`Updating category to "${targetCat?.name}"...`);
+
+    try {
+      for (const id of selectedProductIds) {
+        const prod = products.find((p) => p.id === id);
+        if (prod) {
+          await fetch(`/api/products/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              name: prod.name,
+              sku: prod.sku,
+              categoryId: newCategoryId,
+              unit: prod.unit,
+              reorderPoint: prod.reorderPoint,
+            }),
+          });
+        }
+      }
+      await queryClient.invalidateQueries({ queryKey: ['products'] });
+      setSelectedProductIds([]);
+      toast.success(`Updated category to "${targetCat?.name}" for selected items`, { id: toastId });
+    } catch (err: any) {
+      toast.error('Failed to update category for some products', { id: toastId });
+    }
+  };
+
+  // Seed Demo Data
+  const handleSeedDemoData = async () => {
+    setSeeding(true);
+    const toastId = toast.loading('Seeding demo catalog products...');
+    try {
+      for (const item of DEMO_PRODUCTS) {
+        await fetch('/api/products', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(item),
+        });
+      }
+      await queryClient.invalidateQueries({ queryKey: ['products'] });
+      await queryClient.invalidateQueries({ queryKey: ['categories'] });
+      toast.success('Demo inventory catalog loaded successfully!', { id: toastId });
+    } catch (err) {
+      toast.error('Failed to seed demo products', { id: toastId });
+    } finally {
+      setSeeding(false);
+    }
+  };
+
+  // Export CSV
+  const handleExportCSV = (specificItems?: Product[]) => {
+    const exportList = specificItems || filteredProducts;
+    if (exportList.length === 0) {
+      toast.error('No products available to export');
+      return;
+    }
+    const headers = [
+      'SKU / Code',
+      'Product Name',
+      'Category',
+      'Unit',
+      'Current Stock',
+      'Min Reorder Point',
+      'Health Status',
+    ];
+    const rows = exportList.map((p) => [
+      p.sku,
+      `"${p.name.replace(/"/g, '""')}"`,
+      p.category?.name || 'Uncategorized',
+      p.unit,
+      p.totalQuantity,
+      p.reorderPoint,
+      p.totalQuantity === 0 ? 'Out of Stock' : p.isLowStock ? 'Low Stock' : 'In Stock',
+    ]);
+
+    const csvContent = [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute(
+      'download',
+      `stocksense-inventory-${new Date().toISOString().slice(0, 10)}.csv`
+    );
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    toast.success(`Exported ${exportList.length} products to CSV`);
+  };
+
+  // Selection Checkbox Handlers
+  const toggleSelectAll = () => {
+    if (selectedProductIds.length === filteredProducts.length && filteredProducts.length > 0) {
+      setSelectedProductIds([]);
+    } else {
+      setSelectedProductIds(filteredProducts.map((p) => p.id));
+    }
+  };
+
+  const toggleSelectProduct = (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setSelectedProductIds((prev) =>
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+    );
+  };
+
+  // Optimistic stock update callback for drawer stepper
+  const handleStockAdjusted = (productId: string, warehouseId: string, newQty: number) => {
+    queryClient.setQueryData<Product[]>(['products'], (old = []) => {
+      return old.map((p) => {
+        if (p.id !== productId) return p;
+        const levels = p.levels || [];
+        const existingIdx = levels.findIndex((l) => l.warehouseId === warehouseId);
+        let updatedLevels = [...levels];
+
+        if (existingIdx >= 0) {
+          updatedLevels[existingIdx] = {
+            ...updatedLevels[existingIdx],
+            quantity: newQty,
+          };
+        } else {
+          updatedLevels.push({
+            id: `temp_${Date.now()}`,
+            warehouseId,
+            quantity: newQty,
+          });
+        }
+
+        const newTotal = updatedLevels.reduce((sum, lvl) => sum + lvl.quantity, 0);
+        return {
+          ...p,
+          levels: updatedLevels,
+          totalQuantity: newTotal,
+          isLowStock: newTotal <= p.reorderPoint,
+        };
+      });
+    });
+
+    // Also update sheetProduct in place
+    if (sheetProduct && sheetProduct.id === productId) {
+      setSheetProduct((prev) => {
+        if (!prev) return null;
+        const levels = prev.levels || [];
+        const existingIdx = levels.findIndex((l) => l.warehouseId === warehouseId);
+        let updatedLevels = [...levels];
+        if (existingIdx >= 0) {
+          updatedLevels[existingIdx] = { ...updatedLevels[existingIdx], quantity: newQty };
+        } else {
+          updatedLevels.push({ id: `temp_${Date.now()}`, warehouseId, quantity: newQty });
+        }
+        const newTotal = updatedLevels.reduce((sum, lvl) => sum + lvl.quantity, 0);
+        return {
+          ...prev,
+          levels: updatedLevels,
+          totalQuantity: newTotal,
+          isLowStock: newTotal <= prev.reorderPoint,
+        };
+      });
+    }
+  };
+
+  // Row click opens right Sheet drawer
+  const handleRowClick = (product: Product) => {
+    setSheetProduct(product);
+    setIsSheetOpen(true);
   };
 
   return (
     <OperationsShell>
-      <div className="flex-1 flex flex-col h-full bg-[#0D1117] text-[#F0F6FC]">
+      <div className="flex-1 flex flex-col h-full bg-[#0B0F14] text-[#F0F6FC]">
         {/* Main Content Area */}
         <div className="p-4 sm:p-8 max-w-7xl mx-auto space-y-6 w-full">
-          {/* Page Title & Main Actions */}
+          {/* 1. Header & Primary Actions */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
-                Products & Inventory
+                Products
               </h1>
               <p className="text-xs sm:text-sm text-slate-400 mt-1">
-                Manage your master catalog, track live warehouse stock, and monitor reorder levels.
+                Live warehouse inventory, catalog items, and stock tracking.
               </p>
             </div>
 
             <div className="flex flex-wrap items-center gap-2.5">
-              {/* Seed Demo Button */}
-              {products.length < 5 && (
+              {/* Search input with ⌘K hint */}
+              <div className="relative w-full sm:w-64">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                <input
+                  id="catalog-search"
+                  type="text"
+                  placeholder="Search products or SKU..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full h-9 pl-9 pr-14 text-xs bg-[#12161F] border border-white/[0.08] rounded-xl text-white placeholder-slate-400 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all shadow-xs"
+                />
+                {searchQuery ? (
+                  <button
+                    onClick={() => setSearchQuery('')}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
+                  >
+                    <X className="h-3.5 w-3.5" />
+                  </button>
+                ) : (
+                  <div className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-[10px] font-mono text-slate-400 bg-white/[0.06] border border-white/[0.08] px-1.5 py-0.5 rounded">
+                    ⌘K
+                  </div>
+                )}
+              </div>
+
+              {/* Action Dropdown (Export, Seed Demo, Refresh) */}
+              <div className="relative">
                 <button
-                  onClick={handleSeedDemoData}
-                  disabled={seeding}
-                  className="h-9 px-3.5 text-xs font-medium text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/15 border border-emerald-500/20 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowExportMenu(!showExportMenu);
+                  }}
+                  className="h-9 px-3 text-xs font-medium text-slate-300 hover:text-white bg-[#12161F] hover:bg-[#181E29] border border-white/[0.08] rounded-xl transition-all flex items-center gap-1.5 cursor-pointer shadow-xs"
+                  title="More actions"
                 >
-                  <Sparkles className={`h-3.5 w-3.5 ${seeding ? "animate-spin" : ""}`} />
-                  <span>{seeding ? "Loading..." : "⚡ Demo Items"}</span>
+                  <MoreVertical className="h-4 w-4 text-slate-400" />
+                  <span className="hidden sm:inline">Options</span>
+                  <ChevronDown className="h-3 w-3 text-slate-400" />
                 </button>
-              )}
 
-              {/* Export CSV */}
-              <button
-                onClick={() => handleExportCSV()}
-                disabled={products.length === 0}
-                className="h-9 px-3.5 text-xs font-medium text-slate-300 hover:text-white bg-[#161B22] hover:bg-[#1F242C] border border-white/[0.08] rounded-lg transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-40 shadow-xs"
-              >
-                <Download className="h-3.5 w-3.5 text-slate-400" />
-                <span>Export CSV</span>
-              </button>
+                {showExportMenu && (
+                  <div
+                    onClick={(e) => e.stopPropagation()}
+                    className="absolute right-0 mt-1.5 w-52 bg-[#161B22] border border-white/[0.12] rounded-xl shadow-2xl p-1.5 z-50 text-xs space-y-1"
+                  >
+                    <button
+                      onClick={() => {
+                        handleExportCSV();
+                        setShowExportMenu(false);
+                      }}
+                      className="w-full text-left px-3 py-2 text-slate-200 hover:text-white hover:bg-white/[0.06] rounded-lg transition-colors flex items-center gap-2 cursor-pointer"
+                    >
+                      <Download className="h-3.5 w-3.5 text-slate-400" />
+                      <span>Export Filtered CSV</span>
+                    </button>
+                    {selectedProductIds.length > 0 && (
+                      <button
+                        onClick={() => {
+                          const selected = products.filter((p) =>
+                            selectedProductIds.includes(p.id)
+                          );
+                          handleExportCSV(selected);
+                          setShowExportMenu(false);
+                        }}
+                        className="w-full text-left px-3 py-2 text-slate-200 hover:text-white hover:bg-white/[0.06] rounded-lg transition-colors flex items-center gap-2 cursor-pointer"
+                      >
+                        <Download className="h-3.5 w-3.5 text-emerald-400" />
+                        <span>Export {selectedProductIds.length} Selected</span>
+                      </button>
+                    )}
+                    <div className="my-1 border-t border-white/[0.06]" />
+                    <button
+                      onClick={() => {
+                        handleSeedDemoData();
+                        setShowExportMenu(false);
+                      }}
+                      disabled={seeding}
+                      className="w-full text-left px-3 py-2 text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/10 rounded-lg transition-colors flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                    >
+                      <Sparkles className="h-3.5 w-3.5" />
+                      <span>{seeding ? 'Seeding...' : 'Seed Demo Catalog'}</span>
+                    </button>
+                    <button
+                      onClick={() => {
+                        refetch();
+                        setShowExportMenu(false);
+                      }}
+                      className="w-full text-left px-3 py-2 text-slate-300 hover:text-white hover:bg-white/[0.06] rounded-lg transition-colors flex items-center gap-2 cursor-pointer"
+                    >
+                      <RefreshCw className={`h-3.5 w-3.5 ${isRefetching ? 'animate-spin' : ''}`} />
+                      <span>Refresh Catalog</span>
+                    </button>
+                  </div>
+                )}
+              </div>
 
-              {/* Add Product Primary CTA */}
+              {/* Prominent [+ Add Product] Primary CTA */}
               <button
                 onClick={() => {
                   setProductToEdit(null);
                   setIsPanelOpen(true);
                 }}
-                className="h-9 px-4 text-xs font-semibold bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg shadow-sm shadow-emerald-600/30 transition-all flex items-center gap-1.5 cursor-pointer active:scale-[0.98]"
+                className="h-9 px-4 text-xs font-semibold bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl shadow-sm shadow-emerald-600/30 transition-all flex items-center gap-1.5 cursor-pointer active:scale-[0.98]"
               >
                 <Plus className="h-4 w-4" />
                 <span>Add Product</span>
@@ -302,527 +584,548 @@ export default function ProductsPage() {
             </div>
           </div>
 
-          {/* 4 High-Impact Elevated KPI Summary Cards */}
+          {/* 2. KPI Strip: 4 Clickable Elevated Cards with Colored Ring & Framer-Motion Count */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {/* KPI 1: Total SKUs */}
-            <div className="p-4 rounded-xl bg-[#161B22] border border-white/[0.08] shadow-sm hover:border-white/[0.12] transition-colors">
+            {/* KPI 1: Total Products */}
+            <div
+              onClick={() => handleKpiCardClick('TOTAL')}
+              className={`p-4.5 rounded-xl bg-[#12161F] border border-white/[0.08] shadow-sm hover:border-white/[0.14] transition-all cursor-pointer ${
+                activeKpiFilter === 'TOTAL' ? 'ring-2 ring-emerald-500 bg-emerald-500/[0.04]' : ''
+              }`}
+            >
               <div className="flex items-center justify-between text-slate-400 mb-2">
-                <span className="text-xs font-medium">Total SKUs</span>
+                <span className="text-xs font-medium">Total Products</span>
                 <div className="h-7 w-7 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
                   <Package className="h-4 w-4" />
                 </div>
               </div>
               <div className="text-2xl font-bold text-white tracking-tight">
-                {products.length}
+                <AnimatedCounter value={totalProductsCount} />
               </div>
-              <div className="text-[11px] text-slate-400 mt-1 flex items-center gap-1">
-                <span className="text-emerald-400 font-medium">Active</span>
-                <span>catalog products</span>
-              </div>
-            </div>
-
-            {/* KPI 2: Total Inventory */}
-            <div className="p-4 rounded-xl bg-[#161B22] border border-white/[0.08] shadow-sm hover:border-white/[0.12] transition-colors">
-              <div className="flex items-center justify-between text-slate-400 mb-2">
-                <span className="text-xs font-medium">Total Inventory</span>
-                <div className="h-7 w-7 rounded-lg bg-teal-500/10 border border-teal-500/20 flex items-center justify-center text-teal-400">
-                  <Layers className="h-4 w-4" />
-                </div>
-              </div>
-              <div className="text-2xl font-bold text-white tracking-tight">
-                {totalStockUnits} <span className="text-xs font-normal text-slate-400">Units</span>
-              </div>
-              <div className="text-[11px] text-slate-400 mt-1">
-                {outOfStockCount > 0 ? (
-                  <span className="text-amber-400">{outOfStockCount} items need restock</span>
-                ) : (
-                  <span className="text-emerald-400">Stock distributed in DC</span>
+              <div className="text-[11px] text-slate-400 mt-1 flex items-center justify-between">
+                <span>Active registered SKUs</span>
+                {activeKpiFilter === 'TOTAL' && (
+                  <span className="text-[10px] font-semibold text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded">
+                    Active Filter
+                  </span>
                 )}
               </div>
             </div>
 
-            {/* KPI 3: Stock Health Score */}
-            <div className="p-4 rounded-xl bg-[#161B22] border border-white/[0.08] shadow-sm hover:border-white/[0.12] transition-colors">
+            {/* KPI 2: Total Units */}
+            <div
+              onClick={() => handleKpiCardClick('UNITS')}
+              className={`p-4.5 rounded-xl bg-[#12161F] border border-white/[0.08] shadow-sm hover:border-white/[0.14] transition-all cursor-pointer ${
+                activeKpiFilter === 'UNITS' ? 'ring-2 ring-sky-500 bg-sky-500/[0.04]' : ''
+              }`}
+            >
+              <div className="flex items-center justify-between text-slate-400 mb-2">
+                <span className="text-xs font-medium">Total Units</span>
+                <div className="h-7 w-7 rounded-lg bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-400">
+                  <Layers className="h-4 w-4" />
+                </div>
+              </div>
+              <div className="text-2xl font-bold text-white tracking-tight">
+                <AnimatedCounter value={totalStockUnits} />
+              </div>
+              <div className="text-[11px] text-slate-400 mt-1 flex items-center justify-between">
+                <span>Physical stock in DC</span>
+                {activeKpiFilter === 'UNITS' && (
+                  <span className="text-[10px] font-semibold text-sky-400 bg-sky-500/10 px-1.5 py-0.5 rounded">
+                    Active Filter
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {/* KPI 3: Stock Health % */}
+            <div
+              onClick={() => handleKpiCardClick('HEALTH')}
+              className={`p-4.5 rounded-xl bg-[#12161F] border border-white/[0.08] shadow-sm hover:border-white/[0.14] transition-all cursor-pointer ${
+                activeKpiFilter === 'HEALTH' ? 'ring-2 ring-teal-500 bg-teal-500/[0.04]' : ''
+              }`}
+            >
               <div className="flex items-center justify-between text-slate-400 mb-2">
                 <span className="text-xs font-medium">Stock Health</span>
-                <div className="h-7 w-7 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+                <div className="h-7 w-7 rounded-lg bg-teal-500/10 border border-teal-500/20 flex items-center justify-center text-teal-400">
                   <Activity className="h-4 w-4" />
                 </div>
               </div>
               <div className="flex items-baseline gap-2">
-                <span className={`text-2xl font-bold tracking-tight ${
-                  healthPercentage >= 75 ? "text-emerald-400" : healthPercentage >= 40 ? "text-amber-400" : "text-red-400"
-                }`}>
-                  {healthPercentage}%
+                <span
+                  className={`text-2xl font-bold tracking-tight ${
+                    healthPercentage >= 75
+                      ? 'text-emerald-400'
+                      : healthPercentage >= 40
+                      ? 'text-amber-400'
+                      : 'text-red-400'
+                  }`}
+                >
+                  <AnimatedCounter value={healthPercentage} suffix="%" />
                 </span>
                 <span className="text-[11px] text-slate-400">
-                  ({healthyCount}/{products.length} healthy)
+                  ({healthyCount}/{products.length} optimal)
                 </span>
               </div>
-              {/* Mini Health Bar */}
+              {/* Animated Health Progress Bar */}
               <div className="w-full h-1.5 bg-white/[0.06] rounded-full overflow-hidden mt-2">
                 <div
-                  className={`h-full transition-all duration-500 ${
-                    healthPercentage >= 75 ? "bg-emerald-500" : healthPercentage >= 40 ? "bg-amber-500" : "bg-red-500"
+                  className={`h-full transition-all duration-700 ${
+                    healthPercentage >= 75
+                      ? 'bg-emerald-500'
+                      : healthPercentage >= 40
+                      ? 'bg-amber-500'
+                      : 'bg-red-500'
                   }`}
                   style={{ width: `${healthPercentage}%` }}
                 />
               </div>
             </div>
 
-            {/* KPI 4: Attention Needed */}
-            <div className={`p-4 rounded-xl border shadow-sm transition-colors ${
-              lowStockCount > 0 
-                ? "bg-amber-500/[0.04] border-amber-500/20 hover:border-amber-500/30" 
-                : "bg-[#161B22] border-white/[0.08]"
-            }`}>
+            {/* KPI 4: Low Stock Count */}
+            <div
+              onClick={() => handleKpiCardClick('LOW')}
+              className={`p-4.5 rounded-xl border shadow-sm transition-all cursor-pointer ${
+                activeKpiFilter === 'LOW'
+                  ? 'ring-2 ring-amber-500 bg-amber-500/[0.08] border-amber-500/30'
+                  : lowStockCount > 0
+                  ? 'bg-amber-500/[0.04] border-amber-500/20 hover:border-amber-500/30'
+                  : 'bg-[#12161F] border-white/[0.08]'
+              }`}
+            >
               <div className="flex items-center justify-between text-slate-400 mb-2">
-                <span className="text-xs font-medium">Attention Needed</span>
-                <div className={`h-7 w-7 rounded-lg flex items-center justify-center ${
-                  lowStockCount > 0 ? "bg-amber-500/10 border border-amber-500/20 text-amber-400" : "bg-emerald-500/10 border border-emerald-500/20 text-emerald-400"
-                }`}>
+                <span className="text-xs font-medium">Low Stock Alerts</span>
+                <div
+                  className={`h-7 w-7 rounded-lg flex items-center justify-center ${
+                    lowStockCount > 0
+                      ? 'bg-amber-500/10 border border-amber-500/20 text-amber-400'
+                      : 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-400'
+                  }`}
+                >
                   <AlertTriangle className="h-4 w-4" />
                 </div>
               </div>
               <div className="text-2xl font-bold text-white tracking-tight">
-                {lowStockCount} <span className="text-xs font-normal text-slate-400">Reorders</span>
+                <AnimatedCounter value={lowStockCount} />{' '}
+                <span className="text-xs font-normal text-slate-400">Items</span>
               </div>
-              <div className="mt-1">
+              <div className="text-[11px] text-slate-400 mt-1 flex items-center justify-between">
                 {lowStockCount > 0 ? (
-                  <button
-                    onClick={() => setLowStockOnly(true)}
-                    className="text-[11px] font-medium text-amber-400 hover:text-amber-300 hover:underline flex items-center gap-1 cursor-pointer"
-                  >
-                    <span>View alerts</span>
-                    <span>→</span>
-                  </button>
+                  <span className="text-amber-400 font-medium">Below reorder point</span>
                 ) : (
-                  <span className="text-[11px] text-emerald-400 font-medium">All levels optimal</span>
+                  <span className="text-emerald-400">All levels optimal</span>
+                )}
+                {activeKpiFilter === 'LOW' && (
+                  <span className="text-[10px] font-semibold text-amber-400 bg-amber-500/10 px-1.5 py-0.5 rounded">
+                    Active Filter
+                  </span>
                 )}
               </div>
             </div>
           </div>
 
-          {/* Search Toolbar & Filter Pills */}
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
-            {/* Search Input */}
-            <div className="relative flex-1 max-w-sm">
-              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-              <input
-                id="catalog-search"
-                type="text"
-                placeholder="Search products, SKU, barcode..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full h-9 pl-9.5 pr-8 text-xs bg-[#161B22] border border-white/[0.08] rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all shadow-xs"
-              />
-              {searchQuery && (
-                <button
-                  onClick={() => setSearchQuery("")}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
-                >
-                  <X className="h-3.5 w-3.5" />
-                </button>
-              )}
-            </div>
-
-            {/* Filter Pills */}
-            <div className="flex flex-wrap items-center gap-2">
+          {/* 3. Filter Bar: Shadcn-style Tabs + Category Select + Warehouse Select */}
+          <div className="bg-[#12161F] border border-white/[0.08] rounded-xl p-3 shadow-sm flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3">
+            {/* Tabs [All | Low Stock | Out of Stock] with Counts */}
+            <div className="flex items-center bg-[#0B0F14] p-1 rounded-lg border border-white/[0.06] text-xs font-medium">
               <button
                 onClick={() => {
-                  setSelectedCategory("all");
-                  setLowStockOnly(false);
+                  setActiveTab('ALL');
+                  setActiveKpiFilter('NONE');
                 }}
-                className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
-                  selectedCategory === "all" && !lowStockOnly
-                    ? "bg-white text-slate-900 shadow-sm font-semibold"
-                    : "bg-[#161B22] text-slate-400 hover:text-white hover:bg-white/[0.06] border border-white/[0.06]"
+                className={`px-3.5 py-1.5 rounded-md transition-all cursor-pointer flex items-center gap-1.5 ${
+                  activeTab === 'ALL'
+                    ? 'bg-[#181E29] text-white shadow-xs font-semibold'
+                    : 'text-slate-400 hover:text-slate-200'
                 }`}
               >
-                <span>All</span>
-                <span className={`px-1.5 py-0.2 rounded-full text-[10px] ${
-                  selectedCategory === "all" && !lowStockOnly
-                    ? "bg-slate-200 text-slate-900"
-                    : "bg-white/[0.06] text-slate-400"
-                }`}>
-                  {products.length}
+                <span>All Products</span>
+                <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-white/[0.08] text-slate-300">
+                  {totalProductsCount}
                 </span>
               </button>
 
-              {lowStockCount > 0 && (
-                <button
-                  onClick={() => setLowStockOnly(!lowStockOnly)}
-                  className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
-                    lowStockOnly
-                      ? "bg-amber-500 text-slate-950 font-semibold shadow-sm"
-                      : "bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 border border-amber-500/20"
-                  }`}
+              <button
+                onClick={() => {
+                  setActiveTab('LOW_STOCK');
+                  setActiveKpiFilter('LOW');
+                }}
+                className={`px-3.5 py-1.5 rounded-md transition-all cursor-pointer flex items-center gap-1.5 ${
+                  activeTab === 'LOW_STOCK'
+                    ? 'bg-amber-500/15 text-amber-300 border border-amber-500/30 font-semibold'
+                    : 'text-slate-400 hover:text-amber-400'
+                }`}
+              >
+                <AlertTriangle className="h-3.5 w-3.5 text-amber-400" />
+                <span>Low Stock</span>
+                <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-amber-500/20 text-amber-200">
+                  {lowStockCount}
+                </span>
+              </button>
+
+              <button
+                onClick={() => {
+                  setActiveTab('OUT_OF_STOCK');
+                  setActiveKpiFilter('NONE');
+                }}
+                className={`px-3.5 py-1.5 rounded-md transition-all cursor-pointer flex items-center gap-1.5 ${
+                  activeTab === 'OUT_OF_STOCK'
+                    ? 'bg-red-500/15 text-red-300 border border-red-500/30 font-semibold'
+                    : 'text-slate-400 hover:text-red-400'
+                }`}
+              >
+                <span className="h-2 w-2 rounded-full bg-red-400" />
+                <span>Out of Stock</span>
+                <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-red-500/20 text-red-200">
+                  {outOfStockCount}
+                </span>
+              </button>
+            </div>
+
+            {/* Right: ONE Category Select + ONE Warehouse Select */}
+            <div className="flex flex-wrap items-center gap-2">
+              {/* Category Select */}
+              <div className="relative flex-1 sm:flex-initial">
+                <select
+                  value={selectedCategory}
+                  onChange={(e) => setSelectedCategory(e.target.value)}
+                  className="w-full sm:w-44 h-8.5 pl-3 pr-7 bg-[#0B0F14] border border-white/[0.08] rounded-lg text-xs text-slate-200 focus:outline-none focus:border-emerald-500 transition-colors cursor-pointer appearance-none"
                 >
-                  <AlertTriangle className="h-3 w-3" />
-                  <span>Low Stock</span>
-                  <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-amber-950/40 text-amber-200">
-                    {lowStockCount}
-                  </span>
+                  <option value="all">All Categories ({categories.length})</option>
+                  {categories.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.name}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400 pointer-events-none" />
+              </div>
+
+              {/* Warehouse Select */}
+              <div className="relative flex-1 sm:flex-initial">
+                <select
+                  value={selectedWarehouse}
+                  onChange={(e) => setSelectedWarehouse(e.target.value)}
+                  className="w-full sm:w-44 h-8.5 pl-3 pr-7 bg-[#0B0F14] border border-white/[0.08] rounded-lg text-xs text-slate-200 focus:outline-none focus:border-emerald-500 transition-colors cursor-pointer appearance-none"
+                >
+                  <option value="all">All Warehouses ({warehouses.length})</option>
+                  {warehouses.map((w) => (
+                    <option key={w.id} value={w.id}>
+                      {w.name}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400 pointer-events-none" />
+              </div>
+
+              {/* Reset Filters */}
+              {(selectedCategory !== 'all' ||
+                selectedWarehouse !== 'all' ||
+                activeTab !== 'ALL' ||
+                searchQuery ||
+                activeKpiFilter !== 'NONE') && (
+                <button
+                  onClick={() => {
+                    setSelectedCategory('all');
+                    setSelectedWarehouse('all');
+                    setActiveTab('ALL');
+                    setActiveKpiFilter('NONE');
+                    setSearchQuery('');
+                  }}
+                  className="h-8.5 px-3 text-xs font-medium text-slate-400 hover:text-white bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] rounded-lg transition-colors cursor-pointer"
+                  title="Reset all filters"
+                >
+                  Reset
                 </button>
               )}
-
-              {categories.map((cat) => (
-                <button
-                  key={cat.id}
-                  onClick={() => {
-                    setSelectedCategory(cat.id);
-                    setLowStockOnly(false);
-                  }}
-                  className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
-                    selectedCategory === cat.id && !lowStockOnly
-                      ? "bg-white text-slate-900 shadow-sm font-semibold"
-                      : "bg-[#161B22] text-slate-400 hover:text-white hover:bg-white/[0.06] border border-white/[0.06]"
-                  }`}
-                >
-                  <span>{cat.name}</span>
-                  {cat._count?.products !== undefined && (
-                    <span className={`px-1.5 py-0.2 rounded-full text-[10px] ${
-                      selectedCategory === cat.id && !lowStockOnly
-                        ? "bg-slate-200 text-slate-900"
-                        : "bg-white/[0.06] text-slate-400"
-                    }`}>
-                      {cat._count.products}
-                    </span>
-                  )}
-                </button>
-              ))}
-
-              {/* Refresh Button */}
-              <button
-                onClick={fetchProducts}
-                disabled={loading}
-                className="h-8 w-8 rounded-lg border border-white/[0.08] bg-[#161B22] hover:bg-white/[0.04] text-slate-400 hover:text-white flex items-center justify-center transition-colors cursor-pointer"
-                title="Refresh inventory"
-              >
-                <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin text-emerald-400" : ""}`} />
-              </button>
             </div>
           </div>
 
-          {/* Modern Enterprise Data Table */}
-          <div className="rounded-xl border border-white/[0.08] bg-[#161B22] shadow-sm overflow-hidden">
+          {/* 4. Table: Modern, Clean, Warehouse-Friendly */}
+          <div className="rounded-xl border border-white/[0.08] bg-[#12161F] shadow-sm overflow-hidden">
             <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse">
-                {/* Table Head */}
+              <table className="w-full text-left border-collapse text-xs">
+                {/* Table Header */}
                 <thead>
-                  <tr className="border-b border-white/[0.08] bg-white/[0.02] text-slate-400 text-xs font-medium">
-                    <th className="px-4 py-3.5 w-10 text-center">
+                  <tr className="border-b border-white/[0.08] bg-white/[0.02] text-slate-400 font-semibold uppercase tracking-wider text-[11px]">
+                    <th className="p-3.5 w-10 text-center" onClick={(e) => e.stopPropagation()}>
                       <input
                         type="checkbox"
-                        checked={products.length > 0 && selectedProductIds.length === products.length}
+                        checked={
+                          filteredProducts.length > 0 &&
+                          selectedProductIds.length === filteredProducts.length
+                        }
                         onChange={toggleSelectAll}
-                        className="rounded border-white/[0.2] bg-[#0D1117] text-emerald-600 focus:ring-emerald-500 cursor-pointer"
+                        className="rounded border-white/[0.2] bg-[#0B0F14] text-emerald-600 focus:ring-emerald-500 cursor-pointer"
                       />
                     </th>
-                    <th className="px-4 py-3.5">Product & SKU</th>
-                    <th className="px-4 py-3.5 hidden sm:table-cell">Category</th>
-                    <th className="px-4 py-3.5">Stock vs Minimum</th>
-                    <th className="px-4 py-3.5">Status</th>
-                    <th className="px-4 py-3.5 text-right w-24">Actions</th>
+                    <th className="p-3.5">Product & SKU</th>
+                    <th className="p-3.5 hidden md:table-cell">Category</th>
+                    <th className="p-3.5">Stock vs Needed</th>
+                    <th className="p-3.5">Status</th>
+                    <th className="p-3.5 text-right w-16">Actions</th>
                   </tr>
                 </thead>
 
                 {/* Table Body */}
-                <tbody className="divide-y divide-white/[0.06] text-sm">
-                  {loading && products.length === 0 ? (
-                    // Skeleton Shimmer Loading Rows
-                    [1, 2, 3, 4].map((i) => (
+                <tbody className="divide-y divide-white/[0.06]">
+                  {isLoading ? (
+                    // Skeleton Rows
+                    [1, 2, 3, 4, 5].map((i) => (
                       <tr key={i} className="animate-pulse">
-                        <td className="p-4 text-center">
+                        <td className="p-3.5 text-center">
                           <div className="h-4 w-4 bg-white/[0.06] rounded mx-auto" />
                         </td>
-                        <td className="p-4">
+                        <td className="p-3.5">
                           <div className="flex items-center gap-3">
-                            <div className="h-10 w-10 bg-white/[0.06] rounded-lg" />
-                            <div className="space-y-2">
-                              <div className="h-4 w-40 bg-white/[0.06] rounded" />
-                              <div className="h-3 w-20 bg-white/[0.04] rounded" />
+                            <div className="h-9 w-9 bg-white/[0.06] rounded-lg" />
+                            <div className="space-y-1.5">
+                              <div className="h-3.5 w-36 bg-white/[0.06] rounded" />
+                              <div className="h-2.5 w-20 bg-white/[0.04] rounded" />
                             </div>
                           </div>
                         </td>
-                        <td className="p-4 hidden sm:table-cell">
-                          <div className="h-6 w-24 bg-white/[0.06] rounded-full" />
+                        <td className="p-3.5 hidden md:table-cell">
+                          <div className="h-4 w-20 bg-white/[0.06] rounded" />
                         </td>
-                        <td className="p-4">
+                        <td className="p-3.5">
                           <div className="h-4 w-28 bg-white/[0.06] rounded" />
                         </td>
-                        <td className="p-4">
-                          <div className="h-6 w-20 bg-white/[0.06] rounded-full" />
+                        <td className="p-3.5">
+                          <div className="h-5 w-20 bg-white/[0.06] rounded-full" />
                         </td>
-                        <td className="p-4 text-right">
-                          <div className="h-8 w-16 bg-white/[0.06] rounded ml-auto" />
+                        <td className="p-3.5 text-right">
+                          <div className="h-6 w-8 bg-white/[0.06] rounded ml-auto" />
                         </td>
                       </tr>
                     ))
-                  ) : products.length === 0 ? (
+                  ) : filteredProducts.length === 0 ? (
                     <tr>
-                      <td colSpan={6} className="text-center py-20 text-slate-400">
+                      <td colSpan={6} className="text-center py-16 text-slate-400">
                         <div className="flex flex-col items-center justify-center gap-3 max-w-md mx-auto p-4">
                           <div className="h-12 w-12 rounded-2xl bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-slate-400">
                             <Package className="h-6 w-6" />
                           </div>
                           <p className="text-sm text-slate-200 font-medium">
-                            {searchQuery || selectedCategory !== "all" || lowStockOnly
-                              ? "No products match your current filters."
-                              : "No inventory products registered yet."}
+                            {searchQuery ||
+                            selectedCategory !== 'all' ||
+                            selectedWarehouse !== 'all' ||
+                            activeTab !== 'ALL'
+                              ? 'No products match your current filters.'
+                              : 'No products in inventory yet.'}
                           </p>
                           <p className="text-xs text-slate-400 text-center">
-                            Start adding items to configure stock levels, safety thresholds, and warehouse allocation.
+                            Register your items to track warehouse locations, safety thresholds, and receipts.
                           </p>
                           <div className="flex items-center gap-2.5 mt-2">
                             <button
                               onClick={handleSeedDemoData}
                               disabled={seeding}
-                              className="px-3.5 py-2 text-xs font-medium text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/15 border border-emerald-500/20 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer"
+                              className="px-3.5 py-1.5 text-xs font-medium text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer"
                             >
                               <Sparkles className="h-3.5 w-3.5" />
-                              Seed Demo Items
+                              <span>Seed Demo Items</span>
                             </button>
                             <button
                               onClick={() => {
                                 setProductToEdit(null);
                                 setIsPanelOpen(true);
                               }}
-                              className="px-3.5 py-2 text-xs font-medium bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg shadow-sm transition-all flex items-center gap-1.5 cursor-pointer"
+                              className="px-3.5 py-1.5 text-xs font-semibold bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg shadow-sm transition-all flex items-center gap-1.5 cursor-pointer"
                             >
                               <Plus className="h-3.5 w-3.5" />
-                              Add Product
+                              <span>Add First Product</span>
                             </button>
                           </div>
                         </div>
                       </td>
                     </tr>
                   ) : (
-                    products.map((product) => {
+                    filteredProducts.map((product) => {
                       const isOutOfStock = product.totalQuantity === 0;
                       const isLow = product.totalQuantity <= product.reorderPoint;
-                      const isExpanded = expandedProductId === product.id;
                       const isSelected = selectedProductIds.includes(product.id);
 
-                      // Stock vs reorder ratio for progress indicator
-                      const stockPercentage = product.reorderPoint > 0 
-                        ? Math.min(100, Math.round((product.totalQuantity / (product.reorderPoint * 2)) * 100))
-                        : 100;
+                      // Progress percentage calculation
+                      const maxRatio = Math.max(product.reorderPoint * 2, 10);
+                      const progressPct = Math.min(
+                        100,
+                        Math.round((product.totalQuantity / maxRatio) * 100)
+                      );
 
                       return (
-                        <Fragment key={product.id}>
-                          <tr
-                            onClick={() => setExpandedProductId(isExpanded ? null : product.id)}
-                            className={`transition-all duration-150 cursor-pointer group ${
-                              isSelected 
-                                ? "bg-emerald-950/25" 
-                                : isExpanded 
-                                ? "bg-white/[0.04]" 
-                                : "hover:bg-white/[0.02]"
-                            }`}
+                        <tr
+                          key={product.id}
+                          onClick={() => handleRowClick(product)}
+                          className={`transition-colors cursor-pointer group ${
+                            isSelected
+                              ? 'bg-emerald-950/20'
+                              : 'hover:bg-white/[0.02]'
+                          }`}
+                        >
+                          {/* Checkbox */}
+                          <td
+                            className="p-3.5 text-center"
+                            onClick={(e) => e.stopPropagation()}
                           >
-                            {/* Row Checkbox */}
-                            <td className="px-4 py-3.5 text-center" onClick={(e) => e.stopPropagation()}>
-                              <input
-                                type="checkbox"
-                                checked={isSelected}
-                                onChange={(e) => toggleSelectProduct(product.id, e as any)}
-                                className="rounded border-white/[0.2] bg-[#0D1117] text-emerald-600 focus:ring-emerald-500 cursor-pointer"
-                              />
-                            </td>
+                            <input
+                              type="checkbox"
+                              checked={isSelected}
+                              onChange={(e) => toggleSelectProduct(product.id, e as any)}
+                              className="rounded border-white/[0.2] bg-[#0B0F14] text-emerald-600 focus:ring-emerald-500 cursor-pointer"
+                            />
+                          </td>
 
-                            {/* Product & SKU Column */}
-                            <td className="px-4 py-3.5">
-                              <div className="flex items-center gap-3">
-                                {/* 40x40 Thumbnail / Category Placeholder */}
-                                <div className="h-10 w-10 rounded-lg bg-white/[0.03] border border-white/[0.06] flex items-center justify-center shrink-0 shadow-inner group-hover:border-white/[0.12] transition-colors">
-                                  {getCategoryIcon(product.category?.name)}
-                                </div>
-
-                                <div>
-                                  <div className="font-medium text-slate-100 text-sm group-hover:text-emerald-300 transition-colors">
-                                    {product.name}
-                                  </div>
-                                  <div className="flex items-center gap-2 mt-0.5">
-                                    <span className="font-mono text-[11px] text-slate-400 bg-[#0D1117] px-1.5 py-0.5 rounded border border-white/[0.06]">
-                                      {product.sku}
-                                    </span>
-                                    <button
-                                      onClick={(e) => handleCopySku(product.sku, e)}
-                                      className="opacity-0 group-hover:opacity-100 p-0.5 text-slate-400 hover:text-white transition-opacity"
-                                      title="Copy SKU code"
-                                    >
-                                      {copiedSku === product.sku ? (
-                                        <Check className="h-3 w-3 text-emerald-400" />
-                                      ) : (
-                                        <Copy className="h-3 w-3" />
-                                      )}
-                                    </button>
-                                  </div>
-                                </div>
+                          {/* Product & SKU */}
+                          <td className="p-3.5">
+                            <div className="flex items-center gap-3">
+                              <div className="h-9 w-9 rounded-lg bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-slate-300 group-hover:text-emerald-400 group-hover:border-emerald-500/30 transition-colors shrink-0">
+                                <Package className="h-4.5 w-4.5" />
                               </div>
-                            </td>
-
-                            {/* Category Tag Pill */}
-                            <td className="px-4 py-3.5 hidden sm:table-cell">
-                              <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border ${getCategoryBadgeClass(product.category?.name)}`}>
-                                {product.category?.name || "Unassigned"}
-                              </span>
-                            </td>
-
-                            {/* Stock vs Min Level Column */}
-                            <td className="px-4 py-3.5">
-                              <div className="space-y-1 max-w-[140px]">
-                                <div className="flex items-center justify-between text-xs">
-                                  <span className="font-semibold text-white">
-                                    {product.totalQuantity} <span className="font-normal text-slate-400">{product.unit}</span>
+                              <div>
+                                <div className="font-semibold text-slate-100 text-xs group-hover:text-white transition-colors">
+                                  {product.name}
+                                </div>
+                                <div className="flex items-center gap-1.5 mt-0.5">
+                                  <span
+                                    className="font-mono text-[11px] text-slate-400 hover:text-slate-200 transition-colors"
+                                    title="SKU = Stock Keeping Unit (Product code)"
+                                  >
+                                    {product.sku}
                                   </span>
-                                  <span className="text-[11px] text-slate-400">
-                                    min {product.reorderPoint}
-                                  </span>
-                                </div>
-                                {/* Visual Stock Bar */}
-                                <div className="w-full h-1.5 bg-white/[0.06] rounded-full overflow-hidden">
-                                  <div
-                                    className={`h-full rounded-full transition-all ${
-                                      isOutOfStock 
-                                        ? "bg-red-500 w-full" 
-                                        : isLow 
-                                        ? "bg-amber-500" 
-                                        : "bg-emerald-500"
-                                    }`}
-                                    style={{ width: isOutOfStock ? "100%" : `${Math.max(8, stockPercentage)}%` }}
-                                  />
-                                </div>
-                              </div>
-                            </td>
-
-                            {/* Status Badge */}
-                            <td className="px-4 py-3.5">
-                              {isOutOfStock ? (
-                                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-red-500/10 text-red-400 border border-red-500/20">
-                                  <span className="h-1.5 w-1.5 rounded-full bg-red-400 animate-pulse" />
-                                  Out of Stock
-                                </span>
-                              ) : isLow ? (
-                                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20">
-                                  <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
-                                  Low Stock
-                                </span>
-                              ) : (
-                                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-                                  In Stock
-                                </span>
-                              )}
-                            </td>
-
-                            {/* Actions */}
-                            <td className="px-4 py-3.5 text-right" onClick={(e) => e.stopPropagation()}>
-                              <div className="flex items-center justify-end gap-1">
-                                <button
-                                  onClick={() => {
-                                    setProductToEdit(product);
-                                    setIsPanelOpen(true);
-                                  }}
-                                  className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/[0.08] transition-colors"
-                                  title="Edit Product"
-                                >
-                                  <Edit2 className="h-3.5 w-3.5" />
-                                </button>
-                                <button
-                                  onClick={() => handleDelete(product.id, product.name)}
-                                  className="p-1.5 rounded-lg text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-colors"
-                                  title="Delete Product"
-                                >
-                                  <Trash2 className="h-3.5 w-3.5" />
-                                </button>
-                                <button
-                                  onClick={() => setExpandedProductId(isExpanded ? null : product.id)}
-                                  className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/[0.08] transition-colors"
-                                  title="Inspect details"
-                                >
-                                  {isExpanded ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
-                                </button>
-                              </div>
-                            </td>
-                          </tr>
-
-                          {/* Expanded Detail Panel */}
-                          {isExpanded && (
-                            <tr className="bg-[#12151C] border-b border-white/[0.08]">
-                              <td colSpan={6} className="p-4 px-6">
-                                <div className="rounded-lg bg-[#161B22] border border-white/[0.08] p-4 grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
-                                  {/* Item Metadata */}
-                                  <div className="space-y-1.5">
-                                    <div className="text-[10px] font-mono uppercase tracking-wider text-slate-400">
-                                      Product Details
-                                    </div>
-                                    <div className="font-semibold text-white text-sm">
-                                      {product.name}
-                                    </div>
-                                    <div className="text-slate-400 font-mono">
-                                      SKU: <span className="text-emerald-400">{product.sku}</span>
-                                    </div>
-                                    <div className="text-slate-400">
-                                      Unit: {product.unit} • Category: {product.category?.name || "Unassigned"}
-                                    </div>
-                                  </div>
-
-                                  {/* Storage breakdown */}
-                                  <div className="space-y-1.5">
-                                    <div className="text-[10px] font-mono uppercase tracking-wider text-slate-400">
-                                      Warehouse Distribution
-                                    </div>
-                                    {product.levels && product.levels.length > 0 ? (
-                                      <div className="space-y-1">
-                                        {product.levels.map((lvl) => (
-                                          <div key={lvl.id} className="flex items-center justify-between text-slate-300">
-                                            <span>{lvl.warehouse?.name || "Main Distribution Center"}:</span>
-                                            <span className="font-bold text-white">{lvl.quantity} {product.unit}</span>
-                                          </div>
-                                        ))}
-                                      </div>
+                                  <button
+                                    onClick={(e) => handleCopySku(product.sku, e)}
+                                    className="opacity-0 group-hover:opacity-100 p-0.5 text-slate-400 hover:text-emerald-400 transition-opacity cursor-pointer"
+                                    title="Copy SKU"
+                                  >
+                                    {copiedSku === product.sku ? (
+                                      <Check className="h-3 w-3 text-emerald-400" />
                                     ) : (
-                                      <div className="text-slate-500">
-                                        No storage records. Stock increments automatically when Receipts are processed.
-                                      </div>
+                                      <Copy className="h-3 w-3" />
                                     )}
-                                  </div>
-
-                                  {/* Reorder Diagnostic */}
-                                  <div className="space-y-1.5 flex flex-col justify-between">
-                                    <div>
-                                      <div className="text-[10px] font-mono uppercase tracking-wider text-slate-400">
-                                        Safety Threshold
-                                      </div>
-                                      <div className="text-slate-300 mt-1">
-                                        Minimum Threshold: <span className="font-semibold text-white">{product.reorderPoint} {product.unit}</span>
-                                      </div>
-                                      <div className="text-slate-400 mt-0.5">
-                                        {product.totalQuantity <= product.reorderPoint
-                                          ? "⚠️ Stock is at or below threshold. Reorder advised."
-                                          : "✓ Current inventory levels meet safety margins."}
-                                      </div>
-                                    </div>
-
-                                    <div>
-                                      <button
-                                        onClick={() => {
-                                          setProductToEdit(product);
-                                          setIsPanelOpen(true);
-                                        }}
-                                        className="text-emerald-400 hover:text-emerald-300 font-medium hover:underline text-xs cursor-pointer"
-                                      >
-                                        Edit product parameters →
-                                      </button>
-                                    </div>
-                                  </div>
+                                  </button>
                                 </div>
-                              </td>
-                            </tr>
-                          )}
-                        </Fragment>
+                              </div>
+                            </div>
+                          </td>
+
+                          {/* Category with Colored Dot */}
+                          <td className="p-3.5 hidden md:table-cell">
+                            <div className="flex items-center gap-1.5 text-slate-300">
+                              <span className="h-2 w-2 rounded-full bg-emerald-400 shrink-0" />
+                              <span>{product.category?.name || 'Unassigned'}</span>
+                            </div>
+                          </td>
+
+                          {/* Stock Progress Bar with X of Y needed */}
+                          <td className="p-3.5">
+                            <div className="space-y-1 max-w-[150px]">
+                              <div className="flex items-center justify-between text-[11px]">
+                                <span className="font-bold text-white font-mono">
+                                  {product.totalQuantity}{' '}
+                                  <span className="font-normal text-slate-400 text-[10px]">
+                                    {product.unit}
+                                  </span>
+                                </span>
+                                <span className="text-[10px] text-slate-400">
+                                  min {product.reorderPoint}
+                                </span>
+                              </div>
+                              {/* Animated Width Bar */}
+                              <div className="w-full h-1.5 bg-white/[0.06] rounded-full overflow-hidden">
+                                <div
+                                  className={`h-full transition-all duration-500 ${
+                                    isOutOfStock
+                                      ? 'bg-red-500 w-full'
+                                      : isLow
+                                      ? 'bg-amber-500'
+                                      : 'bg-emerald-500'
+                                  }`}
+                                  style={{
+                                    width: isOutOfStock ? '100%' : `${Math.max(8, progressPct)}%`,
+                                  }}
+                                />
+                              </div>
+                            </div>
+                          </td>
+
+                          {/* Status Badge */}
+                          <td className="p-3.5">
+                            {isOutOfStock ? (
+                              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-red-500/10 text-red-400 border border-red-500/20">
+                                <span className="h-1.5 w-1.5 rounded-full bg-red-400" />
+                                Out of Stock
+                              </span>
+                            ) : isLow ? (
+                              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20 animate-pulse">
+                                <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
+                                Low Stock
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+                                In Stock
+                              </span>
+                            )}
+                          </td>
+
+                          {/* Actions Dropdown */}
+                          <td
+                            className="p-3.5 text-right relative"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <div className="relative inline-block text-left">
+                              <button
+                                onClick={() =>
+                                  setOpenDropdownId(
+                                    openDropdownId === product.id ? null : product.id
+                                  )
+                                }
+                                className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/[0.08] transition-colors cursor-pointer"
+                                title="Actions"
+                              >
+                                <MoreVertical className="h-4 w-4" />
+                              </button>
+
+                              {openDropdownId === product.id && (
+                                <div className="absolute right-0 mt-1 w-36 bg-[#161B22] border border-white/[0.12] rounded-xl shadow-xl p-1 z-50 text-xs space-y-0.5">
+                                  <button
+                                    onClick={() => {
+                                      handleRowClick(product);
+                                      setOpenDropdownId(null);
+                                    }}
+                                    className="w-full text-left px-2.5 py-1.5 text-slate-200 hover:text-white hover:bg-white/[0.06] rounded-lg transition-colors flex items-center gap-2 cursor-pointer"
+                                  >
+                                    <Package className="h-3.5 w-3.5 text-emerald-400" />
+                                    <span>View Details</span>
+                                  </button>
+                                  <button
+                                    onClick={() => {
+                                      setProductToEdit(product);
+                                      setIsPanelOpen(true);
+                                      setOpenDropdownId(null);
+                                    }}
+                                    className="w-full text-left px-2.5 py-1.5 text-slate-200 hover:text-white hover:bg-white/[0.06] rounded-lg transition-colors flex items-center gap-2 cursor-pointer"
+                                  >
+                                    <Edit2 className="h-3.5 w-3.5 text-sky-400" />
+                                    <span>Edit Info</span>
+                                  </button>
+                                  <div className="my-1 border-t border-white/[0.06]" />
+                                  <button
+                                    onClick={() => {
+                                      handleDelete(product.id, product.name);
+                                      setOpenDropdownId(null);
+                                    }}
+                                    className="w-full text-left px-2.5 py-1.5 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg transition-colors flex items-center gap-2 cursor-pointer"
+                                  >
+                                    <Trash2 className="h-3.5 w-3.5" />
+                                    <span>Delete</span>
+                                  </button>
+                                </div>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
                       );
                     })
                   )}
@@ -832,48 +1135,42 @@ export default function ProductsPage() {
           </div>
         </div>
 
-        {/* Floating Bulk Action Toolbar Dock */}
-        {selectedProductIds.length > 0 && (
-          <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 bg-[#161B22]/95 backdrop-blur-md border border-white/[0.12] rounded-xl px-4 py-2.5 shadow-2xl flex items-center gap-4 text-xs">
-            <div className="font-medium text-white flex items-center gap-1.5">
-              <span className="h-2 w-2 rounded-full bg-emerald-500" />
-              <span>{selectedProductIds.length} item{selectedProductIds.length > 1 ? "s" : ""} selected</span>
-            </div>
+        {/* 5. Row-Click Product Detail Sheet Drawer from Right */}
+        <ProductDetailSheet
+          product={sheetProduct}
+          isOpen={isSheetOpen}
+          onClose={() => setIsSheetOpen(false)}
+          onStockAdjusted={handleStockAdjusted}
+          warehouses={warehouses}
+        />
 
-            <div className="h-4 w-px bg-white/[0.12]" />
+        {/* 6. Checkbox Selection Floating Bulk Bar at Bottom Center */}
+        <FloatingBulkBar
+          selectedCount={selectedProductIds.length}
+          onClearSelection={() => setSelectedProductIds([])}
+          onExportSelected={() => {
+            const selected = products.filter((p) => selectedProductIds.includes(p.id));
+            handleExportCSV(selected);
+          }}
+          onDeleteSelected={handleBulkDelete}
+          onChangeCategory={handleBulkChangeCategory}
+          categories={categories}
+        />
 
-            <button
-              onClick={() => {
-                const selectedItems = products.filter((p) => selectedProductIds.includes(p.id));
-                handleExportCSV(selectedItems);
-              }}
-              className="font-medium text-slate-300 hover:text-white flex items-center gap-1.5 cursor-pointer"
-            >
-              <Download className="h-3.5 w-3.5" />
-              <span>Export Selected</span>
-            </button>
-
-            <button
-              onClick={() => setSelectedProductIds([])}
-              className="text-slate-400 hover:text-white text-xs cursor-pointer"
-            >
-              Deselect All
-            </button>
-          </div>
-        )}
-
-        {/* Slide-over Create / Edit Panel */}
+        {/* Create / Edit SlideOver Form */}
         <ProductFormSlideOver
           isOpen={isPanelOpen}
           onClose={() => setIsPanelOpen(false)}
+          onSuccess={() => {
+            queryClient.invalidateQueries({ queryKey: ['products'] });
+            toast.success(
+              productToEdit ? 'Product updated successfully' : 'Product created successfully'
+            );
+          }}
           productToEdit={productToEdit}
           categories={categories}
-          onSuccess={() => {
-            fetchProducts();
-            fetchCategories();
-          }}
           onCategoryCreated={(newCat) => {
-            setCategories((prev) => [...prev, newCat]);
+            queryClient.setQueryData<Category[]>(['categories'], (old = []) => [...old, newCat]);
           }}
         />
       </div>

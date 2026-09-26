@@ -13,6 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 import { Navbar } from "@/components/layout/navbar";
+import { Providers } from "@/components/providers";
 
 export const metadata: Metadata = {
   title: "StockSense — Modular Inventory Management System",
@@ -25,9 +26,11 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased dark`}
     >
-      <body className="min-h-full flex flex-col bg-[#0D1117] text-[#F0F6FC] font-sans antialiased">
-        <Navbar />
-        <main className="flex-1 min-w-0">{children}</main>
+      <body className="min-h-full flex flex-col bg-[#0B0F14] text-[#F0F6FC] font-sans antialiased">
+        <Providers>
+          <Navbar />
+          <main className="flex-1 min-w-0">{children}</main>
+        </Providers>
       </body>
     </html>
   );
