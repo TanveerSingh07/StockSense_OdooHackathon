@@ -1,6 +1,10 @@
-import { PrismaClient } from "@prisma/client";
+import * as PrismaModule from "@prisma/client";
 
-const globalForPrisma = globalThis as unknown as { prisma: PrismaClient };
+type PrismaClientType = new (...args: any[]) => any;
+
+const PrismaClient = (PrismaModule as any).PrismaClient as PrismaClientType;
+
+const globalForPrisma = globalThis as unknown as { prisma?: PrismaClientType };
 
 export const prisma = globalForPrisma.prisma || new PrismaClient();
 
