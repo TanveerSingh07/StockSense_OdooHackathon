@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { ArrowLeft, ArrowDownLeft, Printer, Check, CheckCircle2, ShieldCheck } from 'lucide-react';
 
 interface ReceiptDetail {
   id: string;
@@ -86,16 +87,16 @@ export default function ReceiptDetailPage() {
   };
 
   if (loading) {
-    return <div className="p-12 text-center text-gray-500">Loading receipt details...</div>;
+    return <div className="p-12 text-center text-slate-400 text-xs animate-pulse">Loading receipt details...</div>;
   }
 
   if (error && !receipt) {
     return (
-      <div className="p-8 max-w-4xl mx-auto">
-        <div className="p-6 bg-red-50 text-red-700 rounded-xl border border-red-200">
-          <p className="font-bold">Error loading receipt</p>
-          <p className="text-sm mt-1">{error}</p>
-          <Link href="/receipts" className="mt-4 inline-block text-sm underline font-semibold">
+      <div className="p-4 sm:p-8 max-w-4xl mx-auto">
+        <div className="p-6 bg-red-500/10 text-red-400 rounded-xl border border-red-500/20">
+          <p className="font-bold text-sm">Error loading receipt</p>
+          <p className="text-xs mt-1">{error}</p>
+          <Link href="/receipts" className="mt-4 inline-block text-xs underline font-semibold text-red-300">
             ← Return to Receipts
           </Link>
         </div>
@@ -108,33 +109,42 @@ export default function ReceiptDetailPage() {
   const isDone = receipt.status === 'DONE';
 
   return (
-    <div className="p-8 max-w-4xl mx-auto space-y-6">
+    <div className="p-4 sm:p-8 max-w-4xl mx-auto space-y-6 text-[#F0F6FC]">
       {/* Top Bar / Navigation */}
       <div className="flex justify-between items-center print:hidden">
-        <Link href="/receipts" className="text-sm font-semibold text-gray-600 hover:text-gray-900 flex items-center gap-1">
-          ← Back to Inbound Receipts
+        <Link
+          href="/receipts"
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-400 hover:text-white transition-colors"
+        >
+          <ArrowLeft className="h-3.5 w-3.5" />
+          <span>Back to Inbound Receipts</span>
         </Link>
         <div className="flex gap-2">
           {!isDone && (
             <Button
               onClick={handleValidate}
               disabled={validating}
-              className="bg-emerald-600 hover:bg-emerald-700 text-white font-medium shadow-sm"
+              className="h-9 px-4 text-xs font-semibold bg-emerald-600 hover:bg-emerald-500 text-white shadow-sm shadow-emerald-600/30 cursor-pointer disabled:opacity-50"
             >
-              {validating ? 'Validating...' : 'Validate & Receive Stock'}
+              <Check className="h-3.5 w-3.5 mr-1" />
+              <span>{validating ? 'Validating...' : 'Validate & Receive Stock'}</span>
             </Button>
           )}
           {isDone && (
             <Button
               onClick={handlePrint}
               variant="outline"
-              className="border-gray-300 font-medium"
+              className="h-9 px-3.5 text-xs font-semibold bg-[#161B22] hover:bg-[#1F242C] border-white/[0.08] text-slate-200"
             >
-              🖨️ Print Receipt
+              <Printer className="h-3.5 w-3.5 mr-1.5 text-slate-400" />
+              <span>Print Receipt</span>
             </Button>
           )}
           <Link href="/receipts">
-            <Button variant="ghost" className="text-gray-600">
+            <Button
+              variant="ghost"
+              className="h-9 px-3 text-xs text-slate-400 hover:text-white hover:bg-white/[0.04]"
+            >
               Close
             </Button>
           </Link>
@@ -142,51 +152,51 @@ export default function ReceiptDetailPage() {
       </div>
 
       {/* Main Document Card */}
-      <div className="bg-white border rounded-2xl shadow-sm overflow-hidden p-8 space-y-8 print:shadow-none print:border-none print:p-0">
+      <div className="bg-[#161B22] border border-white/[0.08] rounded-xl shadow-sm overflow-hidden p-6 sm:p-8 space-y-6">
         {/* Document Header & Status Bar */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-6 border-b">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-5 border-b border-white/[0.08]">
           <div>
-            <span className="text-xs uppercase font-bold tracking-wider text-blue-600">Inbound Shipment</span>
-            <h1 className="text-3xl font-extrabold text-gray-900 font-mono mt-1">{receipt.reference}</h1>
+            <span className="text-[11px] uppercase font-bold tracking-wider text-sky-400">Inbound Shipment</span>
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-white font-mono mt-1">{receipt.reference}</h1>
           </div>
 
           {/* Stepper (Draft > Ready > Done) */}
-          <div className="flex items-center text-xs font-bold rounded-lg border bg-gray-50/80 p-1.5 gap-2">
-            <div className={`px-3 py-1 rounded-md ${!isDone ? 'bg-amber-100 text-amber-800' : 'text-gray-400'}`}>
+          <div className="flex items-center text-xs font-bold rounded-lg border border-white/[0.08] bg-[#0D1117] p-1.5 gap-2">
+            <div className={`px-2.5 py-1 rounded-md ${!isDone ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30' : 'text-slate-500'}`}>
               1. Draft / Ready
             </div>
-            <span className="text-gray-300">→</span>
-            <div className={`px-3 py-1 rounded-md ${isDone ? 'bg-emerald-100 text-emerald-800 font-bold' : 'text-gray-400'}`}>
+            <span className="text-slate-600">→</span>
+            <div className={`px-2.5 py-1 rounded-md ${isDone ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30' : 'text-slate-500'}`}>
               2. Done
             </div>
           </div>
         </div>
 
         {error && (
-          <div className="p-4 bg-red-50 text-red-700 rounded-lg text-sm border border-red-200">
+          <div className="p-4 bg-red-500/10 text-red-400 rounded-lg text-xs border border-red-500/20">
             {error}
           </div>
         )}
 
         {/* Metadata Details */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 bg-gray-50/60 p-6 rounded-xl border border-gray-100 text-sm">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 bg-[#0D1117] p-5 rounded-xl border border-white/[0.08] text-xs">
           <div>
-            <div className="text-xs text-gray-500 font-medium uppercase">Receive From (Supplier)</div>
-            <div className="font-semibold text-gray-900 mt-1">{receipt.supplier?.name || receipt.supplierId}</div>
+            <div className="text-[11px] text-slate-400 font-medium uppercase tracking-wider">Receive From</div>
+            <div className="font-semibold text-white mt-1">{receipt.supplier?.name || receipt.supplierId}</div>
           </div>
           <div>
-            <div className="text-xs text-gray-500 font-medium uppercase">Destination Warehouse</div>
-            <div className="font-semibold text-gray-900 mt-1">{receipt.warehouseName}</div>
+            <div className="text-[11px] text-slate-400 font-medium uppercase tracking-wider">Warehouse</div>
+            <div className="font-semibold text-white mt-1">{receipt.warehouseName}</div>
           </div>
           <div>
-            <div className="text-xs text-gray-500 font-medium uppercase">Responsible</div>
-            <div className="font-semibold text-gray-900 mt-1">Inventory Manager</div>
+            <div className="text-[11px] text-slate-400 font-medium uppercase tracking-wider">Responsible</div>
+            <div className="font-semibold text-slate-300 mt-1">Inventory Manager</div>
           </div>
           <div>
-            <div className="text-xs text-gray-500 font-medium uppercase">Status</div>
+            <div className="text-[11px] text-slate-400 font-medium uppercase tracking-wider">Status</div>
             <div className="mt-1">
-              <span className={`inline-block px-2.5 py-0.5 rounded-full text-xs font-bold ${
-                isDone ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'
+              <span className={`inline-block px-2 py-0.5 rounded text-[11px] font-bold ${
+                isDone ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30' : 'bg-amber-500/15 text-amber-400 border border-amber-500/30'
               }`}>
                 {isDone ? 'COMPLETED (DONE)' : 'READY TO RECEIVE'}
               </span>
@@ -196,31 +206,31 @@ export default function ReceiptDetailPage() {
 
         {/* Line Items Table */}
         <div className="space-y-3">
-          <h2 className="text-lg font-bold text-gray-900">Products Received</h2>
-          <div className="border rounded-xl overflow-hidden">
-            <table className="w-full text-left border-collapse text-sm">
+          <h2 className="text-sm font-semibold text-white">Products Received</h2>
+          <div className="border border-white/[0.08] rounded-xl overflow-hidden bg-[#0D1117]">
+            <table className="w-full text-left border-collapse text-xs">
               <thead>
-                <tr className="bg-gray-50 border-b text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                  <th className="p-4">SKU</th>
-                  <th className="p-4">Product Name</th>
-                  <th className="p-4 text-center">Unit</th>
-                  <th className="p-4 text-right">Quantity</th>
+                <tr className="bg-white/[0.02] border-b border-white/[0.08] text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
+                  <th className="p-3.5">SKU</th>
+                  <th className="p-3.5">Product Name</th>
+                  <th className="p-3.5 text-center">Unit</th>
+                  <th className="p-3.5 text-right">Quantity</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-white/[0.06]">
                 {receipt.lines.map((line, idx) => (
-                  <tr key={idx} className="hover:bg-gray-50/50">
-                    <td className="p-4 font-mono font-medium text-gray-700">{line.product?.sku || 'N/A'}</td>
-                    <td className="p-4 font-semibold text-gray-900">{line.product?.name || line.productId}</td>
-                    <td className="p-4 text-center text-gray-500">{line.product?.unit || 'Units'}</td>
-                    <td className="p-4 text-right font-mono font-bold text-base text-gray-900">{line.quantity}</td>
+                  <tr key={idx} className="hover:bg-white/[0.02] transition-colors">
+                    <td className="p-3.5 font-mono text-slate-400">{line.product?.sku || 'N/A'}</td>
+                    <td className="p-3.5 font-medium text-white">{line.product?.name || line.productId}</td>
+                    <td className="p-3.5 text-center text-slate-400">{line.product?.unit || 'Units'}</td>
+                    <td className="p-3.5 text-right font-mono font-bold text-emerald-400 text-sm">{line.quantity}</td>
                   </tr>
                 ))}
               </tbody>
               <tfoot>
-                <tr className="bg-gray-50/80 font-bold border-t">
-                  <td colSpan={3} className="p-4 text-right text-gray-700">Total Units:</td>
-                  <td className="p-4 text-right font-mono text-base text-blue-600">
+                <tr className="bg-white/[0.02] font-bold border-t border-white/[0.08]">
+                  <td colSpan={3} className="p-3.5 text-right text-slate-300">Total Units:</td>
+                  <td className="p-3.5 text-right font-mono text-emerald-400 text-sm">
                     {receipt.lines.reduce((sum, l) => sum + l.quantity, 0)}
                   </td>
                 </tr>
@@ -230,9 +240,11 @@ export default function ReceiptDetailPage() {
         </div>
 
         {/* Audit / Note */}
-        <div className="text-xs text-gray-500 pt-4 border-t flex justify-between items-center">
-          <span>System Record ID: <span className="font-mono">{receipt.id}</span></span>
-          <span>{isDone ? '✓ Validated and recorded to Stock Ledger' : 'Draft stage — validating will increment inventory stock'}</span>
+        <div className="text-[11px] text-slate-400 pt-3 border-t border-white/[0.06] flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+          <span>System Record ID: <span className="font-mono text-slate-300">{receipt.id}</span></span>
+          <span className="text-emerald-400 font-medium">
+            {isDone ? '✓ Validated and recorded to Stock Ledger' : 'Draft stage — validating will increment inventory stock'}
+          </span>
         </div>
       </div>
     </div>

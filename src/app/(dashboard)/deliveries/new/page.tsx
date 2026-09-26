@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { ArrowLeft, ArrowUpRight, Plus, Trash2, AlertTriangle, CheckCircle2 } from 'lucide-react';
 
 interface ProductOption {
   id: string;
@@ -71,9 +72,9 @@ export default function NewDeliveryPage() {
   }, []);
 
   const getAvailableStock = (prodId: string, whId: string) => {
-    const prod = products.find(p => p.id === prodId);
+    const prod = products.find((p) => p.id === prodId);
     if (!prod || !prod.levels) return 0;
-    const lvl = prod.levels.find(l => l.warehouseId === whId);
+    const lvl = prod.levels.find((l) => l.warehouseId === whId);
     return lvl ? lvl.quantity : 0;
   };
 
@@ -87,7 +88,7 @@ export default function NewDeliveryPage() {
     setLines(lines.filter((_, idx) => idx !== index));
   };
 
-  const hasAnyDeficit = lines.some(l => {
+  const hasAnyDeficit = lines.some((l) => {
     const avail = getAvailableStock(l.productId, warehouseId);
     return l.quantity > avail;
   });
@@ -103,7 +104,7 @@ export default function NewDeliveryPage() {
       return;
     }
 
-    const validLines = lines.filter(l => l.productId && l.quantity > 0);
+    const validLines = lines.filter((l) => l.productId && l.quantity > 0);
     if (!validLines.length) {
       alert('Please add at least one line item with quantity > 0.');
       return;
@@ -136,58 +137,74 @@ export default function NewDeliveryPage() {
   };
 
   return (
-    <div className="p-8 max-w-4xl mx-auto space-y-6">
+    <div className="p-4 sm:p-8 max-w-4xl mx-auto space-y-6 text-[#F0F6FC]">
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <Link href="/deliveries" className="text-sm font-semibold text-gray-500 hover:text-gray-800">
-            ← Back to Delivery Orders
+          <Link
+            href="/deliveries"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-400 hover:text-white transition-colors"
+          >
+            <ArrowLeft className="h-3.5 w-3.5" />
+            <span>Back to Delivery Orders</span>
           </Link>
-          <h1 className="text-3xl font-bold tracking-tight text-gray-900 mt-2">New Outbound Delivery Order</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white mt-2 flex items-center gap-2.5">
+            <ArrowUpRight className="h-6 w-6 text-emerald-400" />
+            <span>New Outbound Delivery Order</span>
+          </h1>
+          <p className="text-xs text-slate-400 mt-1">Dispatch products and deduct warehouse inventory upon fulfillment.</p>
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="bg-white p-8 rounded-2xl border shadow-sm space-y-8">
+      <form
+        onSubmit={handleSubmit}
+        className="bg-[#161B22] p-6 sm:p-8 rounded-xl border border-white/[0.08] shadow-sm space-y-6"
+      >
         {/* Status header indicator */}
-        <div className="flex items-center justify-between pb-6 border-b">
-          <span className="text-sm font-mono text-gray-500">Operation: WH/OUT/AUTO</span>
-          <span className={`px-3 py-1 font-bold text-xs rounded-full ${
-            hasAnyDeficit
-              ? 'bg-red-100 text-red-800 border border-red-200'
-              : 'bg-blue-100 text-blue-800 border border-blue-200'
-          }`}>
+        <div className="flex items-center justify-between pb-5 border-b border-white/[0.08]">
+          <span className="text-xs font-mono text-slate-400">Operation: WH/OUT/AUTO</span>
+          <span
+            className={`px-2.5 py-1 font-bold text-xs rounded-lg border ${
+              hasAnyDeficit
+                ? 'bg-red-500/10 text-red-400 border-red-500/20'
+                : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+            }`}
+          >
             {hasAnyDeficit ? '⚠️ WILL BE WAITING (Insufficient Stock)' : 'READY TO PICK'}
           </span>
         </div>
 
         {hasAnyDeficit && (
-          <div className="p-4 bg-amber-50 text-amber-800 rounded-xl border border-amber-200 text-sm">
-            <p className="font-bold">⚠️ Notice: Inventory Deficit Detected</p>
-            <p className="mt-1 text-xs">
-              One or more items exceed current on-hand warehouse stock. The order will be saved as <strong>WAITING FOR STOCK</strong> and cannot be validated until incoming receipts replenish the inventory.
-            </p>
+          <div className="p-4 bg-amber-500/[0.08] text-amber-300 rounded-xl border border-amber-500/20 text-xs flex items-start gap-2.5">
+            <AlertTriangle className="h-4 w-4 text-amber-400 shrink-0 mt-0.5" />
+            <div>
+              <p className="font-semibold text-amber-200">Inventory Deficit Detected</p>
+              <p className="mt-1 text-slate-300">
+                One or more items exceed current on-hand warehouse stock. The order will be saved as <strong>WAITING FOR STOCK</strong> and cannot be validated until incoming receipts replenish the inventory.
+              </p>
+            </div>
           </div>
         )}
 
         {/* Primary Meta Fields */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           <div>
-            <Label className="mb-2 block font-semibold text-gray-700">Delivery Address / Customer Name *</Label>
+            <Label className="mb-2 block text-xs font-medium text-slate-300">Delivery Address / Customer Name *</Label>
             <Input
               placeholder="e.g. Azure Interior / Acme Corp"
               value={customer}
               onChange={(e) => setCustomer(e.target.value)}
               required
-              className="bg-white"
+              className="bg-[#0D1117] border-white/[0.1] text-white text-xs placeholder-slate-500"
             />
           </div>
 
           <div>
-            <Label className="mb-2 block font-semibold text-gray-700">Source Warehouse *</Label>
+            <Label className="mb-2 block text-xs font-medium text-slate-300">Source Warehouse *</Label>
             <select
               value={warehouseId}
               onChange={(e) => setWarehouseId(e.target.value)}
-              className="w-full h-10 px-3 border rounded-md text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full h-10 px-3 border border-white/[0.1] rounded-lg text-xs bg-[#0D1117] text-white focus:outline-none focus:border-emerald-500 transition-colors cursor-pointer"
               required
             >
               {warehouses.map((w) => (
@@ -200,54 +217,62 @@ export default function NewDeliveryPage() {
           </div>
 
           <div>
-            <Label className="mb-2 block font-semibold text-gray-700">Schedule Date</Label>
+            <Label className="mb-2 block text-xs font-medium text-slate-300">Schedule Date</Label>
             <Input
               type="date"
               value={scheduleDate}
               onChange={(e) => setScheduleDate(e.target.value)}
+              className="bg-[#0D1117] border-white/[0.1] text-white text-xs"
             />
           </div>
 
           <div>
-            <Label className="mb-2 block font-semibold text-gray-700">Responsible</Label>
-            <Input value="Inventory Manager (You)" disabled className="bg-gray-50 text-gray-500" />
+            <Label className="mb-2 block text-xs font-medium text-slate-300">Responsible</Label>
+            <Input
+              value="Inventory Manager (You)"
+              disabled
+              className="bg-white/[0.02] border-white/[0.06] text-slate-400 text-xs cursor-not-allowed"
+            />
           </div>
         </div>
 
         {/* Line Items Section */}
-        <div className="pt-6 border-t space-y-4">
+        <div className="pt-5 border-t border-white/[0.08] space-y-4">
           <div className="flex justify-between items-center">
             <div>
-              <h2 className="text-lg font-bold text-gray-900">Pick & Pack Lines</h2>
-              <p className="text-xs text-gray-500">Select products and demand quantities for outbound shipment.</p>
+              <h2 className="text-sm font-semibold text-white">Pick & Pack Lines</h2>
+              <p className="text-xs text-slate-400">Select products and demand quantities for outbound shipment.</p>
             </div>
             <Button
               type="button"
               variant="outline"
               size="sm"
               onClick={handleAddLine}
-              className="text-emerald-600 border-emerald-200 hover:bg-emerald-50"
+              className="h-8 text-xs font-medium text-emerald-400 border-emerald-500/20 bg-emerald-500/10 hover:bg-emerald-500/20 hover:text-emerald-300"
             >
-              + Add Item Line
+              <Plus className="h-3.5 w-3.5 mr-1" />
+              <span>Add Item Line</span>
             </Button>
           </div>
 
           <div className="space-y-3">
             {lines.map((line, idx) => {
-              const selectedProduct = products.find(p => p.id === line.productId);
+              const selectedProduct = products.find((p) => p.id === line.productId);
               const availableStock = getAvailableStock(line.productId, warehouseId);
               const isDeficit = line.quantity > availableStock;
 
               return (
                 <div
                   key={idx}
-                  className={`flex flex-col sm:flex-row gap-4 items-start sm:items-center p-3 rounded-lg border transition ${
-                    isDeficit ? 'bg-red-50/70 border-red-300' : 'bg-gray-50/80 border-gray-200'
+                  className={`flex flex-col sm:flex-row gap-3 items-start sm:items-center p-3.5 rounded-lg border transition ${
+                    isDeficit
+                      ? 'bg-red-500/[0.06] border-red-500/30'
+                      : 'bg-[#0D1117] border-white/[0.08]'
                   }`}
                 >
                   {/* Product selector */}
                   <div className="flex-1 w-full">
-                    <Label className="text-xs text-gray-500 mb-1 block">Product</Label>
+                    <Label className="text-[11px] text-slate-400 mb-1 block">Product</Label>
                     <select
                       value={line.productId}
                       onChange={(e) => {
@@ -255,7 +280,7 @@ export default function NewDeliveryPage() {
                         newLines[idx].productId = e.target.value;
                         setLines(newLines);
                       }}
-                      className="w-full h-10 px-3 border rounded-md text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full h-9 px-3 border border-white/[0.1] rounded-lg text-xs bg-[#161B22] text-white focus:outline-none focus:border-emerald-500 transition-colors cursor-pointer"
                       required
                     >
                       {products.map((p) => (
@@ -268,7 +293,7 @@ export default function NewDeliveryPage() {
 
                   {/* Quantity */}
                   <div className="w-full sm:w-32">
-                    <Label className="text-xs text-gray-500 mb-1 block">Quantity</Label>
+                    <Label className="text-[11px] text-slate-400 mb-1 block">Quantity</Label>
                     <Input
                       type="number"
                       min="1"
@@ -279,33 +304,37 @@ export default function NewDeliveryPage() {
                         setLines(newLines);
                       }}
                       required
-                      className={`bg-white ${isDeficit ? 'border-red-400 text-red-700 font-bold' : ''}`}
+                      className={`h-9 bg-[#161B22] border-white/[0.1] text-white text-xs font-mono ${
+                        isDeficit ? 'border-red-500 text-red-400 font-bold' : ''
+                      }`}
                     />
                   </div>
 
                   {/* Stock Availability Indicator */}
-                  <div className="w-full sm:w-48 pt-2 sm:pt-5">
+                  <div className="w-full sm:w-44 pt-0 sm:pt-4">
                     {isDeficit ? (
-                      <span className="text-xs font-bold text-red-600 block">
-                        ⚠️ Insufficient (Avail: {availableStock})
+                      <span className="text-[11px] font-semibold text-red-400 flex items-center gap-1">
+                        <AlertTriangle className="h-3 w-3" />
+                        <span>Deficit (Avail: {availableStock})</span>
                       </span>
                     ) : (
-                      <span className="text-xs font-semibold text-emerald-600 block">
-                        ✓ In Stock (Avail: {availableStock})
+                      <span className="text-[11px] font-semibold text-emerald-400 flex items-center gap-1">
+                        <CheckCircle2 className="h-3 w-3" />
+                        <span>In Stock (Avail: {availableStock})</span>
                       </span>
                     )}
                   </div>
 
                   {/* Remove line */}
-                  <div className="pt-2 sm:pt-5">
+                  <div className="pt-0 sm:pt-4">
                     <button
                       type="button"
                       onClick={() => handleRemoveLine(idx)}
                       disabled={lines.length <= 1}
-                      className="text-gray-400 hover:text-red-500 p-2 disabled:opacity-30 transition"
+                      className="text-slate-400 hover:text-red-400 p-1.5 disabled:opacity-20 transition-colors cursor-pointer"
                       title="Remove item"
                     >
-                      ✕
+                      <Trash2 className="h-4 w-4" />
                     </button>
                   </div>
                 </div>
@@ -315,16 +344,20 @@ export default function NewDeliveryPage() {
         </div>
 
         {/* Actions */}
-        <div className="flex justify-end gap-3 pt-6 border-t">
+        <div className="flex justify-end gap-3 pt-5 border-t border-white/[0.08]">
           <Link href="/deliveries">
-            <Button type="button" variant="outline">
+            <Button
+              type="button"
+              variant="outline"
+              className="h-9 px-4 text-xs font-semibold bg-[#0D1117] hover:bg-[#1F242C] border-white/[0.1] text-slate-300"
+            >
               Cancel
             </Button>
           </Link>
           <Button
             type="submit"
             disabled={loading || fetchingOptions}
-            className="bg-emerald-600 hover:bg-emerald-700 text-white font-medium"
+            className="h-9 px-4 text-xs font-semibold bg-emerald-600 hover:bg-emerald-500 text-white shadow-sm shadow-emerald-600/30 cursor-pointer disabled:opacity-50"
           >
             {loading ? 'Creating...' : 'Create Delivery Order'}
           </Button>
