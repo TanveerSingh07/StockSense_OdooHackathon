@@ -4,19 +4,13 @@ import { useState, useEffect, useTransition } from "react";
 import { 
   Search, 
   Plus, 
-  Package, 
-  AlertTriangle, 
-  Filter, 
   RefreshCw, 
-  Layers,
-  CheckCircle2,
+  Edit2, 
   Trash2,
-  Edit2
+  AlertCircle
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { ProductFormDialog } from "@/components/products/product-form-dialog";
+import { OperationsShell } from "@/components/layout/operations-shell";
+import { ProductFormSlideOver } from "@/components/products/product-form-slideover";
 
 export interface Category {
   id: string;
@@ -53,8 +47,8 @@ export default function ProductsPage() {
   const [lowStockOnly, setLowStockOnly] = useState(false);
   const [isPending, startTransition] = useTransition();
 
-  // Dialog state
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  // Slide-over panel state
+  const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [productToEdit, setProductToEdit] = useState<Product | null>(null);
 
   const fetchCategories = async () => {
@@ -98,12 +92,12 @@ export default function ProductsPage() {
       startTransition(() => {
         fetchProducts();
       });
-    }, 250);
+    }, 200);
     return () => clearTimeout(timer);
   }, [searchQuery, selectedCategory, lowStockOnly]);
 
   const handleDelete = async (id: string, name: string) => {
-    if (!confirm(`Are you sure you want to delete "${name}"? This will also remove associated stock levels.`)) {
+    if (!confirm(`Confirm deletion of SKU item "${name}"?`)) {
       return;
     }
 
@@ -121,264 +115,223 @@ export default function ProductsPage() {
   };
 
   const lowStockCount = products.filter((p) => p.isLowStock).length;
-  const totalStockUnits = products.reduce((sum, p) => sum + (p.totalQuantity || 0), 0);
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight text-foreground flex items-center gap-2">
-            <Package className="h-8 w-8 text-primary" />
-            Product Catalog
-          </h1>
-          <p className="text-muted-foreground mt-1">
-            Manage product master data, SKUs, categories, and stock reorder rules.
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={fetchProducts}
-            disabled={loading}
-            className="gap-2"
-          >
-            <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
-            Refresh
-          </Button>
-          <Button 
-            onClick={() => {
-              setProductToEdit(null);
-              setIsDialogOpen(true);
-            }}
-            className="gap-2 bg-primary text-primary-foreground"
-          >
-            <Plus className="h-4 w-4" />
-            Add Product
-          </Button>
-        </div>
-      </div>
+    <OperationsShell>
+      <div className="flex-1 flex flex-col h-full overflow-hidden bg-[#101312] text-[#E7ECE7]">
+        {/* Top Operational Action Bar */}
+        <header className="h-12 px-6 border-b border-[#2C332E] flex items-center justify-between bg-[#141816] shrink-0">
+          <div className="flex items-center gap-3">
+            <h1 className="text-[20px] font-sans font-semibold text-[#E7ECE7] tracking-tight">
+              Products
+            </h1>
+            <span className="font-mono text-xs text-[#9AA69C] bg-[#181C1A] px-2 py-0.5 rounded-[3px] border border-[#2C332E]">
+              {products.length} SKUs
+            </span>
+            {lowStockCount > 0 && (
+              <span className="font-mono text-xs text-[#E8A33D] bg-[#E8A33D]/10 px-2 py-0.5 rounded-[3px] border border-[#E8A33D]/25 flex items-center gap-1">
+                <span className="h-1.5 w-1.5 rounded-full bg-[#E8A33D]"></span>
+                {lowStockCount} LOW STOCK
+              </span>
+            )}
+          </div>
 
-      {/* KPI Overview Pills */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className="shadow-xs border border-border">
-          <CardHeader className="p-4 pb-2">
-            <CardDescription className="text-xs uppercase font-semibold">Total Products</CardDescription>
-            <CardTitle className="text-2xl font-bold flex items-center justify-between">
-              {products.length}
-              <Layers className="h-5 w-5 text-muted-foreground" />
-            </CardTitle>
-          </CardHeader>
-        </Card>
-
-        <Card className="shadow-xs border border-border">
-          <CardHeader className="p-4 pb-2">
-            <CardDescription className="text-xs uppercase font-semibold">Total Stock on Hand</CardDescription>
-            <CardTitle className="text-2xl font-bold flex items-center justify-between text-blue-600 dark:text-blue-400">
-              {totalStockUnits}
-              <span className="text-xs font-normal text-muted-foreground">units</span>
-            </CardTitle>
-          </CardHeader>
-        </Card>
-
-        <Card className={`shadow-xs border ${lowStockCount > 0 ? "border-amber-500/40 bg-amber-500/5" : "border-border"}`}>
-          <CardHeader className="p-4 pb-2">
-            <CardDescription className="text-xs uppercase font-semibold">Low Stock Alerts</CardDescription>
-            <CardTitle className="text-2xl font-bold flex items-center justify-between text-amber-600 dark:text-amber-400">
-              {lowStockCount}
-              <AlertTriangle className="h-5 w-5 text-amber-500" />
-            </CardTitle>
-          </CardHeader>
-        </Card>
-      </div>
-
-      {/* Filter & Search Bar */}
-      <Card className="shadow-xs border border-border">
-        <CardContent className="p-4">
-          <div className="flex flex-col md:flex-row gap-3 items-center justify-between">
+          <div className="flex items-center gap-2.5">
             {/* Search Input */}
-            <div className="relative w-full md:w-80">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search by name or SKU..."
+            <div className="relative w-64">
+              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[#9AA69C]" />
+              <input
+                type="text"
+                placeholder="Search SKU or name..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9 h-9"
+                className="w-full h-8 pl-8 pr-3 text-[13px] bg-[#101312] border border-[#2C332E] rounded-[4px] text-[#E7ECE7] placeholder-[#9AA69C]/50 focus:outline-none focus:border-[#E8A33D] focus:ring-1 focus:ring-[#E8A33D]"
               />
             </div>
 
-            {/* Filter controls */}
-            <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
-              <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                <Filter className="h-3.5 w-3.5" />
-                Category:
-              </div>
-              <select
-                value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
-                className="h-9 px-3 py-1 bg-background border border-input rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-ring"
-              >
-                <option value="all">All Categories</option>
-                {categories.map((cat) => (
-                  <option key={cat.id} value={cat.id}>
-                    {cat.name}
-                  </option>
-                ))}
-              </select>
+            {/* Category Filter */}
+            <select
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              className="h-8 px-2 text-[13px] bg-[#101312] border border-[#2C332E] rounded-[4px] text-[#9AA69C] focus:text-[#E7ECE7] focus:outline-none focus:border-[#E8A33D]"
+            >
+              <option value="all">All Categories</option>
+              {categories.map((cat) => (
+                <option key={cat.id} value={cat.id} className="bg-[#181C1A] text-[#E7ECE7]">
+                  {cat.name}
+                </option>
+              ))}
+            </select>
 
-              <button
-                type="button"
-                onClick={() => setLowStockOnly((prev) => !prev)}
-                className={`h-9 px-3 rounded-md text-xs font-medium border transition-colors flex items-center gap-1.5 ${
-                  lowStockOnly
-                    ? "bg-amber-500/15 border-amber-500 text-amber-600 dark:text-amber-400"
-                    : "bg-background border-input text-foreground hover:bg-muted"
-                }`}
-              >
-                <AlertTriangle className="h-3.5 w-3.5" />
-                Low Stock Only
-              </button>
-            </div>
+            {/* Refresh Button */}
+            <button
+              onClick={fetchProducts}
+              disabled={loading}
+              className="h-8 w-8 flex items-center justify-center rounded-[4px] border border-[#2C332E] bg-[#181C1A] text-[#9AA69C] hover:text-[#E7ECE7] transition-colors focus-visible:outline-2 focus-visible:outline-[#E8A33D]"
+              title="Refresh table"
+            >
+              <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} />
+            </button>
+
+            {/* Primary New Product Action */}
+            <button
+              onClick={() => {
+                setProductToEdit(null);
+                setIsPanelOpen(true);
+              }}
+              className="h-8 px-3 text-xs font-semibold bg-[#E8A33D] text-[#101312] hover:bg-[#d89430] rounded-[4px] transition-colors flex items-center gap-1.5 focus-visible:outline-2 focus-visible:outline-white"
+            >
+              <Plus className="h-3.5 w-3.5" />
+              New product
+            </button>
           </div>
-        </CardContent>
-      </Card>
+        </header>
 
-      {/* Products Table */}
-      <Card className="shadow-xs border border-border overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm text-left">
-            <thead className="bg-muted/50 text-muted-foreground text-xs uppercase tracking-wider border-b border-border">
+        {/* Dense Table Viewport */}
+        <div className="flex-1 overflow-auto bg-[#101312]">
+          <table className="w-full text-left border-collapse text-[13px]">
+            {/* Table Header */}
+            <thead className="bg-[#181C1A] text-[#9AA69C] text-[11px] font-mono uppercase tracking-wider sticky top-0 border-b border-[#2C332E] z-10">
               <tr>
-                <th className="px-5 py-3 font-semibold">SKU</th>
-                <th className="px-5 py-3 font-semibold">Product Name</th>
-                <th className="px-5 py-3 font-semibold">Category</th>
-                <th className="px-5 py-3 font-semibold">Unit</th>
-                <th className="px-5 py-3 font-semibold text-right">Reorder Point</th>
-                <th className="px-5 py-3 font-semibold text-right">Available Stock</th>
-                <th className="px-5 py-3 font-semibold text-center">Status</th>
-                <th className="px-5 py-3 font-semibold text-right">Actions</th>
+                <th className="py-2.5 px-4 font-semibold w-36">SKU</th>
+                <th className="py-2.5 px-4 font-semibold">Name</th>
+                <th className="py-2.5 px-4 font-semibold w-40">Category</th>
+                <th className="py-2.5 px-4 font-semibold w-24">Unit</th>
+                <th className="py-2.5 px-4 font-semibold w-32 text-right">Stock</th>
+                <th className="py-2.5 px-4 font-semibold w-32 text-right">Reorder Point</th>
+                <th className="py-2.5 px-4 font-semibold w-20 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-border">
-              {loading ? (
+
+            {/* Table Body */}
+            <tbody className="divide-y divide-[#2C332E] text-[#E7ECE7]">
+              {loading && products.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="text-center py-12 text-muted-foreground">
-                    <div className="flex flex-col items-center justify-center gap-2">
-                      <RefreshCw className="h-6 w-6 animate-spin text-primary" />
-                      <span>Loading products...</span>
+                  <td colSpan={7} className="text-center py-16 text-[#9AA69C]">
+                    <div className="flex items-center justify-center gap-2 font-mono text-xs">
+                      <RefreshCw className="h-4 w-4 animate-spin text-[#E8A33D]" />
+                      <span>QUERYING CATALOG...</span>
                     </div>
                   </td>
                 </tr>
               ) : products.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="text-center py-16 text-muted-foreground">
-                    <div className="flex flex-col items-center justify-center gap-2">
-                      <Package className="h-10 w-10 text-muted-foreground/60" />
-                      <p className="text-base font-medium text-foreground">No products found</p>
-                      <p className="text-xs text-muted-foreground max-w-sm">
-                        {searchQuery || selectedCategory !== "all" || lowStockOnly
-                          ? "Try adjusting your search query or filters."
-                          : "Get started by adding your first product to the inventory."}
+                  <td colSpan={7} className="text-center py-20 text-[#9AA69C]">
+                    <div className="flex flex-col items-center justify-center gap-3">
+                      <p className="text-[13px] text-[#9AA69C]">
+                        {searchQuery || selectedCategory !== "all"
+                          ? "No matching products for current filter criteria."
+                          : "No products yet. Add your first one to start tracking stock."}
                       </p>
+                      {!searchQuery && selectedCategory === "all" && (
+                        <button
+                          onClick={() => {
+                            setProductToEdit(null);
+                            setIsPanelOpen(true);
+                          }}
+                          className="h-8 px-3 text-xs font-semibold bg-[#E8A33D] text-[#101312] hover:bg-[#d89430] rounded-[4px] transition-colors flex items-center gap-1.5 focus-visible:outline-2 focus-visible:outline-white"
+                        >
+                          <Plus className="h-3.5 w-3.5" />
+                          New product
+                        </button>
+                      )}
                     </div>
                   </td>
                 </tr>
               ) : (
-                products.map((product) => (
-                  <tr 
-                    key={product.id} 
-                    className="hover:bg-muted/30 transition-colors"
-                  >
-                    <td className="px-5 py-3.5 font-mono text-xs font-medium text-foreground">
-                      <span className="bg-muted px-2 py-1 rounded border border-border">
+                products.map((product) => {
+                  const isOutOfStock = product.totalQuantity === 0;
+                  const isLow = product.totalQuantity <= product.reorderPoint;
+
+                  // Functional Stock Color: Danger for 0, Accent for low stock, Success for healthy
+                  const stockColorClass = isOutOfStock
+                    ? "text-[#C4553F] font-bold"
+                    : isLow
+                    ? "text-[#E8A33D] font-bold"
+                    : "text-[#6FA66A] font-medium";
+
+                  return (
+                    <tr
+                      key={product.id}
+                      className="hover:bg-[#181C1A] transition-none border-b border-[#2C332E]"
+                    >
+                      {/* SKU (Monospace) */}
+                      <td className="py-2.5 px-4 font-mono text-xs text-[#E7ECE7]">
                         {product.sku}
-                      </span>
-                    </td>
-                    <td className="px-5 py-3.5 font-medium text-foreground">
-                      {product.name}
-                    </td>
-                    <td className="px-5 py-3.5">
-                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary">
-                        {product.category?.name || "Uncategorized"}
-                      </span>
-                    </td>
-                    <td className="px-5 py-3.5 text-muted-foreground text-xs">
-                      {product.unit}
-                    </td>
-                    <td className="px-5 py-3.5 text-right font-mono text-xs text-muted-foreground">
-                      {product.reorderPoint}
-                    </td>
-                    <td className="px-5 py-3.5 text-right font-mono font-semibold">
-                      <span className={product.isLowStock ? "text-amber-600 dark:text-amber-400" : "text-foreground"}>
+                      </td>
+
+                      {/* Name */}
+                      <td className="py-2.5 px-4 font-medium text-[#E7ECE7]">
+                        {product.name}
+                      </td>
+
+                      {/* Category */}
+                      <td className="py-2.5 px-4 text-[#9AA69C] text-xs">
+                        {product.category?.name || "—"}
+                      </td>
+
+                      {/* Unit */}
+                      <td className="py-2.5 px-4 text-[#9AA69C] text-xs">
+                        {product.unit}
+                      </td>
+
+                      {/* Stock on Hand (Monospace with Threshold color) */}
+                      <td className={`py-2.5 px-4 font-mono text-xs text-right ${stockColorClass}`}>
                         {product.totalQuantity}
-                      </span>
-                    </td>
-                    <td className="px-5 py-3.5 text-center">
-                      {product.totalQuantity === 0 ? (
-                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20">
-                          Out of Stock
-                        </span>
-                      ) : product.isLowStock ? (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
-                          <AlertTriangle className="h-3 w-3" />
-                          Low Stock
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-                          <CheckCircle2 className="h-3 w-3" />
-                          Healthy
-                        </span>
-                      )}
-                    </td>
-                    <td className="px-5 py-3.5 text-right">
-                      <div className="flex items-center justify-end gap-1">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => {
-                            setProductToEdit(product);
-                            setIsDialogOpen(true);
-                          }}
-                          className="h-8 w-8 text-muted-foreground hover:text-foreground"
-                          title="Edit Product"
-                        >
-                          <Edit2 className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleDelete(product.id, product.name)}
-                          className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                          title="Delete Product"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
+                        {isOutOfStock && <span className="ml-1 text-[10px] text-[#C4553F]">(OUT)</span>}
+                        {!isOutOfStock && isLow && <span className="ml-1 text-[10px] text-[#E8A33D]">(LOW)</span>}
+                      </td>
+
+                      {/* Reorder Point (Monospace) */}
+                      <td className="py-2.5 px-4 font-mono text-xs text-right text-[#9AA69C]">
+                        {product.reorderPoint}
+                      </td>
+
+                      {/* Actions */}
+                      <td className="py-2.5 px-4 text-right">
+                        <div className="flex items-center justify-end gap-1">
+                          <button
+                            onClick={() => {
+                              setProductToEdit(product);
+                              setIsPanelOpen(true);
+                            }}
+                            className="p-1 text-[#9AA69C] hover:text-[#E7ECE7] rounded-[3px] transition-colors focus-visible:outline-2 focus-visible:outline-[#E8A33D]"
+                            title="Edit Product"
+                          >
+                            <Edit2 className="h-3.5 w-3.5" />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(product.id, product.name)}
+                            className="p-1 text-[#9AA69C] hover:text-[#C4553F] rounded-[3px] transition-colors focus-visible:outline-2 focus-visible:outline-[#C4553F]"
+                            title="Delete Product"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })
               )}
             </tbody>
           </table>
         </div>
-      </Card>
 
-      {/* Create / Edit Product Form Dialog */}
-      <ProductFormDialog
-        isOpen={isDialogOpen}
-        onClose={() => setIsDialogOpen(false)}
-        productToEdit={productToEdit}
-        categories={categories}
-        onSuccess={() => {
-          fetchProducts();
-          fetchCategories();
-        }}
-        onCategoryCreated={(newCat) => {
-          setCategories((prev) => [...prev, newCat]);
-        }}
-      />
-    </div>
+        {/* Slide-over Create / Edit Panel */}
+        <ProductFormSlideOver
+          isOpen={isPanelOpen}
+          onClose={() => setIsPanelOpen(false)}
+          productToEdit={productToEdit}
+          categories={categories}
+          onSuccess={() => {
+            fetchProducts();
+            fetchCategories();
+          }}
+          onCategoryCreated={(newCat) => {
+            setCategories((prev) => [...prev, newCat]);
+          }}
+        />
+      </div>
+    </OperationsShell>
   );
 }
-
