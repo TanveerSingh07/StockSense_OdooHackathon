@@ -1,10 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { SlidersHorizontal, Check } from 'lucide-react';
 
 export default function NewAdjustmentPage() {
   const router = useRouter();
@@ -36,46 +35,61 @@ export default function NewAdjustmentPage() {
   };
 
   return (
-    <div className="p-8 max-w-2xl mx-auto">
-      <h1 className="text-2xl font-bold mb-6">Create Stock Adjustment</h1>
-      <form onSubmit={handleSubmit} className="space-y-6 bg-white p-6 rounded-lg border shadow-sm">
-        
-        <div className="grid grid-cols-2 gap-4">
+    <div className="p-4 sm:p-8 max-w-2xl mx-auto space-y-6 text-[#F0F6FC]">
+      <div>
+        <h1 className="text-2xl font-bold tracking-tight text-white">Create Stock Adjustment</h1>
+        <p className="text-xs sm:text-sm text-slate-400 mt-1">
+          Perform a physical inventory audit adjustment to reconcile counted vs recorded stock.
+        </p>
+      </div>
+
+      <form onSubmit={handleSubmit} className="space-y-5 bg-[#161B22] p-6 rounded-xl border border-white/[0.08] shadow-sm">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <Label className="mb-2 block">Product ID</Label>
-            <Input 
+            <Label className="mb-1.5 block text-xs font-medium text-slate-300">Product Identifier *</Label>
+            <input 
               value={productId} 
               onChange={e => setProductId(e.target.value)} 
               required 
-              placeholder="e.g. product_apple_1" 
+              placeholder="e.g. product ID or SKU" 
+              className="w-full px-3 py-2 text-xs bg-[#0D1117] border border-white/[0.08] rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-colors"
             />
           </div>
           <div>
-            <Label className="mb-2 block">Warehouse ID</Label>
-            <Input 
+            <Label className="mb-1.5 block text-xs font-medium text-slate-300">Warehouse Identifier *</Label>
+            <input 
               value={warehouseId} 
               onChange={e => setWarehouseId(e.target.value)} 
               required 
-              placeholder="e.g. cmui2htg00000y93mkgtqkao0" 
+              placeholder="e.g. warehouse ID" 
+              className="w-full px-3 py-2 text-xs bg-[#0D1117] border border-white/[0.08] rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-colors"
             />
           </div>
         </div>
 
         <div>
-          <Label className="mb-2 block">Quantity Change (+ or -)</Label>
-          <Input 
+          <Label className="mb-1.5 block text-xs font-medium text-slate-300">Quantity Delta Change (+ or -) *</Label>
+          <input 
             type="number"
             value={change} 
             onChange={e => setChange(Number(e.target.value))} 
             required 
             placeholder="e.g. -5 to reduce, 10 to add" 
+            className="w-full px-3 py-2 text-xs font-mono bg-[#0D1117] border border-white/[0.08] rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-colors"
           />
-          <p className="text-xs text-gray-500 mt-2">Use a negative number to reduce stock (e.g. due to damage), or a positive number to increase it.</p>
+          <p className="text-[11px] text-slate-400 mt-1.5">
+            Use a negative number to reduce stock (e.g. shrinkage/damage) or positive number to increment inventory.
+          </p>
         </div>
 
-        <Button type="submit" className="w-full mt-6" disabled={loading || change === 0}>
-          {loading ? 'Adjusting...' : 'Save Adjustment'}
-        </Button>
+        <button 
+          type="submit" 
+          disabled={loading || change === 0}
+          className="w-full py-2.5 px-4 text-xs font-semibold bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg shadow-sm shadow-emerald-600/30 transition-all flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
+        >
+          <Check className="h-4 w-4" />
+          <span>{loading ? 'Adjusting...' : 'Save Stock Adjustment'}</span>
+        </button>
       </form>
     </div>
   );
