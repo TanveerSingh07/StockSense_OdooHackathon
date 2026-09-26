@@ -34,9 +34,9 @@ export async function GET(req: NextRequest) {
       orderBy: { name: "asc" },
     });
 
-    // Compute total quantity and check low stock
+    // Compute total quantity across all active warehouses from StockLevel records
     const formattedProducts = products.map((product: any) => {
-      const totalQuantity = product.levels.reduce((sum: number, lvl: any) => sum + lvl.quantity, 0);
+      const totalQuantity = (product.levels || []).reduce((sum: number, lvl: any) => sum + (lvl.quantity || 0), 0);
       const isLowStock = totalQuantity <= product.reorderPoint;
       return {
         ...product,
