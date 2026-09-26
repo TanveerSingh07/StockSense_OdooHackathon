@@ -451,14 +451,14 @@ export default function ProductsPage() {
   return (
     <OperationsShell>
       <div className="flex-1 flex flex-col min-h-full bg-[#0F172A] text-slate-100 font-sans relative">
-        {/* 1. Ambient Background Drift (Pure CSS, only self-moving element) */}
+        {/* 1. Ambient Background Drift (~12-14% opacity for noticeable subtle lighting) */}
         <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
-          <div className="absolute -top-48 -left-48 w-[640px] h-[640px] rounded-full bg-[#F59E0B]/[0.08] blur-[120px] animate-ambient-drift-amber" />
-          <div className="absolute -bottom-48 -right-48 w-[680px] h-[680px] rounded-full bg-[#6366F1]/[0.06] blur-[120px] animate-ambient-drift-indigo" />
+          <div className="absolute -top-48 -left-48 w-[680px] h-[680px] rounded-full bg-[#F59E0B]/[0.13] blur-[130px] animate-ambient-drift-amber" />
+          <div className="absolute -bottom-48 -right-48 w-[720px] h-[720px] rounded-full bg-[#6366F1]/[0.11] blur-[130px] animate-ambient-drift-indigo" />
         </div>
 
-        {/* 2. Sticky Glass Header Chrome */}
-        <header className="sticky top-0 z-30 bg-[#0F172A]/70 backdrop-blur-md border-b border-white/[0.05] px-6 sm:px-8 py-4">
+        {/* 2. In-flow Page Header (Natural layout, never clipped by navbar) */}
+        <div className="px-6 sm:px-8 pt-6 pb-2 relative z-10">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 w-full">
             <div>
               <h1 className="text-2xl font-semibold text-zinc-100 tracking-tight">
@@ -564,13 +564,13 @@ export default function ProductsPage() {
               </button>
             </div>
           </div>
-        </header>
+        </div>
 
         {/* 3. Full-width Content Zone */}
         <main className="flex-1 w-full space-y-6 relative z-10">
           
           {/* KPI Strip: Flat & Iconless (Label + Big Number) */}
-          <div className="px-6 sm:px-8 pt-6">
+          <div className="px-6 sm:px-8 pt-2">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5 w-full">
               {/* Card 1: Total Products */}
               <div
@@ -615,64 +615,28 @@ export default function ProductsPage() {
                 </div>
               </div>
 
-              {/* Card 4: Stock Health (Hero 2 Columns) */}
+              {/* Card 4: Stock Health (Clean 2 Columns without duplicate ring) */}
               <div
                 onClick={() => handleKpiCardClick('HEALTH')}
-                className={`lg:col-span-2 p-4 rounded-lg bg-[#1E293B] border border-white/[0.08] hover:border-white/[0.14] transition-colors cursor-pointer flex items-center justify-between gap-4 ${
+                className={`lg:col-span-2 p-4 rounded-lg bg-[#1E293B] border border-white/[0.08] hover:border-white/[0.14] transition-colors cursor-pointer flex flex-col justify-between ${
                   activeKpiFilter === 'HEALTH' ? 'ring-2 ring-amber-500' : ''
                 }`}
               >
-                <div className="space-y-1">
-                  <div className="text-sm font-normal text-zinc-400">Stock health</div>
+                <div className="text-sm font-normal text-zinc-400 mb-2">Stock health</div>
+                <div className="flex items-baseline justify-between">
                   <div className="text-3xl font-semibold text-white tracking-tight tabular-nums">
                     <AnimatedCounter value={healthPercentage} suffix="%" />
                   </div>
-                  <div className="text-xs text-zinc-400 pt-0.5">
+                  <div className="text-xs text-zinc-400">
                     {healthyCount} of {products.length} items optimal
-                  </div>
-                </div>
-
-                {/* Quiet Radial Gauge Ring with Single Sweep */}
-                <div className="flex flex-col items-center justify-center shrink-0 pr-2">
-                  <div className="relative h-14 w-14 flex items-center justify-center">
-                    <svg className="h-14 w-14 -rotate-90 transform" viewBox="0 0 36 36">
-                      <path
-                        className="text-zinc-700"
-                        strokeWidth="2.5"
-                        stroke="currentColor"
-                        fill="none"
-                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                      />
-                      <motion.path
-                        initial={{ pathLength: 0 }}
-                        animate={{ pathLength: healthPercentage / 100 }}
-                        transition={{ duration: 0.8, ease: 'easeOut' }}
-                        className={`${
-                          healthPercentage >= 75
-                            ? 'text-emerald-500'
-                            : healthPercentage >= 40
-                            ? 'text-amber-500'
-                            : 'text-rose-500'
-                        }`}
-                        strokeDasharray="100, 100"
-                        strokeWidth="2.5"
-                        strokeLinecap="round"
-                        stroke="currentColor"
-                        fill="none"
-                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                      />
-                    </svg>
-                    <span className="absolute font-mono font-medium text-xs text-zinc-200">
-                      {healthPercentage}%
-                    </span>
                   </div>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* 4. Sticky Glass Filter & Tabs Bar */}
-          <div className="sticky top-[69px] z-20 bg-[#0F172A]/70 backdrop-blur-md border-y border-white/[0.05] px-6 sm:px-8 py-3">
+          {/* 4. Sticky Glass Filter & Tabs Bar (Docked right under Navbar top-16) */}
+          <div className="sticky top-16 z-20 bg-[#0F172A]/80 backdrop-blur-md border-y border-white/[0.05] px-6 sm:px-8 py-3">
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 w-full">
               {/* Sliding Tab Indicator (framer-motion layoutId) */}
               <div className="flex items-center bg-[#0F172A] p-0.5 rounded-lg border border-white/[0.06] text-xs font-medium relative">

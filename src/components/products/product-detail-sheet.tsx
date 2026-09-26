@@ -147,7 +147,7 @@ export function ProductDetailSheet({
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-hidden select-none">
+    <div className="fixed inset-0 z-[60] overflow-hidden select-none">
       {/* Flat Backdrop */}
       <div
         className="fixed inset-0 bg-black/60 transition-opacity animate-in fade-in duration-150"
@@ -355,6 +355,12 @@ export function ProductDetailSheet({
                 <div className="divide-y divide-white/[0.06] border border-white/[0.08] rounded-lg bg-[#1E293B] overflow-hidden">
                   {recentMoves.map((m) => {
                     const isIn = m.change > 0;
+                    const cleanRef = m.refId
+                      ? m.refId.length > 12 && m.refId.startsWith('c')
+                        ? `…${m.refId.slice(-6)}`
+                        : m.refId
+                      : 'MANUAL';
+
                     return (
                       <div key={m.id} className="p-2.5 flex items-center justify-between text-xs hover:bg-white/[0.02] transition-colors">
                         <div>
@@ -370,7 +376,7 @@ export function ProductDetailSheet({
                           <div className="text-[10px] text-zinc-500 flex items-center gap-1.5 mt-0.5 font-mono">
                             <span>{getRelativeTime(m.createdAt)}</span>
                             <span>•</span>
-                            <span>{m.refId}</span>
+                            <span>{cleanRef}</span>
                           </div>
                         </div>
 
@@ -392,13 +398,10 @@ export function ProductDetailSheet({
           </div>
 
           {/* Footer */}
-          <div className="p-4 sm:p-5 border-t border-white/[0.08] bg-[#0F172A] flex items-center justify-between">
-            <span className="text-xs text-zinc-400">
-              SKU: <span className="font-mono text-zinc-200">{product.sku}</span>
-            </span>
+          <div className="p-4 sm:p-5 border-t border-white/[0.08] bg-[#0F172A] flex items-center justify-end">
             <button
               onClick={onClose}
-              className="px-3 py-1.5 text-xs font-medium bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] text-zinc-200 hover:text-white rounded-lg transition-colors cursor-pointer"
+              className="px-3.5 py-1.5 text-xs font-medium bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] text-zinc-200 hover:text-white rounded-lg transition-colors cursor-pointer"
             >
               Close
             </button>
