@@ -27,7 +27,7 @@ export async function GET(
       );
     }
 
-    const totalQuantity = product.levels.reduce((sum, lvl) => sum + lvl.quantity, 0);
+    const totalQuantity = product.levels.reduce((sum: number, lvl: any) => sum + lvl.quantity, 0);
 
     return NextResponse.json({
       success: true,
@@ -101,7 +101,7 @@ export async function PUT(
       },
     });
 
-    const totalQuantity = updatedProduct.levels.reduce((sum, lvl) => sum + lvl.quantity, 0);
+    const totalQuantity = updatedProduct.levels.reduce((sum: number, lvl: any) => sum + lvl.quantity, 0);
 
     return NextResponse.json({
       success: true,
