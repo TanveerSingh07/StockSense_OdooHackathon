@@ -16,6 +16,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { ProductFormDialog } from "@/components/products/product-form-dialog";
 
 export interface Category {
   id: string;
@@ -51,6 +52,10 @@ export default function ProductsPage() {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [lowStockOnly, setLowStockOnly] = useState(false);
   const [isPending, startTransition] = useTransition();
+
+  // Dialog state
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [productToEdit, setProductToEdit] = useState<Product | null>(null);
 
   const fetchCategories = async () => {
     try {
@@ -142,7 +147,13 @@ export default function ProductsPage() {
             <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
             Refresh
           </Button>
-          <Button className="gap-2 bg-primary text-primary-foreground">
+          <Button 
+            onClick={() => {
+              setProductToEdit(null);
+              setIsDialogOpen(true);
+            }}
+            className="gap-2 bg-primary text-primary-foreground"
+          >
             <Plus className="h-4 w-4" />
             Add Product
           </Button>
@@ -325,6 +336,10 @@ export default function ProductsPage() {
                         <Button
                           variant="ghost"
                           size="icon"
+                          onClick={() => {
+                            setProductToEdit(product);
+                            setIsDialogOpen(true);
+                          }}
                           className="h-8 w-8 text-muted-foreground hover:text-foreground"
                           title="Edit Product"
                         >
@@ -348,6 +363,22 @@ export default function ProductsPage() {
           </table>
         </div>
       </Card>
+
+      {/* Create / Edit Product Form Dialog */}
+      <ProductFormDialog
+        isOpen={isDialogOpen}
+        onClose={() => setIsDialogOpen(false)}
+        productToEdit={productToEdit}
+        categories={categories}
+        onSuccess={() => {
+          fetchProducts();
+          fetchCategories();
+        }}
+        onCategoryCreated={(newCat) => {
+          setCategories((prev) => [...prev, newCat]);
+        }}
+      />
     </div>
   );
 }
+
