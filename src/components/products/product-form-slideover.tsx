@@ -57,14 +57,12 @@ export function ProductFormSlideOver({
       setFieldErrors({});
       setGeneralError(null);
 
-      // Auto-focus name field after slide in
       setTimeout(() => {
         nameInputRef.current?.focus();
       }, 100);
     }
   }, [productToEdit, isOpen, categories]);
 
-  // Keyboard shortcut: Escape to close
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape" && isOpen) {
@@ -159,22 +157,22 @@ export function ProductFormSlideOver({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex justify-end bg-black/50 backdrop-blur-[1px] transition-opacity duration-200">
+    <div className="fixed inset-0 z-50 flex justify-end bg-black/60 transition-opacity duration-200">
       {/* Backdrop click dismiss */}
       <div className="flex-1" onClick={onClose} />
 
       {/* Slide-over Panel */}
-      <div className="w-full max-w-md h-full bg-[#181C1A] border-l border-[#2C332E] flex flex-col shadow-none animate-in slide-in-from-right duration-200">
+      <div className="w-full max-w-md h-full bg-[#242320] border-l border-[#3A3733] flex flex-col shadow-none animate-in slide-in-from-right duration-200">
         {/* Header */}
-        <div className="h-12 px-5 border-b border-[#2C332E] flex items-center justify-between bg-[#141816] shrink-0">
+        <div className="h-16 px-6 border-b border-[#3A3733] flex items-center justify-between bg-[#242320] shrink-0">
           <div className="flex items-center gap-2">
-            <span className="font-mono text-xs text-[#E8A33D] font-bold tracking-wider uppercase">
+            <span className="font-mono text-xs text-[#F2B705] font-bold tracking-widest uppercase">
               {productToEdit ? "[ EDIT PRODUCT ]" : "[ NEW PRODUCT ]"}
             </span>
           </div>
           <button
             onClick={onClose}
-            className="text-[#9AA69C] hover:text-[#E7ECE7] p-1 rounded-[4px] transition-colors focus-visible:outline-2 focus-visible:outline-[#E8A33D]"
+            className="text-[#938E83] hover:text-[#EDEAE3] p-1 rounded-[2px] transition-colors focus-visible:outline-2 focus-visible:outline-[#F2B705]"
             title="Close (Esc)"
           >
             <X className="h-4 w-4" />
@@ -182,18 +180,18 @@ export function ProductFormSlideOver({
         </div>
 
         {/* Form Container */}
-        <form onSubmit={handleSubmit} className="flex-1 flex flex-col justify-between overflow-y-auto p-5 space-y-4">
+        <form onSubmit={handleSubmit} className="flex-1 flex flex-col justify-between overflow-y-auto p-6 space-y-5">
           <div className="space-y-4">
             {generalError && (
-              <div className="p-2.5 text-xs text-[#C4553F] bg-[#C4553F]/10 border border-[#C4553F]/30 rounded-[4px]">
+              <div className="p-2.5 text-xs text-[#D2482F] bg-[#D2482F]/10 border border-[#D2482F]/30 rounded-[2px]">
                 {generalError}
               </div>
             )}
 
             {/* Field: Product Name */}
-            <div className="space-y-1">
-              <label htmlFor="prod-name" className="block text-[15px] font-medium text-[#E7ECE7]">
-                Product Name <span className="text-[#C4553F]">*</span>
+            <div className="space-y-1.5">
+              <label htmlFor="prod-name" className="block text-[15px] font-medium text-[#EDEAE3]">
+                Product Name <span className="text-[#D2482F]">*</span>
               </label>
               <input
                 id="prod-name"
@@ -202,17 +200,17 @@ export function ProductFormSlideOver({
                 placeholder="e.g. Standard Steel Bracket"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full h-9 px-3 text-[14px] bg-[#101312] border border-[#2C332E] rounded-[4px] text-[#E7ECE7] placeholder-[#9AA69C]/40 focus:outline-none focus:border-[#E8A33D] focus:ring-0 transition-colors"
+                className="w-full h-10 px-3 text-[14px] bg-[#1C1B18] border border-[#3A3733] rounded-[2px] text-[#EDEAE3] placeholder-[#938E83]/40 focus:outline-none focus:border-[#F2B705] focus:ring-0 transition-colors"
               />
               {fieldErrors.name && (
-                <p className="text-xs text-[#C4553F] pt-0.5">{fieldErrors.name}</p>
+                <p className="text-xs text-[#D2482F] pt-0.5">{fieldErrors.name}</p>
               )}
             </div>
 
             {/* Field: SKU */}
-            <div className="space-y-1">
-              <label htmlFor="prod-sku" className="block text-[15px] font-medium text-[#E7ECE7]">
-                SKU <span className="text-[#C4553F]">*</span>
+            <div className="space-y-1.5">
+              <label htmlFor="prod-sku" className="block text-[15px] font-medium text-[#EDEAE3]">
+                SKU <span className="text-[#D2482F]">*</span>
               </label>
               <input
                 id="prod-sku"
@@ -220,25 +218,25 @@ export function ProductFormSlideOver({
                 placeholder="e.g. BRK-001"
                 value={sku}
                 onChange={(e) => setSku(e.target.value.toUpperCase())}
-                className="w-full h-9 px-3 font-mono text-[14px] bg-[#101312] border border-[#2C332E] rounded-[4px] text-[#E7ECE7] placeholder-[#9AA69C]/40 uppercase focus:outline-none focus:border-[#E8A33D] focus:ring-0 transition-colors"
+                className="w-full h-10 px-3 font-mono text-[14px] bg-[#1C1B18] border border-[#3A3733] rounded-[2px] text-[#EDEAE3] placeholder-[#938E83]/40 uppercase focus:outline-none focus:border-[#F2B705] focus:ring-0 transition-colors"
               />
               {fieldErrors.sku && (
-                <p className="text-xs text-[#C4553F] pt-0.5">{fieldErrors.sku}</p>
+                <p className="text-xs text-[#D2482F] pt-0.5">{fieldErrors.sku}</p>
               )}
             </div>
 
             {/* Grouped Row: Category + Unit */}
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-3.5">
               {/* Category */}
-              <div className="space-y-1">
+              <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
-                  <label htmlFor="prod-cat" className="block text-[15px] font-medium text-[#E7ECE7]">
-                    Category <span className="text-[#C4553F]">*</span>
+                  <label htmlFor="prod-cat" className="block text-[15px] font-medium text-[#EDEAE3]">
+                    Category <span className="text-[#D2482F]">*</span>
                   </label>
                   <button
                     type="button"
                     onClick={() => setIsAddingNewCategory(!isAddingNewCategory)}
-                    className="text-[11px] text-[#E8A33D] hover:underline"
+                    className="text-[11px] font-mono text-[#F2B705] hover:underline"
                   >
                     {isAddingNewCategory ? "Select" : "+ New"}
                   </button>
@@ -250,7 +248,7 @@ export function ProductFormSlideOver({
                     placeholder="New category..."
                     value={newCategoryName}
                     onChange={(e) => setNewCategoryName(e.target.value)}
-                    className="w-full h-9 px-2.5 text-[14px] bg-[#101312] border border-[#2C332E] rounded-[4px] text-[#E7ECE7] placeholder-[#9AA69C]/40 focus:outline-none focus:border-[#E8A33D] focus:ring-0 transition-colors"
+                    className="w-full h-10 px-3 text-[14px] bg-[#1C1B18] border border-[#3A3733] rounded-[2px] text-[#EDEAE3] placeholder-[#938E83]/40 focus:outline-none focus:border-[#F2B705] focus:ring-0 transition-colors"
                     autoFocus
                   />
                 ) : (
@@ -258,13 +256,13 @@ export function ProductFormSlideOver({
                     id="prod-cat"
                     value={categoryId}
                     onChange={(e) => setCategoryId(e.target.value)}
-                    className="w-full h-9 px-2 text-[14px] bg-[#101312] border border-[#2C332E] rounded-[4px] text-[#E7ECE7] focus:outline-none focus:border-[#E8A33D] focus:ring-0 transition-colors"
+                    className="w-full h-10 px-2.5 text-[14px] bg-[#1C1B18] border border-[#3A3733] rounded-[2px] text-[#EDEAE3] focus:outline-none focus:border-[#F2B705] focus:ring-0 transition-colors"
                   >
                     {categories.length === 0 ? (
                       <option value="">No categories</option>
                     ) : (
                       categories.map((cat) => (
-                        <option key={cat.id} value={cat.id} className="bg-[#181C1A]">
+                        <option key={cat.id} value={cat.id} className="bg-[#242320]">
                           {cat.name}
                         </option>
                       ))
@@ -272,13 +270,13 @@ export function ProductFormSlideOver({
                   </select>
                 )}
                 {fieldErrors.category && (
-                  <p className="text-xs text-[#C4553F] pt-0.5">{fieldErrors.category}</p>
+                  <p className="text-xs text-[#D2482F] pt-0.5">{fieldErrors.category}</p>
                 )}
               </div>
 
               {/* Unit */}
-              <div className="space-y-1">
-                <label htmlFor="prod-unit" className="block text-[15px] font-medium text-[#E7ECE7]">
+              <div className="space-y-1.5">
+                <label htmlFor="prod-unit" className="block text-[15px] font-medium text-[#EDEAE3]">
                   Unit
                 </label>
                 <input
@@ -287,14 +285,14 @@ export function ProductFormSlideOver({
                   placeholder="Units, pcs, kg"
                   value={unit}
                   onChange={(e) => setUnit(e.target.value)}
-                  className="w-full h-9 px-3 text-[14px] bg-[#101312] border border-[#2C332E] rounded-[4px] text-[#E7ECE7] placeholder-[#9AA69C]/40 focus:outline-none focus:border-[#E8A33D] focus:ring-0 transition-colors"
+                  className="w-full h-10 px-3 text-[14px] bg-[#1C1B18] border border-[#3A3733] rounded-[2px] text-[#EDEAE3] placeholder-[#938E83]/40 focus:outline-none focus:border-[#F2B705] focus:ring-0 transition-colors"
                 />
               </div>
             </div>
 
             {/* Field: Reorder Point */}
-            <div className="space-y-1 pt-1">
-              <label htmlFor="prod-reorder" className="block text-[15px] font-medium text-[#E7ECE7]">
+            <div className="space-y-1.5 pt-1">
+              <label htmlFor="prod-reorder" className="block text-[15px] font-medium text-[#EDEAE3]">
                 Reorder Point
               </label>
               <input
@@ -304,30 +302,30 @@ export function ProductFormSlideOver({
                 placeholder="10"
                 value={reorderPoint}
                 onChange={(e) => setReorderPoint(e.target.value)}
-                className="w-full h-9 px-3 font-mono text-[14px] bg-[#101312] border border-[#2C332E] rounded-[4px] text-[#E7ECE7] placeholder-[#9AA69C]/40 focus:outline-none focus:border-[#E8A33D] focus:ring-0 transition-colors"
+                className="w-full h-10 px-3 font-mono text-[14px] bg-[#1C1B18] border border-[#3A3733] rounded-[2px] text-[#EDEAE3] placeholder-[#938E83]/40 focus:outline-none focus:border-[#F2B705] focus:ring-0 transition-colors"
               />
-              <p className="text-[12px] text-[#9AA69C]">
-                Alert threshold: stock at or below this triggers amber indicator.
+              <p className="text-[12px] text-[#938E83]">
+                Alert threshold: stock at or below this triggers yellow indicator.
               </p>
             </div>
           </div>
 
           {/* Action Row */}
-          <div className="pt-4 border-t border-[#2C332E] flex items-center justify-end gap-3 shrink-0">
+          <div className="pt-4 border-t border-[#3A3733] flex items-center justify-end gap-3 shrink-0">
             <button
               type="button"
               onClick={onClose}
               disabled={loading}
-              className="px-3 py-1.5 text-xs text-[#9AA69C] hover:text-[#E7ECE7] transition-colors focus-visible:outline-2 focus-visible:outline-[#E8A33D]"
+              className="px-3.5 py-2 text-xs font-mono text-[#938E83] hover:text-[#EDEAE3] transition-colors focus-visible:outline-2 focus-visible:outline-[#F2B705]"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="px-4 py-2 text-[13.5px] font-semibold bg-[#E8A33D] text-[#101312] hover:bg-[#d89430] active:scale-[0.98] transition-all duration-100 rounded-[4px] flex items-center gap-1.5 focus-visible:outline-2 focus-visible:outline-white disabled:opacity-50 select-none"
+              className="px-4 py-2 text-[13.5px] font-bold bg-[#F2B705] text-[#1C1B18] hover:bg-[#deb005] active:scale-[0.98] transition-all duration-100 rounded-[2px] flex items-center gap-1.5 focus-visible:outline-2 focus-visible:outline-white disabled:opacity-50 select-none cursor-pointer"
             >
-              <Check className="h-4 w-4" />
+              <Check className="h-4 w-4 stroke-[2.5]" />
               {loading
                 ? "Saving..."
                 : productToEdit
@@ -340,4 +338,3 @@ export function ProductFormSlideOver({
     </div>
   );
 }
-
