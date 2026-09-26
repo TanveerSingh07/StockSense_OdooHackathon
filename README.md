@@ -1,117 +1,36 @@
-# StockSense
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-> **Inventory management, designed around real stock movement.**
+## Getting Started
 
-StockSense is our approach to the inventory management problem from the Odoo Hackathon. We are building it as a practical system rather than treating inventory as just a list of products and quantities.
+First, run the development server:
 
-## What We Understand
-
-The core problem is maintaining a reliable picture of:
-
-- **What** stock exists
-- **How much** is available
-- **Where** it is located
-- **What changed** and why
-- **What needs attention** (low stock, pending operations, etc.)
-
-The important part for us is the relationship between **inventory state and inventory operations**. A receipt, delivery, transfer, or adjustment should not just create a record — it should correctly affect stock and remain traceable.
-
-## Our Approach
-
-We are currently breaking the system into a few clear areas:
-
-```text
-                    StockSense
-                        │
-        ┌───────────────┼───────────────┐
-        │               │               │
-     Products       Operations       Locations
-                        │
-             ┌──────────┼──────────┐
-             │          │          │
-          Receipts   Deliveries  Transfers
-                        │
-                   Adjustments
-                        │
-                  Stock Ledger
-                        │
-                    Dashboard
+```bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
 ```
 
-The stock ledger is an important part of our design. We want every meaningful stock change to be explainable instead of only storing the latest quantity.
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-## Initial Thinking
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-We are currently exploring:
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-- Product and SKU management
-- Warehouse/location-based stock
-- Receipt and delivery workflows
-- Internal stock transfers
-- Physical stock adjustments
-- Low-stock/reorder rules
-- Operation statuses and validation
-- A searchable and filterable dashboard
-- A history/ledger for stock movements
+## Learn More
 
-The exact data model and workflow rules will be finalized as we work through the edge cases.
+To learn more about Next.js, take a look at the following resources:
 
-## Architecture
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-We are aiming for a modular architecture where the UI, business logic, and data layer have clear responsibilities.
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-```text
+## Deploy on Vercel
 
-            UI
-            ↓
-    Application / API Layer
-            ↓
-    Inventory Business Logic
-            ↓
-        Data Layer
-            ↓
-        Database
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-```
-
-We especially want inventory rules to stay independent from the UI so that stock calculations and validations remain consistent throughout the application.
-
-## Tech Stack
-
-We are building StockSense using the **MERN stack**, with a few supporting technologies where they add value.
-
-### Core Stack
-
-- **MongoDB** — Database for users, products, warehouses, inventory records, operations, and stock history
-- **Express.js** — Backend API layer and request handling
-- **React.js** — Frontend application and dashboard
-- **Node.js** — Backend runtime
-
-### Supporting Technologies
-
-- **JWT / HTTP-only cookies** — Authentication and session handling
-- **REST APIs** — Communication between the frontend and backend
-- **Mongoose** — MongoDB schema modelling and database interaction
-- **Tailwind CSS** — UI styling and responsive layouts
-- **Git & GitHub** — Version control and team collaboration
-
-## Team
-
-We are a team of 4 developers, working collaboratively across architecture, frontend, backend, data modelling, and integration.
-
-Responsibilities may overlap as the project evolves rather than being treated as four completely separate modules.
-
-## Current Status
-
-Phase: Planning & Architecture
-
-Currently we are:
-
-- Breaking down the problem
-- Mapping the main inventory workflows
-- Identifying core entities
-- Discussing stock and ledger behaviour
-- Exploring the architecture
-- Evaluating the technology stack
-
-Next, we plan to turn these decisions into the initial data model, project structure, and working application foundation.
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
